@@ -1,0 +1,22 @@
+﻿<UserControl x:Class="Minimal_Text_Editor__Lite_.View.EditorControl"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:Minimal_Text_Editor__Lite_.View"
+             xmlns:wv2="clr-namespace:Microsoft.Web.WebView2.Wpf;assembly=Microsoft.Web.WebView2.Wpf"
+             xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
+             mc:Ignorable="d" 
+             d:DesignHeight="450" d:DesignWidth="800">
+    <Grid>
+        <!-- Defina as linhas do Grid -->
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <!-- Para a ProgressBar -->
+            <RowDefinition Height="*"/>
+            <!-- Para a WebView2 ocupar o restante -->
+        </Grid.RowDefinitions>
+        <ProgressBar Grid.Row="0" x:Name="progressBar" VerticalAlignment="Top" Value="{Binding ProgressValue}" Height="8" HorizontalAlignment="Stretch" IsIndeterminate="True" BorderBrush="{x:Null}" Style="{DynamicResource MaterialDesignLinearProgressBar}" Foreground="#1163E7" Background="#3B8BFF" Visibility="{Binding ProgressBarVisibility}" />
+        <wv2:WebView2 Grid.Row="1" Name="myWebView" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Visibility="{Binding WebViewVisibility}" />
+    </Grid>
+</UserControl>

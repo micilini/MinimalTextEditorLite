@@ -1,0 +1,74 @@
+﻿<Window x:Class="Minimal_Text_Editor__Lite_.View.SettingsModal.SettingsModalWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:Minimal_Text_Editor__Lite_.View.SettingsModal"
+        xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
+        xmlns:localApp="clr-namespace:Minimal_Text_Editor__Lite_"
+        mc:Ignorable="d"
+        TextElement.Foreground="{DynamicResource MaterialDesignBody}"
+        Background="{x:Null}"
+        AllowsTransparency="true"
+        WindowStyle="None"
+        WindowStartupLocation="CenterScreen"
+        Title="SettingsModalWindow" Height="480" Width="665" Loaded="Window_Loaded">
+    <materialDesign:Card Background="{DynamicResource MaterialDesignPaper}" UniformCornerRadius="15" materialDesign:ShadowAssist.ShadowDepth="Depth4" Width="526" Height="390">
+        <Grid>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="70" />
+                <RowDefinition MinHeight="174" Height="Auto" />
+                <RowDefinition Height="80" />
+            </Grid.RowDefinitions>
+
+            <StackPanel Grid.Row="0">
+                <WrapPanel Margin="20">
+                    <Image RenderOptions.BitmapScalingMode="HighQuality" Source="/Assets/Images/editor-gear-icon.png" Width="30" Height="30" Margin="0 0 10 0" />
+                    <Label Content="{Binding Source={x:Static localApp:App.Localization}, Converter={StaticResource Translate}, ConverterParameter=Modal_Settings_Title}" FontFamily="Arial" FontSize="22" FontWeight="Bold" />
+                </WrapPanel>
+            </StackPanel>
+
+            <ScrollViewer Grid.Row="1" Height="240" VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled">
+
+                <StackPanel Margin="20 10 20 20">
+
+                    <TextBlock Text="{Binding Source={x:Static localApp:App.Localization}, Converter={StaticResource Translate}, ConverterParameter=Modal_Settings_AutoSave}" Foreground="#2d2d2d" FontFamily="Arial" FontSize="18" Margin="0 0 0 0" />
+                    <TextBlock Text="{Binding Source={x:Static localApp:App.Localization}, Converter={StaticResource Translate}, ConverterParameter=Modal_Settings_AutoSave_Description}" Foreground="#2d2d2d" FontFamily="Arial" FontSize="14" FontWeight="Regular" Padding="0" Margin="0 5 0 0" Height="Auto" TextWrapping="Wrap" />
+                    <ComboBox x:Name="AutoSaveComboBox" Width="315" Height="30" VerticalAlignment="Top" HorizontalAlignment="Left" Padding="0" Margin="0 20 0 0" FontFamily="Arial" FontSize="18" FontWeight="Regular" SelectedIndex="{Binding SelectedAutoSaveIndex, Mode=TwoWay}">
+                        <ComboBoxItem Content="{Binding Source={x:Static localApp:App.Localization}, Converter={StaticResource Translate}, ConverterParameter=Modal_Settings_AutoSave_Choice_0}" />
+                        <ComboBoxItem Content="{Binding Source={x:Static localApp:App.Localization}, Converter={StaticResource Translate}, ConverterParameter=Modal_Settings_AutoSave_Choice_1}" />
+                        <ComboBoxItem Content="{Binding Source={x:Static localApp:App.Localization}, Converter={StaticResource Translate}, ConverterParameter=Modal_Settings_AutoSave_Choice_2}" />
+                        <ComboBoxItem Content="{Binding Source={x:Static localApp:App.Localization}, Converter={StaticResource Translate}, ConverterParameter=Modal_Settings_AutoSave_Choice_3}" />
+                        <ComboBoxItem Content="{Binding Source={x:Static localApp:App.Localization}, Converter={StaticResource Translate}, ConverterParameter=Modal_Settings_AutoSave_Choice_4}" />
+                        <ComboBoxItem Content="{Binding Source={x:Static localApp:App.Localization}, Converter={StaticResource Translate}, ConverterParameter=Modal_Settings_AutoSave_Choice_5}" />
+                        <ComboBoxItem Content="{Binding Source={x:Static localApp:App.Localization}, Converter={StaticResource Translate}, ConverterParameter=Modal_Settings_AutoSave_Choice_6}" />
+                    </ComboBox>
+
+                    <TextBlock Text="{Binding Source={x:Static localApp:App.Localization}, Converter={StaticResource Translate}, ConverterParameter=Modal_Settings_Language}" Foreground="#2d2d2d" FontFamily="Arial" FontSize="18" Margin="0 20 0 0" />
+                    <TextBlock Text="{Binding Source={x:Static localApp:App.Localization}, Converter={StaticResource Translate}, ConverterParameter=Modal_Settings_Language_Description}" Foreground="#2d2d2d" FontFamily="Arial" FontSize="14" FontWeight="Regular" Padding="0" Margin="0 5 0 0" Height="Auto" TextWrapping="Wrap" />
+                    <ComboBox x:Name="LanguageComboBox" Width="315" Height="30" VerticalAlignment="Top" HorizontalAlignment="Left" Padding="0" Margin="0 20 0 0" FontFamily="Arial" FontSize="18" FontWeight="Regular" SelectedIndex="{Binding SelectedLanguageIndex, Mode=TwoWay}">
+                        <ComboBoxItem Content="{Binding Source={x:Static localApp:App.Localization}, Converter={StaticResource Translate}, ConverterParameter=Modal_Settings_Language_Choice_0}" />
+                        <ComboBoxItem Content="{Binding Source={x:Static localApp:App.Localization}, Converter={StaticResource Translate}, ConverterParameter=Modal_Settings_Language_Choice_1}" />
+                    </ComboBox>
+
+                    <TextBlock Text="{Binding Source={x:Static localApp:App.Localization}, Converter={StaticResource Translate}, ConverterParameter=Modal_Settings_Backup_Title}" Foreground="#2d2d2d" FontFamily="Arial" FontSize="18" Margin="0 20 0 0" />
+                    <TextBlock x:Name="BackupFilesInfo" Text="{Binding BackupFilesText, Mode=TwoWay}" TextWrapping="Wrap" Foreground="#2d2d2d" FontFamily="Arial" FontSize="14" Margin="0 6 0 0" />
+
+                    <WrapPanel>
+                        <Button Content="{Binding Source={x:Static localApp:App.Localization}, Converter={StaticResource Translate}, ConverterParameter=Modal_Settings_Backup_Open_Button}" Command="{Binding OpenBackupFolderCommand}" Style="{StaticResource MaterialDesignRaisedButton}" BorderBrush="{x:Null}" materialDesign:ShadowAssist.ShadowDepth="Depth0" HorizontalAlignment="Left" Foreground="White"  Background="#3498db" materialDesign:ButtonAssist.CornerRadius="4" Width="120" Height="38" Margin="0 15 10 0" FontFamily="Arial" FontSize="14" FontWeight="Bold" />
+                        <Button Content="{Binding Source={x:Static localApp:App.Localization}, Converter={StaticResource Translate}, ConverterParameter=Modal_Settings_Backup_Button}" Command="{Binding DeleteBackupCommand}" Style="{StaticResource MaterialDesignRaisedButton}" BorderBrush="{x:Null}" materialDesign:ShadowAssist.ShadowDepth="Depth0" HorizontalAlignment="Left" Foreground="White"  Background="#e74c3c" materialDesign:ButtonAssist.CornerRadius="4" Width="120" Height="38" Margin="0 15 20 0" FontFamily="Arial" FontSize="14" FontWeight="Bold" />
+                    </WrapPanel>
+                    </StackPanel>
+                
+            </ScrollViewer>
+
+            <StackPanel Grid.Row="2">
+                <WrapPanel Height="80" HorizontalAlignment="Right" VerticalAlignment="Center" Margin="0 8 0 0">
+                    <Button Content="{Binding Source={x:Static localApp:App.Localization}, Converter={StaticResource Translate}, ConverterParameter=Button_Close}"
+                        Command="{Binding CancelCommand}"
+                        Style="{StaticResource MaterialDesignRaisedButton}" BorderBrush="{x:Null}" materialDesign:ShadowAssist.ShadowDepth="Depth0" HorizontalAlignment="Left" Foreground="White"  Background="#e74c3c" materialDesign:ButtonAssist.CornerRadius="4" Width="90" Height="48" Margin="0 15 20 0" FontFamily="Arial" FontSize="16" FontWeight="Bold" />
+                </WrapPanel>
+            </StackPanel>
+        </Grid>
+    </materialDesign:Card>
+</Window>

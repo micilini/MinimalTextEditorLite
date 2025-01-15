@@ -1,0 +1,143 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>WinExe</OutputType>
+    <TargetFramework>net8.0-windows</TargetFramework>
+    <RootNamespace>Minimal_Text_Editor__Lite_</RootNamespace>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <UseWPF>true</UseWPF>
+    <ApplicationIcon>logo-mte.ico</ApplicationIcon>
+    <StartupObject>Minimal_Text_Editor__Lite_.App</StartupObject>
+    <ApplicationManifest></ApplicationManifest>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <None Remove="app.manifest" />
+    <None Remove="Assets\Images\editor-export-icon.png" />
+    <None Remove="Assets\Images\editor-gear-icon.png" />
+    <None Remove="Assets\Images\editor-open-icon.png" />
+    <None Remove="Assets\Images\editor-save-icon.png" />
+    <None Remove="Assets\Images\editor-trash-icon.png" />
+    <None Remove="Assets\Images\icon-check.png" />
+    <None Remove="Assets\Images\icon-close.png" />
+    <None Remove="Assets\Images\icon-eraser.png" />
+    <None Remove="Assets\Images\icon-info.png" />
+    <None Remove="Assets\Images\icon-notes.png" />
+    <None Remove="Assets\Images\image-splash-screen-lite.png" />
+    <None Remove="Assets\Images\logo-mte.png" />
+    <None Remove="Assets\Images\search-icon.png" />
+    <None Remove="View\logo-mte.ico" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Content Include="logo-mte.ico" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Resource Include="app.manifest" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="DocumentFormat.OpenXml" Version="3.2.0" />
+    <PackageReference Include="HtmlToOpenXml.dll" Version="3.2.1" />
+    <PackageReference Include="InputSimulator" Version="1.0.4" />
+    <PackageReference Include="MaterialDesignColors" Version="2.0.1" />
+    <PackageReference Include="MaterialDesignThemes" Version="4.1.0" />
+    <PackageReference Include="Microsoft.Web.WebView2" Version="1.0.2903.40" />
+    <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
+    <PackageReference Include="sqlite-net-pcl" Version="1.9.172" />
+    <PackageReference Include="sqlite-net-sqlcipher" Version="1.9.172" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Resource Include="Assets\Images\editor-export-icon.png" />
+    <Resource Include="Assets\Images\editor-gear-icon.png" />
+    <Resource Include="Assets\Images\editor-open-icon.png" />
+    <Resource Include="Assets\Images\editor-save-icon.png" />
+    <Resource Include="Assets\Images\editor-trash-icon.png" />
+    <Resource Include="Assets\Images\icon-check.png" />
+    <Resource Include="Assets\Images\icon-close.png" />
+    <Resource Include="Assets\Images\icon-eraser.png" />
+    <Resource Include="Assets\Images\icon-info.png" />
+    <Resource Include="Assets\Images\icon-notes.png" />
+    <Resource Include="Assets\Images\image-splash-screen-lite.png" />
+    <Resource Include="Assets\Images\logo-mte.png" />
+    <Resource Include="Assets\Images\search-icon.png" />
+    <Resource Include="View\logo-mte.ico" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Update="EditorModules\EditorJS\asset-manifest.json">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="EditorModules\EditorJS\favicon.ico">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="EditorModules\EditorJS\index.html">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="EditorModules\EditorJS\logo192.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="EditorModules\EditorJS\logo512.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="EditorModules\EditorJS\manifest.json">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="EditorModules\EditorJS\robots.txt">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="EditorModules\EditorJS\static\css\main.3e27cc38.css">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="EditorModules\EditorJS\static\css\main.3e27cc38.css.map">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="EditorModules\EditorJS\static\js\main.f281e9a7.js">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="EditorModules\EditorJS\static\js\main.f281e9a7.js.LICENSE.txt">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="EditorModules\EditorJS\static\js\main.f281e9a7.js.map">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="EditorModules\EditorJS\static\media\Poppins-Black.eacee5bb9c7fee5939ae.ttf">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="EditorModules\EditorJS\static\media\Poppins-Bold.404e299be26d78e66794.ttf">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="EditorModules\EditorJS\static\media\Poppins-Italic.ce3fff31c0f262aca227.ttf">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="EditorModules\EditorJS\static\media\Poppins-Regular.8081832fc5cfbf634aa6.ttf">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="Languages\en_us.json">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="Languages\pt_br.json">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="LICENSE">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="logo-mte-ico.ico">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="Modules\Export\ExportAsDOC.exe">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="Modules\Export\ExportAsPDF.exe">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="EditorModules\EditorJS\" />
+  </ItemGroup>
+
+</Project>

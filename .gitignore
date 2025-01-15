@@ -1,0 +1,31 @@
+# Ignorar arquivos e pastas dentro de "Minimal Text Editor (Lite)"
+
+# Build folders
+Minimal Text Editor (Lite)/bin/
+Minimal Text Editor (Lite)/obj/
+
+# User-specific files
+Minimal Text Editor (Lite)/*.suo
+Minimal Text Editor (Lite)/*.user
+Minimal Text Editor (Lite)/*.userosscache
+Minimal Text Editor (Lite)/*.sln.docstates
+
+# Logs
+Minimal Text Editor (Lite)/*.log
+
+# Temporary files
+Minimal Text Editor (Lite)/*.tmp
+Minimal Text Editor (Lite)/*.temp
+Minimal Text Editor (Lite)/*.bak
+Minimal Text Editor (Lite)/*.swp
+Minimal Text Editor (Lite)/*~.nib
+Minimal Text Editor (Lite)/*.orig
+
+# Dependencies
+Minimal Text Editor (Lite)/node_modules/
+Minimal Text Editor (Lite)/packages/
+
+# Configurations
+Minimal Text Editor (Lite)/*.DS_Store
+Minimal Text Editor (Lite)/*.appsettings.json
+Minimal Text Editor (Lite)/secrets.json

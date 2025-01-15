@@ -1,0 +1,48 @@
+﻿<UserControl x:Class="Minimal_Text_Editor__Lite_.View.Components.HeaderControl"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:Minimal_Text_Editor__Lite_.View.Components"
+             xmlns:localApp="clr-namespace:Minimal_Text_Editor__Lite_"
+             xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
+             mc:Ignorable="d" 
+             d:DesignHeight="80" d:DesignWidth="800">
+    <Grid HorizontalAlignment="Stretch">
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="300" />
+            <ColumnDefinition Width="*" />
+        </Grid.ColumnDefinitions>
+        
+        <StackPanel Grid.Column="0">
+            <WrapPanel Margin="15">
+                <Image RenderOptions.BitmapScalingMode="HighQuality" Source="/Assets/Images/logo-mte.png" HorizontalAlignment="Left" Width="27" Height="27"></Image>
+                <TextBlock Text="Minimal Text Editor" FontSize="22" FontWeight="Bold" FontFamily="Arial" HorizontalAlignment="Left" VerticalAlignment="Center" Margin="8 0 0 0"></TextBlock>
+            </WrapPanel>
+            <TextBlock Text="{Binding Source={x:Static localApp:App.Localization}, Converter={StaticResource Translate}, ConverterParameter=Header_App_Version}" FontSize="16" FontWeight="Bold" FontFamily="Arial" HorizontalAlignment="Left" Foreground="#2c3e50" VerticalAlignment="Center" Margin="50 -15 0 0"></TextBlock>
+        </StackPanel>
+
+        <StackPanel Grid.Column="1">
+            <WrapPanel Margin="25" HorizontalAlignment="Right">
+                <Button Command="{Binding OpenNoteCommand}" Padding="0" Background="{x:Null}" BorderBrush="{x:Null}" Foreground="{DynamicResource PrimaryHueLightForegroundBrush}" Width="37" Height="37" materialDesign:RippleAssist.Feedback="White" Margin="0 0 0 0">
+                    <Image RenderOptions.BitmapScalingMode="HighQuality" Source="/Assets/Images/editor-open-icon.png" Width="37" Height="37"/>
+                </Button>
+                <Button Command="{Binding SearchNoteCommand}" Padding="0" Background="{x:Null}" BorderBrush="{x:Null}" Foreground="{DynamicResource PrimaryHueLightForegroundBrush}" Width="37" Height="37" materialDesign:RippleAssist.Feedback="White" Margin="20 0 0 0">
+                    <Image RenderOptions.BitmapScalingMode="HighQuality" Source="/Assets/Images/search-icon.png" Width="37" Height="37"/>
+                </Button>
+                <Button Command="{Binding SaveNoteCommand}" Padding="0" Background="{x:Null}" BorderBrush="{x:Null}" Foreground="{DynamicResource PrimaryHueLightForegroundBrush}" Width="37" Height="37" materialDesign:RippleAssist.Feedback="White" Margin="20 0 0 0">
+                    <Image RenderOptions.BitmapScalingMode="HighQuality" Source="/Assets/Images/editor-save-icon.png" Width="37" Height="37"/>
+                </Button>
+                <Button Command="{Binding RemoveNoteCommand}" Padding="0" Background="{x:Null}" BorderBrush="{x:Null}" Foreground="{DynamicResource PrimaryHueLightForegroundBrush}" Width="37" Height="37" materialDesign:RippleAssist.Feedback="White" Margin="20 0 0 0">
+                    <Image RenderOptions.BitmapScalingMode="HighQuality" Source="/Assets/Images/editor-trash-icon.png" Width="37" Height="37"/>
+                </Button>
+                <Button Command="{Binding ExportCommand}" Padding="0" Background="{x:Null}" BorderBrush="{x:Null}" Foreground="{DynamicResource PrimaryHueLightForegroundBrush}" Width="37" Height="37" materialDesign:RippleAssist.Feedback="White" Margin="20 0 0 0">
+                    <Image RenderOptions.BitmapScalingMode="HighQuality" Source="/Assets/Images/editor-export-icon.png" Width="37" Height="37"/>
+                </Button>
+                <Button Command="{Binding SettingsCommand}" Padding="0" Background="{x:Null}" BorderBrush="{x:Null}" Foreground="{DynamicResource PrimaryHueLightForegroundBrush}" Width="37" Height="37" materialDesign:RippleAssist.Feedback="White" Margin="20 0 0 0">
+                    <Image RenderOptions.BitmapScalingMode="HighQuality" Source="/Assets/Images/editor-gear-icon.png" Width="37" Height="37"/>
+                </Button>
+            </WrapPanel>
+        </StackPanel>
+    </Grid>
+</UserControl>
