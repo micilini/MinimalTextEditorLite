@@ -31,7 +31,7 @@ With **Minimal Text Editor (Lite)**, you can create, save and organize your note
 
 The idea is that you can export your notes in JSON format, allowing other applications to interpret them universally, and thus organize your note with customized layouts (which were defined by your application).
 
-Additionally, you can open your notes within the application (as long as they are in JSON format). 
+Additionally, you can open your notes within the application (as long as they are in JSON format). You can download the executable installer in your [homepage](https://micilini.com/apps/mte-lite).
 
 ## How to runs this application locally?
 
@@ -59,9 +59,8 @@ First of all, **clone the repository to your local machine**, and then simply op
 
 Minimal Text Editor (Lite) For Windows is closely related to the following repositories:
 
-- ExportAsDoc (A Python executable for Windows)
-- ExportAsPDF (A Python executable for Windows)
-- Minimal Text Editor (Lite) - Setup for Windows
+- [ExportAsDoc](https://github.com/micilini/ExportAsPDF) (A Python executable for Windows)
+- [ExportAsPDF](https://github.com/micilini/ExportAsPDF) (A Python executable for Windows)
 
 ## Contribuite
 
@@ -97,3 +96,9 @@ To help translate, follow these instructions.
 - And finally create a Pull Request (PR).
 
 **Note**: Currently, language switching only works at the application level, in this case, Editor.JS blocks are not yet translatable.
+
+---
+
+## License
+
+This script is open-source and available under the MIT License.
