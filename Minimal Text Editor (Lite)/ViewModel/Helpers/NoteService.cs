@@ -12,7 +12,7 @@ namespace Minimal_Text_Editor__Lite_.ViewModel.Helpers
 {
     public class NoteService
     {
-        public static async Task ExportCurrentNoteAsJSON()
+        public static async Task<bool> ExportCurrentNoteAsJSON()
         {
             try
             {
@@ -23,7 +23,7 @@ namespace Minimal_Text_Editor__Lite_.ViewModel.Helpers
                 if (note == null)
                 {
                     ModalMessages.showErrorModal(App.Localization.Translate("Error_Notes_Not_Found"));
-                    return;
+                    return false;
                 }
 
                 // 2. Abrir a caixa de diálogo para salvar o arquivo
@@ -39,15 +39,19 @@ namespace Minimal_Text_Editor__Lite_.ViewModel.Helpers
                 {
                     // 3. Salvar o conteúdo no arquivo selecionado
                     await File.WriteAllTextAsync(saveFileDialog.FileName, note.NoteJson);
+                    return true;
                 }
+
+                return false;
             }
             catch (Exception ex)
             {
                 ModalMessages.showErrorModal($"{App.Localization.Translate("Error_Note_Export")} - {ex.Message}");
+                return false;
             }
         }
 
-        public static async Task ExportCurrentNoteAsDoc()
+        public static async Task<bool> ExportCurrentNoteAsDoc()
         {
             try
             {
@@ -58,7 +62,7 @@ namespace Minimal_Text_Editor__Lite_.ViewModel.Helpers
                 if (note == null)
                 {
                     ModalMessages.showErrorModal(App.Localization.Translate("Error_Notes_Not_Found"));
-                    return; // Impede a continuação do fluxo
+                    return false; // Impede a continuação do fluxo
                 }
 
                 // 2. Criar um arquivo temporário para armazenar o JSON
@@ -70,12 +74,13 @@ namespace Minimal_Text_Editor__Lite_.ViewModel.Helpers
                 {
                     var processStartInfo = new ProcessStartInfo
                     {
-                        FileName = "Modules\\Export\\ExportAsDOC.exe",
+                        FileName = "Modules\\Export\\x64\\ExportAsDOC.exe",
                         Arguments = $"\"{tempJsonFilePath}\"",
                         RedirectStandardOutput = true,
                         RedirectStandardError = true,
                         UseShellExecute = false,
-                        CreateNoWindow = true
+                        CreateNoWindow = true,
+                        WorkingDirectory = Path.GetTempPath()
                     };
 
                     using (var process = new Process { StartInfo = processStartInfo })
@@ -110,18 +115,23 @@ namespace Minimal_Text_Editor__Lite_.ViewModel.Helpers
                 if (saveFileDialog.ShowDialog() == true)
                 {
                     await File.WriteAllBytesAsync(saveFileDialog.FileName, result);
+                    
+                    // 5. Limpar o arquivo temporário
+                    File.Delete(tempJsonFilePath);
+
+                    return true;
                 }
 
-                // 5. Limpar o arquivo temporário
-                File.Delete(tempJsonFilePath);
+                return false;
             }
             catch (Exception ex)
             {
                 ModalMessages.showErrorModal($"{App.Localization.Translate("Error_Note_Export")} - {ex.Message}");
+                return false;
             }
         }
 
-        public static async Task ExportCurrentNoteAsPDF()
+        public static async Task<bool> ExportCurrentNoteAsPDF()
         {
             try
             {
@@ -132,7 +142,7 @@ namespace Minimal_Text_Editor__Lite_.ViewModel.Helpers
                 if (note == null)
                 {
                     ModalMessages.showErrorModal(App.Localization.Translate("Error_Notes_Not_Found"));
-                    return; // Impede a continuação do fluxo
+                    return false; // Impede a continuação do fluxo
                 }
 
                 // 2. Criar um arquivo temporário para armazenar o JSON
@@ -144,12 +154,13 @@ namespace Minimal_Text_Editor__Lite_.ViewModel.Helpers
                 {
                     var processStartInfo = new ProcessStartInfo
                     {
-                        FileName = "Modules\\Export\\ExportAsPDF.exe",
+                        FileName = "Modules\\Export\\x64\\ExportAsPDF.exe",
                         Arguments = $"\"{tempJsonFilePath}\"",
                         RedirectStandardOutput = true,
                         RedirectStandardError = true,
                         UseShellExecute = false,
-                        CreateNoWindow = true
+                        CreateNoWindow = true,
+                        WorkingDirectory = Path.GetTempPath()
                     };
 
                     using (var process = new Process { StartInfo = processStartInfo })
@@ -184,18 +195,23 @@ namespace Minimal_Text_Editor__Lite_.ViewModel.Helpers
                 if (saveFileDialog.ShowDialog() == true)
                 {
                     await File.WriteAllBytesAsync(saveFileDialog.FileName, result);
+
+                    // 5. Limpar o arquivo temporário
+                    File.Delete(tempJsonFilePath);
+
+                    return true;
                 }
 
-                // 5. Limpar o arquivo temporário
-                File.Delete(tempJsonFilePath);
+                return false;
             }
             catch (Exception ex)
             {
                 ModalMessages.showErrorModal($"{App.Localization.Translate("Error_Note_Export")} - {ex.Message}");
+                return false;
             }
         }
 
-        public static async Task ExportCurrentNoteAsHTML()
+        public static async Task<bool> ExportCurrentNoteAsHTML()
         {
             try
             {
@@ -206,7 +222,7 @@ namespace Minimal_Text_Editor__Lite_.ViewModel.Helpers
                 if (note == null)
                 {
                     ModalMessages.showErrorModal(App.Localization.Translate("Error_Notes_Not_Found"));
-                    return;
+                    return false;
                 }
 
                 // 2. Converter JSON da nota em objeto dinâmico
@@ -332,15 +348,20 @@ namespace Minimal_Text_Editor__Lite_.ViewModel.Helpers
                 {
                     // 5. Salvar o conteúdo no arquivo selecionado
                     await File.WriteAllTextAsync(saveFileDialog.FileName, htmlBuilder.ToString());
+
+                    return true;
                 }
+
+                return false;
             }
             catch (Exception ex)
             {
                 ModalMessages.showErrorModal(App.Localization.Translate("Error_Note_Export"));
+                return false;
             }
         }
 
-        public static void OpenNewNote()
+        public static bool OpenNewNote()
         {
             try
             {
@@ -352,46 +373,53 @@ namespace Minimal_Text_Editor__Lite_.ViewModel.Helpers
                     Title = App.Localization.Translate("Title_Open_Note")
                 };
 
-                if (openFileDialog.ShowDialog() == true)
+                // Se o usuário cancelar, retorna false imediatamente
+                if (openFileDialog.ShowDialog() != true)
+                    return false;
+
+
+                // 2. Ler o conteúdo do arquivo selecionado
+                string jsonContent = File.ReadAllText(openFileDialog.FileName);
+
+                // 3. Validar se o JSON é válido
+                if (!IsValidJson(jsonContent))
                 {
-
-                    // 2. Ler o conteúdo do arquivo selecionado
-                    string jsonContent = File.ReadAllText(openFileDialog.FileName);
-
-                    // 3. Validar se o JSON é válido
-                    if (!IsValidJson(jsonContent))
-                    {
-                        ModalMessages.showErrorModal(App.Localization.Translate("Error_Invalid_Json"));
-                        return;
-                    }
-
-                    // 4. Validar se contém a chave 'blocks' na primeira ninhada
-                    var jsonObject = System.Text.Json.JsonDocument.Parse(jsonContent);
-                    if (!jsonObject.RootElement.TryGetProperty("blocks", out _))
-                    {
-                        ModalMessages.showErrorModal(App.Localization.Translate("Error_Invalid_Json_Key_Block"));
-                        return;
-                    }
-
-                    // 5. Atualizar o banco de dados com o conteúdo do JSON
-                    var note = DatabaseHelper.QuerySingle<NoteModel>("SELECT * FROM Note WHERE Id = ?", 1);
-
-                    if (note != null)
-                    {
-                        note.NoteJson = jsonContent;
-                        note.UpdatedAt = DateTime.UtcNow;
-                        DatabaseHelper.Update(note);
-                    }
-                    else
-                    {
-                        ModalMessages.showErrorModal(App.Localization.Translate("Error_Notes_Not_Found"));
-                    }
+                    ModalMessages.showErrorModal(App.Localization.Translate("Error_Invalid_Json"));
+                    return false;
                 }
+
+                // 4. Validar se contém a chave 'blocks' na primeira ninhada
+                var jsonObject = System.Text.Json.JsonDocument.Parse(jsonContent);
+                if (!jsonObject.RootElement.TryGetProperty("blocks", out _))
+                {
+                   ModalMessages.showErrorModal(App.Localization.Translate("Error_Invalid_Json_Key_Block"));
+                   return false;
+                }
+
+                // 5. Atualizar o banco de dados com o conteúdo do JSON
+                var note = DatabaseHelper.QuerySingle<NoteModel>("SELECT * FROM Note WHERE Id = ?", 1);
+
+                if (note != null)
+                {
+                    note.NoteJson = jsonContent;
+                    note.UpdatedAt = DateTime.UtcNow;
+                    DatabaseHelper.Update(note);
+
+                    // Tudo ok, devolve true para carregar a nota na UI
+                    return true;
+                }
+                else
+                {
+                    ModalMessages.showErrorModal(App.Localization.Translate("Error_Notes_Not_Found"));
+                    return false;
+                }
+                
             }
             catch (Exception ex)
             {
                 // Tratar exceções
                 ModalMessages.showErrorModal(App.Localization.Translate("Error_Note_Import"));
+                return false;
             }
         }
 

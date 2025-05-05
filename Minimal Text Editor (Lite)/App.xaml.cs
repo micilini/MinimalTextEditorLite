@@ -88,7 +88,7 @@ namespace Minimal_Text_Editor__Lite_
         public static LocalizationHelper Localization { get; private set; }
         public string KeyDatabase = string.Empty;
         public string DatabaseFileName = "mte-lite.dll";
-        public string ApplicationVersion = "1.0.0";
+        public string ApplicationVersion = "1.0.1";
 
         public string ApplicationIdentifier { get; set; } 
         private int autoSaveNote;
@@ -105,6 +105,7 @@ namespace Minimal_Text_Editor__Lite_
             }
         }
         public string AppLanguage { get; set; }
+        public bool ShowBackupSizeLimiteMessage { get; set; }
         public bool ShowOpenNoteMessage { get; set; }
         public bool ShowNewUpdates { get; set; }
 

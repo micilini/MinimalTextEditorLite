@@ -312,6 +312,9 @@ namespace Minimal_Text_Editor__Lite_.ViewModel
                 case "Remove":
                     Delete_Action();
                     break;
+                case "New":
+                    New_Action();
+                    break;
                 case "Search":
                     OpenSearchBox();
                     break;
@@ -329,6 +332,22 @@ namespace Minimal_Text_Editor__Lite_.ViewModel
         private void Delete_Action()
         {
             AskIfUserWillDeleteThisNote();
+        }
+
+        private void New_Action()
+        {
+            mainScreenWindow.AddToMainGrid();
+
+            bool result = ModalMessages.ShowConfirmModal(App.Localization.Translate("Confirm_New_Reset_Note_Title"),
+                App.Localization.Translate("Confirm_New_Reset_Note_Description"),
+                App.Localization.Translate("Confirm_Reset_Note_Bold"));
+
+            if (result)
+            {
+                RemoveCurrentNote();
+            }
+
+            mainScreenWindow.RemoveToMainGrid();
         }
 
         private void AskIfUserWillDeleteThisNote()

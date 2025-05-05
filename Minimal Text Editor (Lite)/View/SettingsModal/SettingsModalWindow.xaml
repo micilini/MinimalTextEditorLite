@@ -23,7 +23,7 @@
 
             <StackPanel Grid.Row="0">
                 <WrapPanel Margin="20">
-                    <Image RenderOptions.BitmapScalingMode="HighQuality" Source="/Assets/Images/editor-gear-icon.png" Width="30" Height="30" Margin="0 0 10 0" />
+                    <Image RenderOptions.BitmapScalingMode="HighQuality" Source="/Assets/Images/editor-gear-icon-2.png" Width="30" Height="30" Margin="0 0 10 0" />
                     <Label Content="{Binding Source={x:Static localApp:App.Localization}, Converter={StaticResource Translate}, ConverterParameter=Modal_Settings_Title}" FontFamily="Arial" FontSize="22" FontWeight="Bold" />
                 </WrapPanel>
             </StackPanel>
@@ -58,7 +58,12 @@
                         <Button Content="{Binding Source={x:Static localApp:App.Localization}, Converter={StaticResource Translate}, ConverterParameter=Modal_Settings_Backup_Open_Button}" Command="{Binding OpenBackupFolderCommand}" Style="{StaticResource MaterialDesignRaisedButton}" BorderBrush="{x:Null}" materialDesign:ShadowAssist.ShadowDepth="Depth0" HorizontalAlignment="Left" Foreground="White"  Background="#3498db" materialDesign:ButtonAssist.CornerRadius="4" Width="120" Height="38" Margin="0 15 10 0" FontFamily="Arial" FontSize="14" FontWeight="Bold" />
                         <Button Content="{Binding Source={x:Static localApp:App.Localization}, Converter={StaticResource Translate}, ConverterParameter=Modal_Settings_Backup_Button}" Command="{Binding DeleteBackupCommand}" Style="{StaticResource MaterialDesignRaisedButton}" BorderBrush="{x:Null}" materialDesign:ShadowAssist.ShadowDepth="Depth0" HorizontalAlignment="Left" Foreground="White"  Background="#e74c3c" materialDesign:ButtonAssist.CornerRadius="4" Width="120" Height="38" Margin="0 15 20 0" FontFamily="Arial" FontSize="14" FontWeight="Bold" />
                     </WrapPanel>
-                    </StackPanel>
+
+                    <TextBlock Text="{Binding Source={x:Static localApp:App.Localization}, Converter={StaticResource Translate}, ConverterParameter=Modal_Settings_Title_System_Messages}" Foreground="#2d2d2d" FontFamily="Arial" FontSize="18" Margin="0 20 0 0" />
+                    <TextBlock x:Name="SystemMessagesRestoration" Text="{Binding Source={x:Static localApp:App.Localization}, Converter={StaticResource Translate}, ConverterParameter=Modal_Settings_Description_System_Messages}" TextWrapping="Wrap" Foreground="#2d2d2d" FontFamily="Arial" FontSize="14" Margin="0 6 0 0" />
+                    <Button Content="{Binding Source={x:Static localApp:App.Localization}, Converter={StaticResource Translate}, ConverterParameter=Modal_Settings_Button_Restore}" Style="{StaticResource MaterialDesignRaisedButton}" Command="{Binding RestoreMessagesCommand}" BorderBrush="{x:Null}" materialDesign:ShadowAssist.ShadowDepth="Depth0" HorizontalAlignment="Left" Foreground="White"  Background="#3498db" materialDesign:ButtonAssist.CornerRadius="4" Width="120" Height="38" Margin="0 15 10 0" FontFamily="Arial" FontSize="14" FontWeight="Bold" />
+
+                </StackPanel>
                 
             </ScrollViewer>
 

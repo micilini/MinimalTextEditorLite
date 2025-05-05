@@ -23,11 +23,13 @@ namespace Minimal_Text_Editor__Lite_.View.GlobalModals
     public partial class GlobalModalsWindow : Window
     {
         GlobalModalsWindowVM GlobalModalsWindowVM { get; set; }
+        string TypeMessage { get; set; }
 
-        public GlobalModalsWindow(GlobalModalModel gmm, bool inputModal)
+        public GlobalModalsWindow(GlobalModalModel gmm, bool inputModal, string typeMessage)
         {
             InitializeComponent();
 
+            TypeMessage = typeMessage;
             GlobalModalsWindowVM = new GlobalModalsWindowVM(this, gmm, inputModal);
             this.DataContext = GlobalModalsWindowVM;
         }
@@ -35,13 +37,35 @@ namespace Minimal_Text_Editor__Lite_.View.GlobalModals
         private void CheckBox_Checked(object sender, RoutedEventArgs e)
         {
             ((App)Application.Current).ShowOpenNoteMessage = false;
-            GlobalModalsWindowVM.UpdateShowOpenNoteMessage(false);
+
+            if (TypeMessage == "OpenNoteMessage")
+            {
+                GlobalModalsWindowVM.UpdateShowOpenNoteMessage(false);
+                return;
+            }
+
+            if (TypeMessage == "BackupMessage")
+            {
+                GlobalModalsWindowVM.UpdateShowBackupSizeMessage(false);
+                return;
+            }
+            
         }
 
         private void CheckBox_Unchecked(object sender, RoutedEventArgs e)
         {
             ((App)Application.Current).ShowOpenNoteMessage = true;
-            GlobalModalsWindowVM.UpdateShowOpenNoteMessage(true);
+
+            if (TypeMessage == "OpenNoteMessage")
+            {
+                GlobalModalsWindowVM.UpdateShowOpenNoteMessage(true);
+            }
+
+            if (TypeMessage == "BackupMessage")
+            {
+                GlobalModalsWindowVM.UpdateShowBackupSizeMessage(true);
+                return;
+            }
         }
 
     }

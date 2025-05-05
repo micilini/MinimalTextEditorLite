@@ -1,15 +1,20 @@
-﻿using Minimal_Text_Editor__Lite_.View;
+﻿using DocumentFormat.OpenXml.Wordprocessing;
+using Minimal_Text_Editor__Lite_.View;
+using Minimal_Text_Editor__Lite_.View.AboutModal;
 using Minimal_Text_Editor__Lite_.View.Components;
+using Minimal_Text_Editor__Lite_.View.ExportModal;
 using Minimal_Text_Editor__Lite_.View.SettingsModal;
 using Minimal_Text_Editor__Lite_.ViewModel.Helpers;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Input;
 
 namespace Minimal_Text_Editor__Lite_.ViewModel
 {
@@ -70,6 +75,19 @@ namespace Minimal_Text_Editor__Lite_.ViewModel
             }
         }
 
+        AppMenuControl appMenuControl { get; set; }
+
+        private object menuContent;
+        public object MenuContent
+        {
+            get => menuContent;
+            set
+            {
+                menuContent = value;
+                OnPropertyChanged("MenuContent");
+            }
+        }
+
         //Construtor da Classe
         public MainScreenWindowVM(MainScreenWindow mainScreen)
         {
@@ -77,7 +95,7 @@ namespace Minimal_Text_Editor__Lite_.ViewModel
             SaveNoteCompleted = true;
 
             editorControl = new EditorControl(this);
-
+            MenuContent = new AppMenuControl(this);
             HeaderContent = new HeaderControl(this);
             MainContent = editorControl;
 
@@ -170,6 +188,9 @@ namespace Minimal_Text_Editor__Lite_.ViewModel
 
             // Monitor for changes in AutoSaveNote.
             ((App)Application.Current).PropertyChanged += App_PropertyChanged;
+
+            // Check if Backup Folder has more than 600MB
+            CheckIfBackupFolderHasReachedSizeLimit();
         }
 
         private void MainScreenWindow_Unloaded(object sender, RoutedEventArgs e)
@@ -182,6 +203,66 @@ namespace Minimal_Text_Editor__Lite_.ViewModel
         {
             UpdatesCheck updatesCheck = new UpdatesCheck();
             updatesCheck.CheckForUpdates();
+        }
+
+        // Método para verificar se a pasta de backup possui mais que 600MB
+        private async void CheckIfBackupFolderHasReachedSizeLimit()
+        {
+            // 1) Espera 3 segundos (sem travar a interface)
+            await Task.Delay(TimeSpan.FromSeconds(3));
+
+            if (((App)Application.Current).ShowBackupSizeLimiteMessage)
+            {
+                string localAppData = Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData);
+                string baseFolder = Path.Combine(localAppData, "MinimalTextEditorLite");
+                string backupsFolder = Path.Combine(baseFolder, "Backups");
+
+                if (Directory.Exists(backupsFolder))
+                {
+                    long folderSize = GetDirectorySize(backupsFolder);
+                    const long sizeLimit = 600L * 1024 * 1024; // 600 MB
+
+                    if (folderSize > sizeLimit)
+                    {
+                        AddToMainGrid();
+
+                        bool result = ModalMessages.ShowBackupSizeMessageConfim(
+                            App.Localization.Translate("Title_Backup_Limit"),
+                            App.Localization.Translate("Description_Backup_Limit"),
+                            ""
+                        );
+
+                        RemoveToMainGrid();
+                    }
+                }
+            }
+        }
+
+        private long GetDirectorySize(string folderPath)
+        {
+            long totalSize = 0;
+
+            try
+            {
+                foreach (string file in Directory.GetFiles(folderPath, "*", SearchOption.AllDirectories))
+                {
+                    try
+                    {
+                        var info = new FileInfo(file);
+                        totalSize += info.Length;
+                    }
+                    catch
+                    {
+                        // Ignora arquivos inacessíveis
+                    }
+                }
+            }
+            catch
+            {
+                // Problema ao acessar a pasta — opcionalmente logue ou trate
+            }
+
+            return totalSize;
         }
 
         //Métodos de Interação Entre UserControls
@@ -203,8 +284,10 @@ namespace Minimal_Text_Editor__Lite_.ViewModel
                 }
             }
 
-            NoteService.OpenNewNote();
-            editorControl.LoadCurrentNote();
+            if (NoteService.OpenNewNote())
+            {
+                editorControl.LoadCurrentNote();
+            }
         }
 
         public void SaveNote()
@@ -235,6 +318,11 @@ namespace Minimal_Text_Editor__Lite_.ViewModel
             editorControl.DoAction("Remove");
         }
 
+        public void NewNote()
+        {
+            editorControl.DoAction("New");
+        }
+
         public void OpenSettingsDialog()
         {
             AddToMainGrid();
@@ -247,11 +335,114 @@ namespace Minimal_Text_Editor__Lite_.ViewModel
 
             RemoveToMainGrid();
         }
+        
+        public void ExportNoteDialog()
+        {
+            //Save Note Before Open Exportation Modal
+            SaveNote();
+
+            //After Save Note, Open Modal
+            AddToMainGrid();
+
+            ExportModalWindow exportModal = new ExportModalWindow();
+            bool? dialogResult = exportModal.ShowDialog();
+
+            RemoveToMainGrid();
+
+            if ((bool)dialogResult)
+            {
+                AddToMainGrid();
+                ModalMessages.ShowSuccessModal(App.Localization.Translate("Export_Note_Success_Title"), App.Localization.Translate("Export_Note_Success_Message"));
+                RemoveToMainGrid();
+            }
+        }
 
         public void SearchNote()
         {
             editorControl.DoAction("Search");
         }
 
+        public void OpenAboutApp()
+        {
+            AddToMainGrid();
+
+            AboutModalWindow aboutModal = new AboutModalWindow();
+            aboutModal.ShowDialog();
+
+            RemoveToMainGrid();
+        }
+
+        // Teclas de Atalhos do Sistema
+        public void OnPreviewKeyDown(KeyEventArgs e)
+        {
+            if (e.Key == Key.N && Keyboard.Modifiers == ModifierKeys.Control)
+            {
+                MenuClick("miNew");
+                e.Handled = true;
+                return;
+            }
+            if (e.Key == Key.O && Keyboard.Modifiers == ModifierKeys.Control)
+            {
+                MenuClick("miOpen");
+                e.Handled = true;
+                return;
+            }
+            if (e.Key == Key.S && Keyboard.Modifiers == ModifierKeys.Control)
+            {
+                MenuClick("miSave");
+                e.Handled = true;
+                return;
+            }
+            if (e.Key == Key.Delete && Keyboard.Modifiers == ModifierKeys.Control)
+            {
+                MenuClick("miDelete");
+                e.Handled = true;
+                return;
+            }
+            if (e.Key == Key.E && Keyboard.Modifiers == (ModifierKeys.Control | ModifierKeys.Shift))
+            {
+                MenuClick("miExport");
+                e.Handled = true;
+                return;
+            }
+            if (e.Key == Key.OemComma && Keyboard.Modifiers == ModifierKeys.Control)
+            {
+                MenuClick("miConfiguration");
+                e.Handled = true;
+                return;
+            }
+        }
+
+        // Métodos para cliques no Menu Superior
+        public void MenuClick(string action)
+        {
+            switch (action)
+            {
+                case "miNew":
+                    NewNote();
+                    break;
+                case "miOpen":
+                    OpenNewNote();
+                    break;
+                case "miSave":
+                    SaveNote();
+                    break;
+                case "miDelete":
+                    RemoveNote();
+                    break;
+                case "miExport":
+                    ExportNoteDialog();
+                    break;
+                case "miConfiguration":
+                    OpenSettingsDialog();
+                    break;
+                case "miExit":
+                    Application.Current.Shutdown();
+                    break;
+                case "miAbout":
+                    OpenAboutApp();
+                    break;
+            }
+        }
     }
 }

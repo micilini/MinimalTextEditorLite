@@ -98,6 +98,7 @@ namespace Minimal_Text_Editor__Lite_.ViewModel.Helpers
                     ((App)Application.Current).ApplicationIdentifier = settings.ApplicationIdentifier;
                     ((App)Application.Current).AutoSaveNote = settings.AutoSaveNote;
                     ((App)Application.Current).AppLanguage = settings.Language;
+                    ((App)Application.Current).ShowBackupSizeLimiteMessage = settings.ShowBackupSizeLimiteMessage;
                     ((App)Application.Current).ShowOpenNoteMessage = settings.ShowOpenNoteMessage;
                     ((App)Application.Current).ShowNewUpdates = settings.ShowNewUpdates;
                 }

@@ -24,7 +24,7 @@
 
                 <StackPanel Grid.Row="0">
                     <WrapPanel Margin="20">
-                        <Image RenderOptions.BitmapScalingMode="HighQuality" Source="/Assets/Images/editor-export-icon.png" Width="30" Height="30" Margin="0 0 10 0" />
+                        <Image RenderOptions.BitmapScalingMode="HighQuality" Source="/Assets/Images/editor-export-icon-2.png" Width="30" Height="30" Margin="0 0 10 0" />
                         <Label Content="{Binding Source={x:Static localApp:App.Localization}, Converter={StaticResource Translate}, ConverterParameter=Export_Note_Title}" FontFamily="Arial" FontSize="22" FontWeight="Bold" />
                     </WrapPanel>
                 </StackPanel>

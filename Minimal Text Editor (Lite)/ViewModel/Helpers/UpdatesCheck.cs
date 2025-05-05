@@ -11,7 +11,7 @@ namespace Minimal_Text_Editor__Lite_.ViewModel.Helpers
 {
     public class UpdatesCheck
     {
-        public async void CheckForUpdates()
+        public async Task CheckForUpdates(bool showNoUpdatedAvailableMessage = true)
         {
             try
             {
@@ -41,6 +41,13 @@ namespace Minimal_Text_Editor__Lite_.ViewModel.Helpers
                     if (showNewUpdates && newVersion)
                     {
                         ShowUpdateMessageBox(version, urlUpdate);
+                        return;
+                    }
+
+                    if (!showNoUpdatedAvailableMessage)
+                    {
+                        MessageBox.Show(App.Localization.Translate("Updates_Description_Fail"),
+                            App.Localization.Translate("Updates_Title_Fail"), MessageBoxButton.OK, MessageBoxImage.Information);
                     }
                 }
             }
@@ -52,10 +59,14 @@ namespace Minimal_Text_Editor__Lite_.ViewModel.Helpers
 
         private void ShowUpdateMessageBox(string version, string urlUpdate)
         {
-            // Configurando os botões do MessageBox
+            // 1) obtém a string formatada
+            var template = App.Localization.Translate("Updates_Description_OK");
+            // 2) injeta o version no lugar de {0}
+            var message = string.Format(template, version);
+
             MessageBoxResult result = MessageBox.Show(
-                $"Uma nova versão ({version}) está disponível! Deseja fazer o download?",
-                "Atualização Disponível",
+                message,
+                App.Localization.Translate("Updates_Title_OK"),
                 MessageBoxButton.YesNo,
                 MessageBoxImage.Information
             );

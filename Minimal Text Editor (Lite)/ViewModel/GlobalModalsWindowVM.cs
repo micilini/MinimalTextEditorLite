@@ -118,6 +118,33 @@ namespace Minimal_Text_Editor__Lite_.ViewModel
             }
         }
 
+        public void UpdateShowBackupSizeMessage(bool value)
+        {
+            try
+            {
+                var query = "SELECT * FROM Settings WHERE Id = ?";
+                var settings = DatabaseHelper.QuerySingle<SettingsModel>(query, 1);
+
+                if (settings != null)
+                {
+                    settings.ShowBackupSizeLimiteMessage = value;
+                    settings.UpdatedAt = DateTime.UtcNow;
+
+                    DatabaseHelper.Update(settings);
+
+                    ((App)Application.Current).ShowBackupSizeLimiteMessage = value;
+                }
+                else
+                {
+                    ModalMessages.showErrorModal(App.Localization.Translate("Error_Update_BackupSize"));
+                }
+            }
+            catch (Exception ex)
+            {
+                // Tratar exceções
+                ModalMessages.showErrorModal(App.Localization.Translate("Error_Update_BackupSize"));
+            }
+        }
 
     }
 }

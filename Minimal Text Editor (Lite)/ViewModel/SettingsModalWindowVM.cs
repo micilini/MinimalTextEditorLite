@@ -77,6 +77,7 @@ namespace Minimal_Text_Editor__Lite_.ViewModel
         public OpenBackupFolderCommand OpenBackupFolderCommand { get; set; }
         public DeleteBackupCommand DeleteBackupCommand { get; set; }
         public CancelCommand<SettingsModalWindowVM> CancelCommand { get; set; }
+        public RestoreMessagesCommand RestoreMessagesCommand { get; set; }
 
         //Método Construtor da Classe
         public SettingsModalWindowVM(SettingsModalWindow settingsWindow)
@@ -86,6 +87,7 @@ namespace Minimal_Text_Editor__Lite_.ViewModel
             OpenBackupFolderCommand = new OpenBackupFolderCommand(this);
             DeleteBackupCommand = new DeleteBackupCommand(this);
             CancelCommand = new CancelCommand<SettingsModalWindowVM>(this);
+            RestoreMessagesCommand = new RestoreMessagesCommand(this);
 
             GetAppConfiguration();
             GetBackupFilesInfo();
@@ -263,6 +265,39 @@ namespace Minimal_Text_Editor__Lite_.ViewModel
         {
             NoteService.RemoveBackupFiles();
             SettingsModalWindow.DialogResult = false;
+        }
+    
+        public void RestoreMessagesButton()
+        {
+            var settings = DatabaseHelper.QuerySingle<SettingsModel>("SELECT * FROM Settings WHERE Id = 1");
+
+            if (settings != null)
+            {
+                settings.ShowBackupSizeLimiteMessage = true;
+                settings.ShowOpenNoteMessage = true;
+                settings.ShowNewUpdates = true;
+
+                settings.UpdatedAt = DateTime.UtcNow;
+
+                bool isUpdated = DatabaseHelper.Update(settings);
+
+                ((App)Application.Current).ShowBackupSizeLimiteMessage = true;
+                ((App)Application.Current).ShowOpenNoteMessage = true;
+                ((App)Application.Current).ShowNewUpdates = true;
+
+                if (!isUpdated)
+                {
+                    // Caso falhe ao atualizar, mostra uma mensagem de erro
+                    ModalMessages.showErrorModal(App.Localization.Translate("Error_Restore_Messages"));
+                    return;
+                }
+
+                SettingsModalWindow.DialogResult = true;
+            }
+            else
+            {
+                ModalMessages.showErrorModal(App.Localization.Translate("Error_Restore_Messages"));
+            }
         }
     }
 }

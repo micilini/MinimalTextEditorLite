@@ -14,10 +14,17 @@
 
   <ItemGroup>
     <None Remove="app.manifest" />
+    <None Remove="Assets\Images\about-icon-2.png" />
+    <None Remove="Assets\Images\close-icon.png" />
+    <None Remove="Assets\Images\editor-export-icon-2.png" />
     <None Remove="Assets\Images\editor-export-icon.png" />
+    <None Remove="Assets\Images\editor-gear-icon-2.png" />
     <None Remove="Assets\Images\editor-gear-icon.png" />
+    <None Remove="Assets\Images\editor-open-icon-2.png" />
     <None Remove="Assets\Images\editor-open-icon.png" />
+    <None Remove="Assets\Images\editor-save-icon-2.png" />
     <None Remove="Assets\Images\editor-save-icon.png" />
+    <None Remove="Assets\Images\editor-trash-icon-2.png" />
     <None Remove="Assets\Images\editor-trash-icon.png" />
     <None Remove="Assets\Images\icon-check.png" />
     <None Remove="Assets\Images\icon-close.png" />
@@ -26,6 +33,7 @@
     <None Remove="Assets\Images\icon-notes.png" />
     <None Remove="Assets\Images\image-splash-screen-lite.png" />
     <None Remove="Assets\Images\logo-mte.png" />
+    <None Remove="Assets\Images\search-icon-2.png" />
     <None Remove="Assets\Images\search-icon.png" />
     <None Remove="View\logo-mte.ico" />
   </ItemGroup>
@@ -45,16 +53,24 @@
     <PackageReference Include="MaterialDesignColors" Version="2.0.1" />
     <PackageReference Include="MaterialDesignThemes" Version="4.1.0" />
     <PackageReference Include="Microsoft.Web.WebView2" Version="1.0.2903.40" />
+    <PackageReference Include="Microsoft.Xaml.Behaviors.Wpf" Version="1.1.135" />
     <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
     <PackageReference Include="sqlite-net-pcl" Version="1.9.172" />
     <PackageReference Include="sqlite-net-sqlcipher" Version="1.9.172" />
   </ItemGroup>
 
   <ItemGroup>
+    <Resource Include="Assets\Images\about-icon-2.png" />
+    <Resource Include="Assets\Images\close-icon.png" />
+    <Resource Include="Assets\Images\editor-export-icon-2.png" />
     <Resource Include="Assets\Images\editor-export-icon.png" />
+    <Resource Include="Assets\Images\editor-gear-icon-2.png" />
     <Resource Include="Assets\Images\editor-gear-icon.png" />
+    <Resource Include="Assets\Images\editor-open-icon-2.png" />
     <Resource Include="Assets\Images\editor-open-icon.png" />
+    <Resource Include="Assets\Images\editor-save-icon-2.png" />
     <Resource Include="Assets\Images\editor-save-icon.png" />
+    <Resource Include="Assets\Images\editor-trash-icon-2.png" />
     <Resource Include="Assets\Images\editor-trash-icon.png" />
     <Resource Include="Assets\Images\icon-check.png" />
     <Resource Include="Assets\Images\icon-close.png" />
@@ -63,6 +79,7 @@
     <Resource Include="Assets\Images\icon-notes.png" />
     <Resource Include="Assets\Images\image-splash-screen-lite.png" />
     <Resource Include="Assets\Images\logo-mte.png" />
+    <Resource Include="Assets\Images\search-icon-2.png" />
     <Resource Include="Assets\Images\search-icon.png" />
     <Resource Include="View\logo-mte.ico" />
   </ItemGroup>
@@ -95,13 +112,13 @@
     <None Update="EditorModules\EditorJS\static\css\main.3e27cc38.css.map">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
-    <None Update="EditorModules\EditorJS\static\js\main.f281e9a7.js">
+    <None Update="EditorModules\EditorJS\static\js\main.9d277236.js">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
-    <None Update="EditorModules\EditorJS\static\js\main.f281e9a7.js.LICENSE.txt">
+    <None Update="EditorModules\EditorJS\static\js\main.9d277236.js.LICENSE.txt">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
-    <None Update="EditorModules\EditorJS\static\js\main.f281e9a7.js.map">
+    <None Update="EditorModules\EditorJS\static\js\main.9d277236.js.map">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
     <None Update="EditorModules\EditorJS\static\media\Poppins-Black.eacee5bb9c7fee5939ae.ttf">
@@ -128,16 +145,12 @@
     <None Update="logo-mte-ico.ico">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
-    <None Update="Modules\Export\ExportAsDOC.exe">
+    <None Update="Modules\Export\x64\ExportAsDOC.exe">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
-    <None Update="Modules\Export\ExportAsPDF.exe">
+    <None Update="Modules\Export\x64\ExportAsPDF.exe">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
-  </ItemGroup>
-
-  <ItemGroup>
-    <Folder Include="EditorModules\EditorJS\" />
   </ItemGroup>
 
 </Project>

@@ -8,6 +8,72 @@
              xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
              mc:Ignorable="d" 
              d:DesignHeight="80" d:DesignWidth="800">
+    <UserControl.Resources>
+        <Style x:Key="IconButtonClickScale" TargetType="Button">
+            <!-- 1) Override total do style padrão -->
+            <Setter Property="OverridesDefaultStyle" Value="True"/>
+            <!-- 2) Cursor mão -->
+            <Setter Property="Cursor" Value="Hand"/>
+            <!-- 3) Fundo e borda transparentes -->
+            <Setter Property="Background" Value="Transparent"/>
+            <Setter Property="BorderBrush" Value="Transparent"/>
+            <Setter Property="BorderThickness" Value="0"/>
+            <!-- 4) Remove o anel de foco -->
+            <Setter Property="FocusVisualStyle" Value="{x:Null}"/>
+            <!-- 5) Configura o ScaleTransform inicial -->
+            <Setter Property="RenderTransformOrigin" Value="0.5,0.5"/>
+            <Setter Property="RenderTransform">
+                <Setter.Value>
+                    <ScaleTransform ScaleX="1" ScaleY="1"/>
+                </Setter.Value>
+            </Setter>
+            <!-- 6) Template mínimo: só exibe o conteúdo sem estados visuais -->
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Button">
+                        <ContentPresenter
+            Content="{TemplateBinding Content}"
+            ContentTemplate="{TemplateBinding ContentTemplate}"
+            HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}"
+            VerticalAlignment="{TemplateBinding VerticalContentAlignment}"
+            Margin="{TemplateBinding Padding}"
+            SnapsToDevicePixels="{TemplateBinding SnapsToDevicePixels}"
+            RecognizesAccessKey="True"/>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+
+            <Style.Triggers>
+                <!-- 7) Scale ao pressionar -->
+                <Trigger Property="IsPressed" Value="True">
+                    <Trigger.EnterActions>
+                        <BeginStoryboard>
+                            <Storyboard>
+                                <DoubleAnimation
+                Storyboard.TargetProperty="RenderTransform.(ScaleTransform.ScaleX)"
+                To="0.9" Duration="0:0:0.08"/>
+                                <DoubleAnimation
+                Storyboard.TargetProperty="RenderTransform.(ScaleTransform.ScaleY)"
+                To="0.9" Duration="0:0:0.08"/>
+                            </Storyboard>
+                        </BeginStoryboard>
+                    </Trigger.EnterActions>
+                    <Trigger.ExitActions>
+                        <BeginStoryboard>
+                            <Storyboard>
+                                <DoubleAnimation
+                Storyboard.TargetProperty="RenderTransform.(ScaleTransform.ScaleX)"
+                To="1" Duration="0:0:0.12"/>
+                                <DoubleAnimation
+                Storyboard.TargetProperty="RenderTransform.(ScaleTransform.ScaleY)"
+                To="1" Duration="0:0:0.12"/>
+                            </Storyboard>
+                        </BeginStoryboard>
+                    </Trigger.ExitActions>
+                </Trigger>
+            </Style.Triggers>
+        </Style>
+    </UserControl.Resources>
     <Grid HorizontalAlignment="Stretch">
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="300" />
@@ -23,24 +89,24 @@
         </StackPanel>
 
         <StackPanel Grid.Column="1">
-            <WrapPanel Margin="25" HorizontalAlignment="Right">
-                <Button Command="{Binding OpenNoteCommand}" Padding="0" Background="{x:Null}" BorderBrush="{x:Null}" Foreground="{DynamicResource PrimaryHueLightForegroundBrush}" Width="37" Height="37" materialDesign:RippleAssist.Feedback="White" Margin="0 0 0 0">
-                    <Image RenderOptions.BitmapScalingMode="HighQuality" Source="/Assets/Images/editor-open-icon.png" Width="37" Height="37"/>
+            <WrapPanel Margin="0 18 20 0" HorizontalAlignment="Right">
+                <Button Style="{StaticResource IconButtonClickScale}" Command="{Binding OpenNoteCommand}" Padding="0" Background="{x:Null}" BorderBrush="{x:Null}" Foreground="{DynamicResource PrimaryHueLightForegroundBrush}" Width="45" Height="45" materialDesign:RippleAssist.Feedback="White" Margin="0 0 0 0">
+                    <Image RenderOptions.BitmapScalingMode="HighQuality" Source="/Assets/Images/editor-open-icon-2.png" Width="45" Height="45"/>
                 </Button>
-                <Button Command="{Binding SearchNoteCommand}" Padding="0" Background="{x:Null}" BorderBrush="{x:Null}" Foreground="{DynamicResource PrimaryHueLightForegroundBrush}" Width="37" Height="37" materialDesign:RippleAssist.Feedback="White" Margin="20 0 0 0">
-                    <Image RenderOptions.BitmapScalingMode="HighQuality" Source="/Assets/Images/search-icon.png" Width="37" Height="37"/>
+                <Button Style="{StaticResource IconButtonClickScale}" Command="{Binding SearchNoteCommand}" Padding="0" Background="{x:Null}" BorderBrush="{x:Null}" Foreground="{DynamicResource PrimaryHueLightForegroundBrush}" Width="45" Height="45" materialDesign:RippleAssist.Feedback="White" Margin="20 0 0 0">
+                    <Image RenderOptions.BitmapScalingMode="HighQuality" Source="/Assets/Images/search-icon-2.png" Width="45" Height="45"/>
                 </Button>
-                <Button Command="{Binding SaveNoteCommand}" Padding="0" Background="{x:Null}" BorderBrush="{x:Null}" Foreground="{DynamicResource PrimaryHueLightForegroundBrush}" Width="37" Height="37" materialDesign:RippleAssist.Feedback="White" Margin="20 0 0 0">
-                    <Image RenderOptions.BitmapScalingMode="HighQuality" Source="/Assets/Images/editor-save-icon.png" Width="37" Height="37"/>
+                <Button Style="{StaticResource IconButtonClickScale}" Command="{Binding SaveNoteCommand}" Padding="0" Background="{x:Null}" BorderBrush="{x:Null}" Foreground="{DynamicResource PrimaryHueLightForegroundBrush}" Width="45" Height="45" materialDesign:RippleAssist.Feedback="White" Margin="20 0 0 0">
+                    <Image RenderOptions.BitmapScalingMode="HighQuality" Source="/Assets/Images/editor-save-icon-2.png" Width="45" Height="45"/>
                 </Button>
-                <Button Command="{Binding RemoveNoteCommand}" Padding="0" Background="{x:Null}" BorderBrush="{x:Null}" Foreground="{DynamicResource PrimaryHueLightForegroundBrush}" Width="37" Height="37" materialDesign:RippleAssist.Feedback="White" Margin="20 0 0 0">
-                    <Image RenderOptions.BitmapScalingMode="HighQuality" Source="/Assets/Images/editor-trash-icon.png" Width="37" Height="37"/>
+                <Button Style="{StaticResource IconButtonClickScale}" Command="{Binding RemoveNoteCommand}" Padding="0" Background="{x:Null}" BorderBrush="{x:Null}" Foreground="{DynamicResource PrimaryHueLightForegroundBrush}" Width="45" Height="45" materialDesign:RippleAssist.Feedback="White" Margin="20 0 0 0">
+                    <Image RenderOptions.BitmapScalingMode="HighQuality" Source="/Assets/Images/editor-trash-icon-2.png" Width="45" Height="45"/>
                 </Button>
-                <Button Command="{Binding ExportCommand}" Padding="0" Background="{x:Null}" BorderBrush="{x:Null}" Foreground="{DynamicResource PrimaryHueLightForegroundBrush}" Width="37" Height="37" materialDesign:RippleAssist.Feedback="White" Margin="20 0 0 0">
-                    <Image RenderOptions.BitmapScalingMode="HighQuality" Source="/Assets/Images/editor-export-icon.png" Width="37" Height="37"/>
+                <Button Style="{StaticResource IconButtonClickScale}" Command="{Binding ExportCommand}" Padding="0" Background="{x:Null}" BorderBrush="{x:Null}" Foreground="{DynamicResource PrimaryHueLightForegroundBrush}" Width="45" Height="45" materialDesign:RippleAssist.Feedback="White" Margin="20 0 0 0">
+                    <Image RenderOptions.BitmapScalingMode="HighQuality" Source="/Assets/Images/editor-export-icon-2.png" Width="45" Height="45"/>
                 </Button>
-                <Button Command="{Binding SettingsCommand}" Padding="0" Background="{x:Null}" BorderBrush="{x:Null}" Foreground="{DynamicResource PrimaryHueLightForegroundBrush}" Width="37" Height="37" materialDesign:RippleAssist.Feedback="White" Margin="20 0 0 0">
-                    <Image RenderOptions.BitmapScalingMode="HighQuality" Source="/Assets/Images/editor-gear-icon.png" Width="37" Height="37"/>
+                <Button Style="{StaticResource IconButtonClickScale}" Command="{Binding SettingsCommand}" Padding="0" Background="{x:Null}" BorderBrush="{x:Null}" Foreground="{DynamicResource PrimaryHueLightForegroundBrush}" Width="45" Height="45" materialDesign:RippleAssist.Feedback="White" Margin="20 0 0 0">
+                    <Image RenderOptions.BitmapScalingMode="HighQuality" Source="/Assets/Images/editor-gear-icon-2.png" Width="45" Height="45"/>
                 </Button>
             </WrapPanel>
         </StackPanel>

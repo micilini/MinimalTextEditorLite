@@ -19,6 +19,8 @@ namespace Minimal_Text_Editor__Lite_.Model
 
         public string Language { get; set; }
 
+        public bool ShowBackupSizeLimiteMessage { get; set; }
+
         public bool ShowOpenNoteMessage { get; set; }
 
         public bool ShowNewUpdates { get; set; }
@@ -32,6 +34,7 @@ namespace Minimal_Text_Editor__Lite_.Model
             ApplicationIdentifier = GenerateApplicationIdentifier();
             AutoSaveNote = 0;
             Language = "en_us";
+            ShowBackupSizeLimiteMessage = true;
             ShowOpenNoteMessage = true;
             ShowNewUpdates = true;
             CreatedAt = DateTime.UtcNow;

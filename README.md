@@ -2,7 +2,7 @@
   <img width="128" align="center" src="images/logo_mte.png">
 </p>
 <h1 align="center">
-  Minimal Text Editor (Lite) For Windows
+  Minimal Text Editor (Lite) For Windows (1.0.1)
 </h1>
 <p align="center">
   Create notes and export them in universal format :)

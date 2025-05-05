@@ -28,7 +28,7 @@ namespace Minimal_Text_Editor__Lite_.ViewModel.Helpers
                 OkButton = new ButtonModel { Text = App.Localization.Translate("Button_Ok"), IsVisible = false }
             };
 
-            return OpenModalWithBooleanResult(globalModalModel);
+            return OpenModalWithBooleanResult(globalModalModel, "");
         }
 
         public static void showErrorModal(string description, string boldMessage = "")
@@ -70,7 +70,7 @@ namespace Minimal_Text_Editor__Lite_.ViewModel.Helpers
                 OkButton = new ButtonModel { Text = App.Localization.Translate("Button_Ok"), IsVisible = false }
             };
 
-            return OpenModalWithBooleanResult(globalModalModel);
+            return OpenModalWithBooleanResult(globalModalModel, "OpenNoteMessage");
         }
 
         public static void showInfoModal(string title, string description, string boldMessage = "")
@@ -113,15 +113,36 @@ namespace Minimal_Text_Editor__Lite_.ViewModel.Helpers
             OpenModal(globalModalModel);
         }
 
+        public static bool ShowBackupSizeMessageConfim(string title, string description, string boldMessage = "")
+        {
+            GlobalModalModel globalModalModel = new GlobalModalModel
+            {
+                ImageSource = "/Assets/Images/icon-info.png",
+                HeaderContent = title,
+                ShowTextField = false,
+                LabelTextField = "...",
+                TextFieldHint = "...",
+                ShowSimpleText = true,
+                SimpleTextContent = description,
+                BoldTextContent = boldMessage,
+                ShowConfirmationCheck = true,
+                SaveButton = new ButtonModel { Text = App.Localization.Translate("Button_Delete"), IsVisible = false },
+                CancelButton = new ButtonModel { Text = App.Localization.Translate("Button_Close"), IsVisible = true },
+                OkButton = new ButtonModel { Text = App.Localization.Translate("Button_Ok"), IsVisible = false }
+            };
+
+            return OpenModalWithBooleanResult(globalModalModel, "BackupMessage");
+        }
+
         private static void OpenModal(GlobalModalModel gmm)
         {
-            GlobalModalsWindow globalModalsWindow = new GlobalModalsWindow(gmm, false);
+            GlobalModalsWindow globalModalsWindow = new GlobalModalsWindow(gmm, false, "");
             bool? dialogResult = globalModalsWindow.ShowDialog();
         }
 
-        private static bool OpenModalWithBooleanResult(GlobalModalModel gmm)
+        private static bool OpenModalWithBooleanResult(GlobalModalModel gmm, string typeMessage)
         {
-            GlobalModalsWindow globalModalsWindow = new GlobalModalsWindow(gmm, false);
+            GlobalModalsWindow globalModalsWindow = new GlobalModalsWindow(gmm, false, typeMessage);
             bool? dialogResult = globalModalsWindow.ShowDialog();
 
             return (bool)dialogResult;

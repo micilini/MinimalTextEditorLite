@@ -70,23 +70,7 @@ namespace Minimal_Text_Editor__Lite_.ViewModel
 
         public void ExportNote()
         {
-            //Save Note Before Open Exportation Modal
-            mainScreenWindow.SaveNote();
-
-            //After Save Note, Open Modal
-            mainScreenWindow.AddToMainGrid();
-
-            ExportModalWindow exportModal = new ExportModalWindow();
-            bool? dialogResult = exportModal.ShowDialog();
-
-            mainScreenWindow.RemoveToMainGrid();
-
-            if ((bool)dialogResult)
-            {
-                mainScreenWindow.AddToMainGrid();
-                ModalMessages.ShowSuccessModal(App.Localization.Translate("Export_Note_Success_Title"), App.Localization.Translate("Export_Note_Success_Message"));
-                mainScreenWindow.RemoveToMainGrid();
-            }
+            mainScreenWindow.ExportNoteDialog();
         }
 
         public void SearchNote()

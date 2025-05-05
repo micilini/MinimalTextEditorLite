@@ -29,7 +29,10 @@ namespace Minimal_Text_Editor__Lite_.View
         public MainScreenWindow()
         {
             InitializeComponent();
-            this.DataContext = new MainScreenWindowVM(this);
+            var vm = new MainScreenWindowVM(this);
+            DataContext = vm;
+
+            this.PreviewKeyDown += (s, e) => vm.OnPreviewKeyDown(e);
         }
     }
 }

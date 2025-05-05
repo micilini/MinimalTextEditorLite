@@ -29,36 +29,46 @@ namespace Minimal_Text_Editor__Lite_.View.ExportModal
         private async void ButtonExport_Click(object sender, RoutedEventArgs e)
         {
             ButtonExport.IsEnabled = false;
-            ButtonExport.Content = App.Localization.Translate("Export_Wait_Message"); 
+            ButtonExport.Content = App.Localization.Translate("Export_Wait_Message");
+            bool exportSucceeded = false;
 
             try
             {
                 switch (ExportComboBox.SelectedIndex)
                 {
                     case 0:
-                        await NoteService.ExportCurrentNoteAsJSON();
+                        exportSucceeded = await NoteService.ExportCurrentNoteAsJSON();
                         break;
                     case 1:
-                        await NoteService.ExportCurrentNoteAsDoc();
+                        exportSucceeded = await NoteService.ExportCurrentNoteAsDoc();
                         break;
                     case 2:
-                        await NoteService.ExportCurrentNoteAsHTML();
+                        exportSucceeded = await NoteService.ExportCurrentNoteAsHTML();
                         break;
                     case 3:
-                        await NoteService.ExportCurrentNoteAsPDF();
+                        exportSucceeded = await NoteService.ExportCurrentNoteAsPDF();
                         break;
                     default:
                         ModalMessages.showErrorModal($"{App.Localization.Translate("Error_Export_1")}");
                         break;
                 }
+
+                if (exportSucceeded)
+                {
+                    this.DialogResult = true;
+                }
+                else
+                {
+                    ButtonExport.IsEnabled = true;
+                    ButtonExport.Content = App.Localization.Translate("Export_Button");
+                }
+
             }
             catch (Exception ex)
             {
                 ModalMessages.showErrorModal($"{App.Localization.Translate("Error_Export_1")}");
-            }
-            finally
-            {
-                this.DialogResult = true;
+                ButtonExport.IsEnabled = true;
+                ButtonExport.Content = App.Localization.Translate("Export_Button");
             }
         }
 

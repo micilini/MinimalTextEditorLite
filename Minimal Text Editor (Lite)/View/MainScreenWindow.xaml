@@ -12,7 +12,10 @@
         Icon="/View/logo-mte.ico"
         Title="Minimal Text Editor (Lite)">
     <Grid>
-        <materialDesign:Card Background="{DynamicResource MaterialDesignPaper}">
+        <DockPanel>
+        <ContentControl DockPanel.Dock="Top" Content="{Binding MenuContent}" />
+
+        <materialDesign:Card Background="{DynamicResource MaterialDesignPaper}" materialDesign:ShadowAssist.ShadowDepth="Depth0">
             <Grid>
                 <Grid.RowDefinitions>
                     <RowDefinition Height="80" />
@@ -20,7 +23,7 @@
                     <RowDefinition Height="30" />
                 </Grid.RowDefinitions>
 
-                <materialDesign:ColorZone Grid.Row="0" Height="Auto" Background="#ecf0f1" VerticalAlignment="Stretch" HorizontalAlignment="Stretch">
+                <materialDesign:ColorZone Grid.Row="0" Height="Auto" Background="#ecf0f1" VerticalAlignment="Stretch" HorizontalAlignment="Stretch" materialDesign:ShadowAssist.ShadowDepth="Depth0">
                     <ContentControl Content="{Binding HeaderContent}" />
                 </materialDesign:ColorZone>
 
@@ -38,5 +41,6 @@
                 </materialDesign:ColorZone>
             </Grid>
         </materialDesign:Card>
+    </DockPanel>
     </Grid>
 </Window>
