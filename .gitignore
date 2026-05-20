@@ -125,3 +125,16 @@ Desktop.ini
 zip-*.sh
 .zip-staging-*/
 
+# ------------------------------------------------------------
+# MinimalTextEditorLite.EditorJS - React source
+# ------------------------------------------------------------
+node_modules/
+MinimalTextEditorLite.EditorJS/node_modules/
+MinimalTextEditorLite.EditorJS/build/
+MinimalTextEditorLite.EditorJS/.npm-cache/
+MinimalTextEditorLite.EditorJS/.env
+MinimalTextEditorLite.EditorJS/.env.*
+MinimalTextEditorLite.EditorJS/npm-debug.log*
+MinimalTextEditorLite.EditorJS/yarn-debug.log*
+MinimalTextEditorLite.EditorJS/yarn-error.log*
+

@@ -229,14 +229,6 @@ public partial class EditorControlVM : ObservableObject, IDisposable
         return Task.CompletedTask;
     }
 
-    private async Task ExecuteEditorScriptAsync(string script)
-    {
-        if (myWebView.CoreWebView2 == null)
-            return;
-
-        await myWebView.CoreWebView2.ExecuteScriptAsync(script);
-    }
-
     private void MyWebView_CoreWebView2_WebMessageReceived(object? sender, CoreWebView2WebMessageReceivedEventArgs e)
     {
         try
