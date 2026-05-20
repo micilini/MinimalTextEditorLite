@@ -35,7 +35,7 @@
                                 VerticalAlignment="Center">
                             <materialDesign:PackIcon Kind="ExportVariant"
                                                      Width="24" Height="24"
-                                                     Foreground="{StaticResource MTE.Brush.Primary}"
+                                                     Foreground="#111827"
                                                      HorizontalAlignment="Center"
                                                      VerticalAlignment="Center" />
                         </Border>
