@@ -1,5 +1,6 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
+using Microsoft.Win32;
 using MinimalTextEditorLite.App.Helpers;
 using MinimalTextEditorLite.App.View;
 using MinimalTextEditorLite.App.View.AboutModal;
@@ -16,7 +17,7 @@ namespace MinimalTextEditorLite.App.ViewModels;
 
 public partial class MainScreenWindowVM : ObservableObject
 {
-    private readonly NoteService noteService;
+    private readonly IImportService importService;
     private BackgroundService? backgroundService;
     private EditorControl editorControl = null!;
     private AddOverlayForModals addOverlayForModals = null!;
@@ -37,9 +38,9 @@ public partial class MainScreenWindowVM : ObservableObject
     [ObservableProperty]
     private object? menuContent;
 
-    public MainScreenWindowVM(NoteService noteService)
+    public MainScreenWindowVM(IImportService importService)
     {
-        this.noteService = noteService;
+        this.importService = importService;
         SaveNoteCompleted = true;
     }
 
@@ -185,7 +186,7 @@ public partial class MainScreenWindowVM : ObservableObject
         return totalSize;
     }
 
-    public void OpenNewNote()
+    public async void OpenNewNote()
     {
         if (((App)Application.Current).ShowOpenNoteMessage)
         {
@@ -200,8 +201,25 @@ public partial class MainScreenWindowVM : ObservableObject
                 return;
         }
 
-        if (noteService.OpenNewNote())
-            editorControl.LoadCurrentNote();
+        var openFileDialog = new OpenFileDialog
+        {
+            Filter = "JSON Files (*.json)|*.json",
+            DefaultExt = "json",
+            Title = App.Localization.Translate("Title_Open_Note")
+        };
+
+        if (openFileDialog.ShowDialog() != true)
+            return;
+
+        var importResult = await importService.ImportAsync(openFileDialog.FileName);
+
+        if (!importResult.Success)
+        {
+            ModalMessages.showErrorModal(App.Localization.Translate(importResult.ErrorKey ?? "Error_Note_Import"));
+            return;
+        }
+
+        editorControl.LoadCurrentNote();
     }
 
     [RelayCommand]
@@ -332,3 +350,5 @@ public partial class MainScreenWindowVM : ObservableObject
     [RelayCommand]
     private void About() => OpenAboutApp();
 }
+
+

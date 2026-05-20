@@ -2,8 +2,8 @@
 using Microsoft.Web.WebView2.Core;
 using Microsoft.Web.WebView2.Wpf;
 using MinimalTextEditorLite.App.Helpers;
-using MinimalTextEditorLite.Core.Database;
-using MinimalTextEditorLite.Core.Models;
+using MinimalTextEditorLite.Core.Repositories;
+using MinimalTextEditorLite.Core.Services;
 using System.IO;
 using System.Windows;
 using WindowsInput;
@@ -12,8 +12,8 @@ namespace MinimalTextEditorLite.App.ViewModels;
 
 public partial class EditorControlVM : ObservableObject, IDisposable
 {
-    private readonly IDatabaseHelper database;
-    private readonly NoteService noteService;
+    private readonly INoteRepository noteRepository;
+    private readonly IBackupService backupService;
     private readonly string virtualHostName = "minimaltexteditorlite.localhost";
     private readonly MainScreenWindowVM mainScreenWindow;
     private readonly WebView2 myWebView;
@@ -30,12 +30,12 @@ public partial class EditorControlVM : ObservableObject, IDisposable
     [ObservableProperty]
     private Visibility progressBarVisibility = Visibility.Visible;
 
-    public EditorControlVM(MainScreenWindowVM mainScreen, WebView2 webView, IDatabaseHelper database, NoteService noteService)
+    public EditorControlVM(MainScreenWindowVM mainScreen, WebView2 webView, INoteRepository noteRepository, IBackupService backupService)
     {
         mainScreenWindow = mainScreen;
         myWebView = webView;
-        this.database = database;
-        this.noteService = noteService;
+        this.noteRepository = noteRepository;
+        this.backupService = backupService;
 
         InitializeWebView();
     }
@@ -141,7 +141,7 @@ public partial class EditorControlVM : ObservableObject, IDisposable
             await Task.Delay(1200);
         }
 
-        var currentNote = database.Read<NoteModel>().FirstOrDefault();
+        var currentNote = await noteRepository.GetCurrentAsync();
 
         if (currentNote != null)
             InsertContent(currentNote.NoteJson);
@@ -149,13 +149,27 @@ public partial class EditorControlVM : ObservableObject, IDisposable
             ModalMessages.showErrorModal(App.Localization.Translate("Error_Notes_Not_Found"));
     }
 
-    private void UpdateNoteContent(string jsonData)
+    private async void UpdateNoteContent(string jsonData)
     {
         ProgressBarVisibility = Visibility.Visible;
 
         try
         {
-            noteService.UpdateCurrentNote(jsonData);
+            var updateSuccess = await noteRepository.UpdateJsonAsync(jsonData);
+
+            if (updateSuccess)
+            {
+                string currentDate = ((App)Application.Current).AppLanguage == "pt_br"
+                    ? DateTime.Now.ToString("dd/MM/yyyy H:mm:ss")
+                    : DateTime.Now.ToString("MM/dd/yyyy h:mm:ss tt");
+
+                ((App)Application.Current).LastNoteUpdated = App.Localization.Translate("Last_Save_Note") + currentDate;
+                await backupService.CreateBackupAsync(jsonData, currentDate);
+            }
+            else
+            {
+                ModalMessages.showErrorModal(App.Localization.Translate("Error_App_Update_Note"));
+            }
         }
         catch
         {
@@ -234,9 +248,9 @@ public partial class EditorControlVM : ObservableObject, IDisposable
         ProgressBarVisibility = Visibility.Visible;
         await Task.Delay(1200);
 
-        int rowsAffected = database.Execute("UPDATE Note SET NoteJson = ? WHERE Id = ?", "{\"blocks\": []}", 1);
+        bool cleared = await noteRepository.ClearAsync();
 
-        if (rowsAffected <= 0)
+        if (!cleared)
         {
             ModalMessages.showErrorModal(App.Localization.Translate("Error_App_Update_Note"));
             return;
@@ -252,3 +266,4 @@ public partial class EditorControlVM : ObservableObject, IDisposable
         sim.Keyboard.ModifiedKeyStroke(WindowsInput.Native.VirtualKeyCode.CONTROL, WindowsInput.Native.VirtualKeyCode.VK_F);
     }
 }
+

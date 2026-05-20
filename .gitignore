@@ -120,3 +120,8 @@ Desktop.ini
 *.rej
 *.swp
 *~
+# Local ZIP bundles/scripts generated for ChatGPT/CODEX context
+*.zip
+zip-*.sh
+.zip-staging-*/
+
