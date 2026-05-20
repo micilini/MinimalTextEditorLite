@@ -1,4 +1,4 @@
-﻿using MinimalTextEditorLite.Core.Database;
+using MinimalTextEditorLite.Core.Database;
 using System.Security.AccessControl;
 using System.Security.Principal;
 
@@ -7,6 +7,8 @@ namespace MinimalTextEditorLite.Core.Security;
 public interface IIsolatedTempFileService
 {
     string CreateTempJsonPath();
+
+    string CreateTempFilePath(string extension);
 
     string CreateTempOutputPath(string extension);
 }
@@ -17,16 +19,31 @@ public sealed class IsolatedTempFileService : IIsolatedTempFileService
 
     public string CreateTempJsonPath()
     {
+        return CreateTempFilePath(".json");
+    }
+
+    public string CreateTempFilePath(string extension)
+    {
         EnsureTempFolder();
-        return Path.Combine(TempFolder, $"{Guid.NewGuid():N}.json");
+
+        var normalizedExtension = NormalizeExtension(extension);
+        return Path.Combine(TempFolder, $"{Guid.NewGuid():N}{normalizedExtension}");
     }
 
     public string CreateTempOutputPath(string extension)
     {
-        EnsureTempFolder();
+        // Backward-compatible alias kept for existing callers.
+        // New code should prefer CreateTempFilePath.
+        return CreateTempFilePath(extension);
+    }
 
-        var normalizedExtension = extension.StartsWith('.') ? extension : $".{extension}";
-        return Path.Combine(TempFolder, $"{Guid.NewGuid():N}{normalizedExtension}");
+    private static string NormalizeExtension(string extension)
+    {
+        if (string.IsNullOrWhiteSpace(extension))
+            throw new ArgumentException("A temporary file extension is required.", nameof(extension));
+
+        var trimmedExtension = extension.Trim();
+        return trimmedExtension.StartsWith('.') ? trimmedExtension : $".{trimmedExtension}";
     }
 
     private static void EnsureTempFolder()
