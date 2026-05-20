@@ -161,6 +161,8 @@ public partial class App : Application, INotifyPropertyChanged
         services.AddSingleton<EditorJsInlineHtmlSanitizer>();
         services.AddSingleton<IIsolatedTempFileService, IsolatedTempFileService>();
 
+        services.AddSingleton<HtmlDocumentBuilder>();
+
         services.AddSingleton<IImporter, JsonImporter>();
         services.AddSingleton<IImporter, MarkdownImporter>();
 
