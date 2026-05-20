@@ -4,6 +4,8 @@ using MinimalTextEditorLite.App.Helpers;
 using MinimalTextEditorLite.App.View.SettingsModal;
 using MinimalTextEditorLite.Core.Database;
 using MinimalTextEditorLite.Core.Models;
+using MinimalTextEditorLite.Core.Repositories;
+using MinimalTextEditorLite.Core.Services;
 using System.Diagnostics;
 using System.IO;
 using System.Text;
@@ -13,8 +15,8 @@ namespace MinimalTextEditorLite.App.ViewModels;
 
 public partial class SettingsModalWindowVM : ObservableObject
 {
-    private readonly IDatabaseHelper database;
-    private readonly NoteService noteService;
+    private readonly ISettingsRepository settingsRepository;
+    private readonly IBackupService backupService;
 
     private SettingsModalWindow SettingsModalWindow { get; }
 
@@ -41,11 +43,11 @@ public partial class SettingsModalWindowVM : ObservableObject
             UpdateLanguageInDatabase(value);
     }
 
-    public SettingsModalWindowVM(SettingsModalWindow settingsWindow, IDatabaseHelper database, NoteService noteService)
+    public SettingsModalWindowVM(SettingsModalWindow settingsWindow, ISettingsRepository settingsRepository, IBackupService backupService)
     {
         SettingsModalWindow = settingsWindow;
-        this.database = database;
-        this.noteService = noteService;
+        this.settingsRepository = settingsRepository;
+        this.backupService = backupService;
 
         GetAppConfiguration();
         GetBackupFilesInfo();
@@ -53,7 +55,7 @@ public partial class SettingsModalWindowVM : ObservableObject
 
     public void GetAppConfiguration()
     {
-        var settings = database.QuerySingle<SettingsModel>("SELECT * FROM Settings WHERE Id = 1");
+        var settings = settingsRepository.GetCurrentAsync().GetAwaiter().GetResult();
 
         if (settings != null)
         {
@@ -69,23 +71,30 @@ public partial class SettingsModalWindowVM : ObservableObject
 
     public void GetBackupFilesInfo()
     {
-        var stats = noteService.GetBackupFolderStatistics();
-        var formattedText = new StringBuilder();
+        try
+        {
+            var stats = backupService.GetStatisticsAsync().GetAwaiter().GetResult();
+            var formattedText = new StringBuilder();
 
-        formattedText.Append(App.Localization.Translate("Modal_Settings_Backup_Total_Of"));
-        formattedText.Append(" ");
-        formattedText.Append(stats.FileCount);
-        formattedText.Append(" ");
-        formattedText.Append(App.Localization.Translate("Modal_Settings_Backup_Files"));
-        formattedText.Append(" ");
-        formattedText.Append(stats.TotalSize);
-        formattedText.Append(" ");
-        formattedText.Append(App.Localization.Translate("Modal_Settings_Backup_Remove_These"));
+            formattedText.Append(App.Localization.Translate("Modal_Settings_Backup_Total_Of"));
+            formattedText.Append(" ");
+            formattedText.Append(stats.FileCount);
+            formattedText.Append(" ");
+            formattedText.Append(App.Localization.Translate("Modal_Settings_Backup_Files"));
+            formattedText.Append(" ");
+            formattedText.Append(stats.TotalSize);
+            formattedText.Append(" ");
+            formattedText.Append(App.Localization.Translate("Modal_Settings_Backup_Remove_These"));
 
-        BackupFilesText = formattedText.ToString();
+            BackupFilesText = formattedText.ToString();
+        }
+        catch
+        {
+            ModalMessages.showErrorModal(App.Localization.Translate("Error_Backup_Folder_Stats"));
+        }
     }
 
-    private int GetAutoSaveIndexFromValue(int autoSaveValue)
+    private static int GetAutoSaveIndexFromValue(int autoSaveValue)
     {
         return autoSaveValue switch
         {
@@ -115,16 +124,16 @@ public partial class SettingsModalWindowVM : ObservableObject
         };
     }
 
-    private void UpdateAutoSaveSetting(AutoSaveInterval interval)
+    private async void UpdateAutoSaveSetting(AutoSaveInterval interval)
     {
-        var settings = database.QuerySingle<SettingsModel>("SELECT * FROM Settings WHERE Id = 1");
+        var settings = await settingsRepository.GetCurrentAsync();
 
         if (settings != null)
         {
             settings.AutoSaveNote = (int)interval;
             settings.UpdatedAt = DateTime.UtcNow;
 
-            bool isUpdated = database.Update(settings);
+            bool isUpdated = await settingsRepository.UpdateAsync(settings);
             ((App)Application.Current).AutoSaveNote = (int)interval;
 
             if (!isUpdated)
@@ -136,15 +145,15 @@ public partial class SettingsModalWindowVM : ObservableObject
         }
     }
 
-    private void UpdateLanguageInDatabase(int newLanguageIndex)
+    private async void UpdateLanguageInDatabase(int newLanguageIndex)
     {
         string newLanguage = newLanguageIndex == 0 ? "en_us" : "pt_br";
-        var settings = database.QuerySingle<SettingsModel>("SELECT * FROM Settings WHERE Id = 1");
+        var settings = await settingsRepository.GetCurrentAsync();
 
         if (settings != null)
         {
             settings.Language = newLanguage;
-            bool isUpdated = database.Update(settings);
+            bool isUpdated = await settingsRepository.UpdateAsync(settings);
 
             LocalizationHelper.UpdateLocalizationFile(newLanguage);
 
@@ -162,32 +171,34 @@ public partial class SettingsModalWindowVM : ObservableObject
     [RelayCommand]
     private void OpenBackupFolder()
     {
-        string backupsFolderPath = Path.Combine(
-            Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData),
-            "MinimalTextEditorLite",
-            "Backups");
-
-        if (Directory.Exists(backupsFolderPath))
+        if (Directory.Exists(AppPaths.BackupsFolder))
         {
             Process.Start(new ProcessStartInfo
             {
-                FileName = backupsFolderPath,
+                FileName = AppPaths.BackupsFolder,
                 UseShellExecute = true,
             });
         }
     }
 
     [RelayCommand]
-    private void DeleteBackup()
+    private async Task DeleteBackup()
     {
-        noteService.RemoveBackupFiles();
-        SettingsModalWindow.DialogResult = false;
+        try
+        {
+            await backupService.RemoveAllAsync();
+            SettingsModalWindow.DialogResult = false;
+        }
+        catch
+        {
+            ModalMessages.showErrorModal(App.Localization.Translate("Error_Backup_Files_Remove"));
+        }
     }
 
     [RelayCommand]
-    private void RestoreMessages()
+    private async Task RestoreMessages()
     {
-        var settings = database.QuerySingle<SettingsModel>("SELECT * FROM Settings WHERE Id = 1");
+        var settings = await settingsRepository.GetCurrentAsync();
 
         if (settings != null)
         {
@@ -196,7 +207,7 @@ public partial class SettingsModalWindowVM : ObservableObject
             settings.ShowNewUpdates = true;
             settings.UpdatedAt = DateTime.UtcNow;
 
-            bool isUpdated = database.Update(settings);
+            bool isUpdated = await settingsRepository.UpdateAsync(settings);
 
             ((App)Application.Current).ShowBackupSizeLimiteMessage = true;
             ((App)Application.Current).ShowOpenNoteMessage = true;
@@ -222,3 +233,4 @@ public partial class SettingsModalWindowVM : ObservableObject
         SettingsModalWindow.DialogResult = false;
     }
 }
+

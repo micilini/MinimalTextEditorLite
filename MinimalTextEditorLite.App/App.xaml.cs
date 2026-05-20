@@ -2,7 +2,10 @@
 using MinimalTextEditorLite.App.Helpers;
 using MinimalTextEditorLite.App.ViewModels;
 using MinimalTextEditorLite.Core.Database;
+using MinimalTextEditorLite.Core.Exporters;
 using MinimalTextEditorLite.Core.Models;
+using MinimalTextEditorLite.Core.Repositories;
+using MinimalTextEditorLite.Core.Services;
 using MinimalTextEditorLite.Core.Startup;
 using System.ComponentModel;
 using System.IO;
@@ -106,10 +109,20 @@ public partial class App : Application, INotifyPropertyChanged
         });
 
         services.AddSingleton<ISqliteConnectionFactory, SqliteConnectionFactory>();
-        services.AddSingleton<IDatabaseHelper, DatabaseHelper>();
         services.AddSingleton<StartupAppConfiguration>();
 
-        services.AddSingleton<NoteService>();
+        services.AddSingleton<INoteRepository, NoteRepository>();
+        services.AddSingleton<ISettingsRepository, SettingsRepository>();
+        services.AddSingleton<IRecentFilesRepository, RecentFilesRepository>();
+
+        services.AddSingleton<IBackupService, BackupService>();
+        services.AddSingleton<IImportService, ImportService>();
+        services.AddSingleton<IExportService, ExportService>();
+
+        services.AddSingleton<IExporter, JsonExporter>();
+        services.AddSingleton<IExporter, HtmlExporter>();
+        services.AddSingleton<IExporter, DocExporter>();
+        services.AddSingleton<IExporter, PdfExporter>();
 
         services.AddTransient<SplashScreenWindowVM>();
         services.AddTransient<MainScreenWindowVM>();
@@ -140,5 +153,6 @@ public partial class App : Application, INotifyPropertyChanged
         PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
     }
 }
+
 
 

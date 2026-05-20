@@ -2,15 +2,15 @@
 using CommunityToolkit.Mvvm.Input;
 using MinimalTextEditorLite.App.Helpers;
 using MinimalTextEditorLite.App.View.GlobalModals;
-using MinimalTextEditorLite.Core.Database;
 using MinimalTextEditorLite.Core.Models;
+using MinimalTextEditorLite.Core.Repositories;
 using System.Windows;
 
 namespace MinimalTextEditorLite.App.ViewModels;
 
 public partial class GlobalModalsWindowVM : ObservableObject
 {
-    private readonly IDatabaseHelper database;
+    private readonly ISettingsRepository settingsRepository;
 
     [ObservableProperty]
     private GlobalModalsWindow globalModalsWindow;
@@ -24,9 +24,9 @@ public partial class GlobalModalsWindowVM : ObservableObject
     [ObservableProperty]
     private bool isInputModal;
 
-    public GlobalModalsWindowVM(GlobalModalsWindow globalModals, GlobalModalModel gmm, bool inputModal, IDatabaseHelper database)
+    public GlobalModalsWindowVM(GlobalModalsWindow globalModals, GlobalModalModel gmm, bool inputModal, ISettingsRepository settingsRepository)
     {
-        this.database = database;
+        this.settingsRepository = settingsRepository;
         globalModalsWindow = globalModals;
         globalModalModel = gmm;
         isInputModal = inputModal;
@@ -50,17 +50,17 @@ public partial class GlobalModalsWindowVM : ObservableObject
         GlobalModalsWindow.DialogResult = false;
     }
 
-    public void UpdateShowOpenNoteMessage(bool value)
+    public async void UpdateShowOpenNoteMessage(bool value)
     {
         try
         {
-            var settings = database.QuerySingle<SettingsModel>("SELECT * FROM Settings WHERE Id = ?", 1);
+            var settings = await settingsRepository.GetCurrentAsync();
 
             if (settings != null)
             {
                 settings.ShowOpenNoteMessage = value;
                 settings.UpdatedAt = DateTime.UtcNow;
-                database.Update(settings);
+                await settingsRepository.UpdateAsync(settings);
                 ((App)Application.Current).ShowOpenNoteMessage = value;
             }
             else
@@ -74,17 +74,17 @@ public partial class GlobalModalsWindowVM : ObservableObject
         }
     }
 
-    public void UpdateShowBackupSizeMessage(bool value)
+    public async void UpdateShowBackupSizeMessage(bool value)
     {
         try
         {
-            var settings = database.QuerySingle<SettingsModel>("SELECT * FROM Settings WHERE Id = ?", 1);
+            var settings = await settingsRepository.GetCurrentAsync();
 
             if (settings != null)
             {
                 settings.ShowBackupSizeLimiteMessage = value;
                 settings.UpdatedAt = DateTime.UtcNow;
-                database.Update(settings);
+                await settingsRepository.UpdateAsync(settings);
                 ((App)Application.Current).ShowBackupSizeLimiteMessage = value;
             }
             else

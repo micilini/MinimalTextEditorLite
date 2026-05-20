@@ -1,18 +1,21 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Win32;
 using MinimalTextEditorLite.App.Helpers;
+using MinimalTextEditorLite.Core.Services;
+using System.IO;
 using System.Windows;
 
 namespace MinimalTextEditorLite.App.View.ExportModal;
 
 public partial class ExportModalWindow : Window
 {
-    private readonly NoteService noteService;
+    private readonly IExportService exportService;
 
     public ExportModalWindow()
     {
         InitializeComponent();
 
-        noteService = ((App)Application.Current).Services.GetRequiredService<NoteService>();
+        exportService = ((App)Application.Current).Services.GetRequiredService<IExportService>();
         ExportComboBox.SelectedIndex = 0;
     }
 
@@ -21,37 +24,44 @@ public partial class ExportModalWindow : Window
         ButtonExport.IsEnabled = false;
         ButtonExport.Content = App.Localization.Translate("Export_Wait_Message");
 
-        var exportSucceeded = false;
-
         try
         {
-            switch (ExportComboBox.SelectedIndex)
+            var exporterId = ExportComboBox.SelectedIndex switch
             {
-                case 0:
-                    exportSucceeded = await noteService.ExportCurrentNoteAsJSON();
-                    break;
-                case 1:
-                    exportSucceeded = await noteService.ExportCurrentNoteAsDoc();
-                    break;
-                case 2:
-                    exportSucceeded = await noteService.ExportCurrentNoteAsHTML();
-                    break;
-                case 3:
-                    exportSucceeded = await noteService.ExportCurrentNoteAsPDF();
-                    break;
-                default:
-                    ModalMessages.showErrorModal(App.Localization.Translate("Error_Export_1"));
-                    break;
-            }
+                0 => "json",
+                1 => "doc",
+                2 => "html",
+                3 => "pdf",
+                _ => string.Empty
+            };
 
-            if (exportSucceeded)
+            if (string.IsNullOrEmpty(exporterId))
             {
-                DialogResult = true;
+                ModalMessages.showErrorModal(App.Localization.Translate("Error_Export_1"));
+                ButtonExport.IsEnabled = true;
+                ButtonExport.Content = App.Localization.Translate("Export_Button");
                 return;
             }
 
-            ButtonExport.IsEnabled = true;
-            ButtonExport.Content = App.Localization.Translate("Export_Button");
+            var descriptor = exportService.GetExporter(exporterId);
+            var saveFileDialog = new SaveFileDialog
+            {
+                Filter = descriptor.FileDialogFilter,
+                FileName = descriptor.DefaultFileName,
+                Title = App.Localization.Translate("Title_Export_Note")
+            };
+
+            if (saveFileDialog.ShowDialog() != true)
+            {
+                ButtonExport.IsEnabled = true;
+                ButtonExport.Content = App.Localization.Translate("Export_Button");
+                return;
+            }
+
+            var bytes = await exportService.ExportAsync(exporterId);
+            await File.WriteAllBytesAsync(saveFileDialog.FileName, bytes);
+
+            DialogResult = true;
         }
         catch
         {
