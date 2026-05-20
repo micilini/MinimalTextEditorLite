@@ -1,9 +1,12 @@
 using MinimalTextEditorLite.Core.Repositories;
-using System.Text.Json;
+using MinimalTextEditorLite.Core.Security;
 
 namespace MinimalTextEditorLite.Core.Services;
 
-public sealed class ImportService(INoteRepository noteRepository, IRecentFilesRepository recentFilesRepository) : IImportService
+public sealed class ImportService(
+    INoteRepository noteRepository,
+    IRecentFilesRepository recentFilesRepository,
+    IEditorJsSecurityService editorJsSecurityService) : IImportService
 {
     public async Task<ImportResult> ImportAsync(string filePath)
     {
@@ -23,18 +26,11 @@ public sealed class ImportService(INoteRepository noteRepository, IRecentFilesRe
             return ImportResult.Fail("Error_Note_Import", ex.Message);
         }
 
-        try
-        {
-            using var jsonObject = JsonDocument.Parse(jsonContent);
-            if (!jsonObject.RootElement.TryGetProperty("blocks", out _))
-                return ImportResult.Fail("Error_Invalid_Json_Key_Block");
-        }
-        catch (JsonException ex)
-        {
-            return ImportResult.Fail("Error_Invalid_Json", ex.Message);
-        }
+        var validation = await editorJsSecurityService.ValidateAndNormalizeJsonAsync(jsonContent);
+        if (!validation.Success || string.IsNullOrWhiteSpace(validation.NormalizedJson))
+            return ImportResult.Fail("Error_Invalid_Json", validation.ErrorMessage);
 
-        var updated = await noteRepository.UpdateJsonAsync(jsonContent);
+        var updated = await noteRepository.UpdateJsonAsync(validation.NormalizedJson);
         if (!updated)
             return ImportResult.Fail("Error_Notes_Not_Found");
 

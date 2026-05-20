@@ -1,26 +1,21 @@
 using MinimalTextEditorLite.Core.Database;
 using MinimalTextEditorLite.Core.Models;
+using MinimalTextEditorLite.Core.Security;
 
 namespace MinimalTextEditorLite.Core.Startup;
 
 public sealed class StartupAppConfiguration(
     DatabaseOptions databaseOptions,
-    ISqliteConnectionFactory connectionFactory)
+    ISqliteConnectionFactory connectionFactory,
+    DatabaseKeyMigrationService databaseKeyMigrationService)
 {
     public StartupResult CheckAndCreateDatabase()
     {
         Directory.CreateDirectory(AppPaths.LocalAppDataFolder);
         Directory.CreateDirectory(AppPaths.BackupsFolder);
 
-        if (!File.Exists(databaseOptions.KeyFilePath))
-        {
-            var timestamp = DateTimeOffset.UtcNow.ToUnixTimeSeconds().ToString();
-            File.WriteAllText(databaseOptions.KeyFilePath, timestamp);
-        }
-
-        databaseOptions.EncryptionKey = File.ReadAllText(databaseOptions.KeyFilePath);
-
         var databaseAlreadyExisted = File.Exists(databaseOptions.DatabasePath);
+        databaseKeyMigrationService.EnsureMigrated();
 
         var connection = connectionFactory.GetConnection();
 

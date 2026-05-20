@@ -1,4 +1,6 @@
+using Ganss.Xss;
 using MinimalTextEditorLite.Exporters.Contracts.EditorJs;
+using System.Net;
 using System.Text;
 using System.Text.Json;
 
@@ -6,6 +8,8 @@ namespace MinimalTextEditorLite.Core.Exporters;
 
 public sealed class HtmlExporter : IExporter
 {
+    private readonly HtmlSanitizer sanitizer = CreateSanitizer();
+
     public string Id => "html";
     public string DisplayName => "HTML";
     public string DefaultFileName => "Note.html";
@@ -35,109 +39,154 @@ public sealed class HtmlExporter : IExporter
         htmlBuilder.Append("<body>");
 
         foreach (var block in document.Blocks)
-        {
-            switch (block.Type)
-            {
-                case "header":
-                {
-                    var data = block.Data.Deserialize<EditorJsHeaderData>(EditorJsJson.Options);
-                    var level = Math.Clamp(data?.Level ?? 1, 1, 6);
-                    htmlBuilder.Append($"<h{level}>{data?.Text ?? string.Empty}</h{level}>");
-                    break;
-                }
-                case "paragraph":
-                {
-                    var data = block.Data.Deserialize<EditorJsParagraphData>(EditorJsJson.Options);
-                    htmlBuilder.Append($"<p>{data?.Text ?? string.Empty}</p>");
-                    break;
-                }
-                case "list":
-                {
-                    var data = block.Data.Deserialize<EditorJsListData>(EditorJsJson.Options);
-                    var listTag = string.Equals(data?.Style, "ordered", StringComparison.OrdinalIgnoreCase) ? "ol" : "ul";
-                    htmlBuilder.Append($"<{listTag}>");
-
-                    foreach (var item in data?.Items ?? [])
-                        htmlBuilder.Append($"<li>{item}</li>");
-
-                    htmlBuilder.Append($"</{listTag}>");
-                    break;
-                }
-                case "checklist":
-                {
-                    var data = block.Data.Deserialize<EditorJsChecklistData>(EditorJsJson.Options);
-                    htmlBuilder.Append("<ul>");
-
-                    foreach (var item in data?.Items ?? [])
-                    {
-                        var checkbox = item.Checked ? "☑" : "☐";
-                        htmlBuilder.Append($"{checkbox} {item.Text}<br>");
-                    }
-
-                    htmlBuilder.Append("</ul>");
-                    break;
-                }
-                case "quote":
-                {
-                    var data = block.Data.Deserialize<EditorJsQuoteData>(EditorJsJson.Options);
-                    htmlBuilder.Append($"<blockquote><p>{data?.Text ?? string.Empty}</p><footer>- {data?.Caption ?? string.Empty}</footer></blockquote>");
-                    break;
-                }
-                case "warning":
-                {
-                    var data = block.Data.Deserialize<EditorJsWarningData>(EditorJsJson.Options);
-                    htmlBuilder.Append("<div style='border: 1px solid #ffa500; padding: 10px; margin: 10px 0; background: #fff8e5;'>");
-                    htmlBuilder.Append($"<strong>{data?.Title ?? string.Empty}</strong>: {data?.Message ?? string.Empty}");
-                    htmlBuilder.Append("</div>");
-                    break;
-                }
-                case "code":
-                {
-                    var data = block.Data.Deserialize<EditorJsCodeData>(EditorJsJson.Options);
-                    htmlBuilder.Append($"<pre><code>{System.Security.SecurityElement.Escape(data?.Code ?? string.Empty)}</code></pre>");
-                    break;
-                }
-                case "delimiter":
-                {
-                    htmlBuilder.Append("<p style='text-align:center; font-size:28px; margin:15px;'>***</p>");
-                    break;
-                }
-                case "table":
-                {
-                    var data = block.Data.Deserialize<EditorJsTableData>(EditorJsJson.Options);
-                    htmlBuilder.Append("<table>");
-
-                    foreach (var row in data?.Content ?? [])
-                    {
-                        htmlBuilder.Append("<tr>");
-
-                        foreach (var cell in row)
-                            htmlBuilder.Append($"<td>{cell}</td>");
-
-                        htmlBuilder.Append("</tr>");
-                    }
-
-                    htmlBuilder.Append("</table>");
-                    break;
-                }
-                case "image":
-                {
-                    var data = block.Data.Deserialize<EditorJsImageData>(EditorJsJson.Options);
-                    htmlBuilder.Append("<figure>");
-                    htmlBuilder.Append($"<img src=\"{data?.Url ?? string.Empty}\" alt=\"{data?.Caption ?? string.Empty}\">");
-
-                    if (!string.IsNullOrEmpty(data?.Caption))
-                        htmlBuilder.Append($"<figcaption>{data.Caption}</figcaption>");
-
-                    htmlBuilder.Append("</figure>");
-                    break;
-                }
-            }
-        }
+            AppendBlock(htmlBuilder, block);
 
         htmlBuilder.Append("</body>");
         htmlBuilder.Append("</html>");
 
         return Task.FromResult(Encoding.UTF8.GetBytes(htmlBuilder.ToString()));
+    }
+
+    private void AppendBlock(StringBuilder htmlBuilder, EditorJsBlock block)
+    {
+        switch (block.Type)
+        {
+            case "header":
+            {
+                var data = block.Data.Deserialize<EditorJsHeaderData>(EditorJsJson.Options);
+                var level = Math.Clamp(data?.Level ?? 1, 1, 6);
+                htmlBuilder.Append($"<h{level}>{SafeInlineHtml(data?.Text)}</h{level}>");
+                break;
+            }
+            case "paragraph":
+            {
+                var data = block.Data.Deserialize<EditorJsParagraphData>(EditorJsJson.Options);
+                htmlBuilder.Append($"<p>{SafeInlineHtml(data?.Text)}</p>");
+                break;
+            }
+            case "list":
+            {
+                var data = block.Data.Deserialize<EditorJsListData>(EditorJsJson.Options);
+                var listTag = string.Equals(data?.Style, "ordered", StringComparison.OrdinalIgnoreCase) ? "ol" : "ul";
+                htmlBuilder.Append($"<{listTag}>");
+
+                foreach (var item in data?.Items ?? [])
+                    htmlBuilder.Append($"<li>{SafeInlineHtml(item)}</li>");
+
+                htmlBuilder.Append($"</{listTag}>");
+                break;
+            }
+            case "checklist":
+            {
+                var data = block.Data.Deserialize<EditorJsChecklistData>(EditorJsJson.Options);
+                htmlBuilder.Append("<ul>");
+
+                foreach (var item in data?.Items ?? [])
+                {
+                    var checkbox = item.Checked ? "&#9745;" : "&#9744;";
+                    htmlBuilder.Append($"{checkbox} {SafeInlineHtml(item.Text)}<br>");
+                }
+
+                htmlBuilder.Append("</ul>");
+                break;
+            }
+            case "quote":
+            {
+                var data = block.Data.Deserialize<EditorJsQuoteData>(EditorJsJson.Options);
+                htmlBuilder.Append($"<blockquote><p>{SafeInlineHtml(data?.Text)}</p><footer>- {SafeInlineHtml(data?.Caption)}</footer></blockquote>");
+                break;
+            }
+            case "warning":
+            {
+                var data = block.Data.Deserialize<EditorJsWarningData>(EditorJsJson.Options);
+                htmlBuilder.Append("<div style='border: 1px solid #ffa500; padding: 10px; margin: 10px 0; background: #fff8e5;'>");
+                htmlBuilder.Append($"<strong>{SafeInlineHtml(data?.Title)}</strong>: {SafeInlineHtml(data?.Message)}");
+                htmlBuilder.Append("</div>");
+                break;
+            }
+            case "code":
+            {
+                var data = block.Data.Deserialize<EditorJsCodeData>(EditorJsJson.Options);
+                htmlBuilder.Append($"<pre><code>{SafeText(data?.Code)}</code></pre>");
+                break;
+            }
+            case "delimiter":
+            {
+                htmlBuilder.Append("<p style='text-align:center; font-size:28px; margin:15px;'>***</p>");
+                break;
+            }
+            case "table":
+            {
+                var data = block.Data.Deserialize<EditorJsTableData>(EditorJsJson.Options);
+                htmlBuilder.Append("<table>");
+
+                foreach (var row in data?.Content ?? [])
+                {
+                    htmlBuilder.Append("<tr>");
+
+                    foreach (var cell in row)
+                        htmlBuilder.Append($"<td>{SafeInlineHtml(cell)}</td>");
+
+                    htmlBuilder.Append("</tr>");
+                }
+
+                htmlBuilder.Append("</table>");
+                break;
+            }
+            case "image":
+            {
+                var data = block.Data.Deserialize<EditorJsImageData>(EditorJsJson.Options);
+                htmlBuilder.Append("<figure>");
+                htmlBuilder.Append($"<img src=\"{SafeText(data?.Url)}\" alt=\"{SafeText(data?.Caption)}\">");
+
+                if (!string.IsNullOrEmpty(data?.Caption))
+                    htmlBuilder.Append($"<figcaption>{SafeInlineHtml(data.Caption)}</figcaption>");
+
+                htmlBuilder.Append("</figure>");
+                break;
+            }
+        }
+    }
+
+    private static HtmlSanitizer CreateSanitizer()
+    {
+        var sanitizer = new HtmlSanitizer();
+
+        sanitizer.AllowedTags.Clear();
+        sanitizer.AllowedTags.Add("b");
+        sanitizer.AllowedTags.Add("strong");
+        sanitizer.AllowedTags.Add("i");
+        sanitizer.AllowedTags.Add("em");
+        sanitizer.AllowedTags.Add("u");
+        sanitizer.AllowedTags.Add("a");
+        sanitizer.AllowedTags.Add("code");
+        sanitizer.AllowedTags.Add("mark");
+        sanitizer.AllowedTags.Add("br");
+
+        sanitizer.AllowedAttributes.Clear();
+        sanitizer.AllowedAttributes.Add("href");
+        sanitizer.AllowedAttributes.Add("title");
+        sanitizer.AllowedAttributes.Add("target");
+        sanitizer.AllowedAttributes.Add("rel");
+
+        sanitizer.AllowedSchemes.Clear();
+        sanitizer.AllowedSchemes.Add("http");
+        sanitizer.AllowedSchemes.Add("https");
+        sanitizer.AllowedSchemes.Add("mailto");
+
+        return sanitizer;
+    }
+
+    private string SafeInlineHtml(string? value)
+    {
+        if (string.IsNullOrWhiteSpace(value))
+            return string.Empty;
+
+        return sanitizer.Sanitize(value);
+    }
+
+    private static string SafeText(string? value)
+    {
+        return WebUtility.HtmlEncode(value ?? string.Empty);
     }
 }

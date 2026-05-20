@@ -184,10 +184,18 @@ public partial class SettingsModalWindowVM : ObservableObject
     [RelayCommand]
     private async Task DeleteBackup()
     {
+        var confirmed = ModalMessages.ShowConfirmModal(
+            App.Localization.Translate("Confirm_Delete_Backups_Title"),
+            App.Localization.Translate("Confirm_Delete_Backups_Description"),
+            App.Localization.Translate("Confirm_Delete_Backups_Bold"));
+
+        if (!confirmed)
+            return;
+
         try
         {
             await backupService.RemoveAllAsync();
-            SettingsModalWindow.DialogResult = false;
+            GetBackupFilesInfo();
         }
         catch
         {
