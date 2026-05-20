@@ -22,6 +22,7 @@ public sealed class StartupAppConfiguration(
         connection.CreateTable<AppVersion>();
         connection.CreateTable<SettingsModel>();
         connection.CreateTable<NoteModel>();
+        connection.CreateTable<RecentFileModel>();
         EnsureV2Columns(connection);
 
         if (!connection.Table<AppVersion>().Any())
@@ -51,6 +52,7 @@ public sealed class StartupAppConfiguration(
 
         AddColumnIfMissing(connection, "Settings", "ExportFrontMatterYaml", "ExportFrontMatterYaml INTEGER NOT NULL DEFAULT 1");
         AddColumnIfMissing(connection, "Settings", "Theme", "Theme TEXT NOT NULL DEFAULT 'light'");
+        AddColumnIfMissing(connection, "Settings", "AssociateFilesWithApp", "AssociateFilesWithApp INTEGER NOT NULL DEFAULT 0");
     }
 
     private static void AddColumnIfMissing(SQLite.SQLiteConnection connection, string tableName, string columnName, string columnDefinition)

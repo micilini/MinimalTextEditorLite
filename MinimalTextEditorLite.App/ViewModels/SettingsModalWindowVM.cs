@@ -63,6 +63,15 @@ public partial class SettingsModalWindowVM : ObservableObject
             _ = UpdateExportFrontMatterYamlSafeAsync(value);
     }
 
+    [ObservableProperty]
+    private bool associateFilesWithApp;
+
+    partial void OnAssociateFilesWithAppChanged(bool value)
+    {
+        if (AllowUserInteract)
+            _ = UpdateAssociateFilesSafeAsync(value);
+    }
+
     public SettingsModalWindowVM(
         SettingsModalWindow settingsWindow,
         ISettingsRepository settingsRepository,
@@ -88,6 +97,7 @@ public partial class SettingsModalWindowVM : ObservableObject
             SelectedLanguageIndex = settings.Language.Equals("pt_br", StringComparison.OrdinalIgnoreCase) ? 1 : 0;
             SelectedThemeIndex = GetThemeIndexFromPreference(settings.Theme);
             ExportFrontMatterYaml = settings.ExportFrontMatterYaml;
+            AssociateFilesWithApp = settings.AssociateFilesWithApp || ShellExtensionInstaller.IsInstalled();
         }
         else
         {
@@ -95,6 +105,7 @@ public partial class SettingsModalWindowVM : ObservableObject
             SelectedLanguageIndex = 0;
             SelectedThemeIndex = 0;
             ExportFrontMatterYaml = true;
+            AssociateFilesWithApp = ShellExtensionInstaller.IsInstalled();
         }
     }
 
@@ -304,6 +315,36 @@ public partial class SettingsModalWindowVM : ObservableObject
 
         if (!await settingsRepository.UpdateAsync(settings))
             ModalMessages.showErrorModal(App.Localization.Translate("Error_Settings_Update"));
+    }
+
+    private async Task UpdateAssociateFilesSafeAsync(bool value)
+    {
+        try
+        {
+            if (value)
+                ShellExtensionInstaller.Install();
+            else
+                ShellExtensionInstaller.Uninstall();
+
+            var settings = await settingsRepository.GetCurrentAsync();
+
+            if (settings == null)
+            {
+                ModalMessages.showErrorModal(App.Localization.Translate("Error_App_Settings_Not_Found"));
+                return;
+            }
+
+            settings.AssociateFilesWithApp = value;
+            settings.UpdatedAt = DateTime.UtcNow;
+
+            if (!await settingsRepository.UpdateAsync(settings))
+                ModalMessages.showErrorModal(App.Localization.Translate("Error_Settings_Update"));
+        }
+        catch
+        {
+            ModalMessages.showErrorModal(App.Localization.Translate("Error_Shell_Association_Update"));
+            AssociateFilesWithApp = ShellExtensionInstaller.IsInstalled();
+        }
     }
 
     [RelayCommand]

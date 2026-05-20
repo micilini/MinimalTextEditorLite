@@ -9,66 +9,128 @@
         xmlns:localApp="clr-namespace:MinimalTextEditorLite.App"
         mc:Ignorable="d"
         TextElement.Foreground="{DynamicResource MaterialDesignBody}"
+        FontFamily="{StaticResource MTE.Font.Primary}"
         Background="{x:Null}"
-        AllowsTransparency="true"
+        AllowsTransparency="True"
         WindowStyle="None"
         WindowStartupLocation="CenterScreen"
-        Title="GlobalModalsWindow" Height="410" Width="665">
+        Title="GlobalModalsWindow"
+        Height="410" Width="665">
+
     <Grid>
-        <materialDesign:Card Background="{DynamicResource MaterialDesignPaper}" UniformCornerRadius="15" materialDesign:ShadowAssist.ShadowDepth="Depth4" Width="526" Height="324">
+        <materialDesign:Card Style="{StaticResource MTE.Card.Modal}"
+                             Width="540" Height="340">
             <Grid>
                 <Grid.RowDefinitions>
-                    <RowDefinition Height="70" />
-                    <RowDefinition MinHeight="174" Height="Auto" />
-                    <RowDefinition Height="80" />
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="*" />
+                    <RowDefinition Height="Auto" />
                 </Grid.RowDefinitions>
 
-                <StackPanel Grid.Row="0">
-                    <WrapPanel Margin="20">
-                        <Image RenderOptions.BitmapScalingMode="HighQuality" Source="{Binding GlobalModalModel.ImageSource, Mode=TwoWay}" Width="30" Height="30" Margin="0 0 10 0" />
-                        <Label Content="{Binding GlobalModalModel.HeaderContent, Mode=TwoWay}" FontFamily="Arial" FontSize="22" FontWeight="Bold" />
-                    </WrapPanel>
-                </StackPanel>
-
-                <StackPanel Grid.Row="1">
-                    <StackPanel Margin="20 10 20 20" Visibility="{Binding GlobalModalModel.ShowTextField, Mode=TwoWay, Converter={StaticResource BoolToVisibilityConverter}}">
-                        <TextBlock Text="{Binding LabelTextField, Mode=TwoWay}" FontFamily="Arial" FontSize="20" FontWeight="Regular" />
-                        <TextBox x:Name="MyTextBox" HorizontalAlignment="Left" Margin="0 15 0 0" Padding="7" Style="{StaticResource MaterialDesignTextBoxBase}" 
-                     TextWrapping="Wrap" Width="485" Height="35" materialDesign:HintAssist.Hint="{Binding GlobalModalModel.TextFieldHint, Mode=TwoWay}"
-                     FontFamily="Arial" FontSize="18" Foreground="{DynamicResource MaterialDesignBody}" />
-                        <TextBlock x:Name="ErrorNullInput" FontFamily="Arial" FontSize="16" FontWeight="Regular" Foreground="Red" Margin="0 15 0 0" />
+                <!-- ===== Header ===== -->
+                <Grid Grid.Row="0" Margin="28 24 28 8">
+                    <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                        <Border Width="44" Height="44"
+                                CornerRadius="12"
+                                Background="{StaticResource MTE.Brush.PrimarySubtle}"
+                                VerticalAlignment="Center">
+                            <!-- A image vem do model (varia por modal). Mantida dinâmica. -->
+                            <Image Source="{Binding GlobalModalModel.ImageSource, Mode=TwoWay}"
+                                   Width="24" Height="24"
+                                   RenderOptions.BitmapScalingMode="HighQuality"
+                                   HorizontalAlignment="Center"
+                                   VerticalAlignment="Center" />
+                        </Border>
+                        <Label Content="{Binding GlobalModalModel.HeaderContent, Mode=TwoWay}"
+                               FontFamily="{StaticResource MTE.Font.Primary}"
+                               FontSize="20"
+                               FontWeight="SemiBold"
+                               VerticalAlignment="Center"
+                               Margin="14 0 0 0"
+                               Padding="0" />
                     </StackPanel>
-                    <StackPanel Margin="20 10 20 20" Visibility="{Binding GlobalModalModel.ShowSimpleText, Mode=TwoWay, Converter={StaticResource BoolToVisibilityConverter}}">
-                        <TextBlock FontFamily="Arial" FontSize="20" FontWeight="Regular" TextWrapping="Wrap">
+                </Grid>
+
+                <Border Grid.Row="0" Style="{StaticResource MTE.Divider}"
+                        VerticalAlignment="Bottom" Margin="28 0 28 0" />
+
+                <!-- ===== Body ===== -->
+                <Grid Grid.Row="1">
+                    <!-- Variante 1: campo de texto -->
+                    <StackPanel Margin="28 16 28 16"
+                                Visibility="{Binding GlobalModalModel.ShowTextField, Mode=TwoWay, Converter={StaticResource BoolToVisibilityConverter}}">
+                        <TextBlock Text="{Binding LabelTextField, Mode=TwoWay}"
+                                   Style="{StaticResource MTE.Text.SectionLabel}" />
+                        <TextBox x:Name="MyTextBox"
+                                 HorizontalAlignment="Stretch"
+                                 Margin="0 12 0 0"
+                                 Padding="12 8"
+                                 Style="{StaticResource MaterialDesignOutlinedTextBox}"
+                                 TextWrapping="Wrap"
+                                 Height="42"
+                                 FontFamily="{StaticResource MTE.Font.Primary}"
+                                 FontSize="14"
+                                 Foreground="{DynamicResource MaterialDesignBody}"
+                                 materialDesign:HintAssist.Hint="{Binding GlobalModalModel.TextFieldHint, Mode=TwoWay}" />
+                        <TextBlock x:Name="ErrorNullInput"
+                                   FontFamily="{StaticResource MTE.Font.Primary}"
+                                   FontSize="13"
+                                   Foreground="{StaticResource MTE.Brush.Danger}"
+                                   Margin="0 10 0 0" />
+                    </StackPanel>
+
+                    <!-- Variante 2: texto simples + check opcional -->
+                    <StackPanel Margin="28 16 28 16"
+                                Visibility="{Binding GlobalModalModel.ShowSimpleText, Mode=TwoWay, Converter={StaticResource BoolToVisibilityConverter}}">
+                        <TextBlock FontFamily="{StaticResource MTE.Font.Primary}"
+                                   FontSize="15"
+                                   FontWeight="Normal"
+                                   LineHeight="22"
+                                   Foreground="{DynamicResource MaterialDesignBody}"
+                                   TextWrapping="Wrap">
                             <Run Text="{Binding GlobalModalModel.SimpleTextContent, Mode=TwoWay}" />
                             <Bold>
                                 <Run Text="{Binding GlobalModalModel.BoldTextContent, Mode=TwoWay}" />
                             </Bold>
                         </TextBlock>
-                        <WrapPanel Margin="0 20 0 0" Orientation="Horizontal" Visibility="{Binding GlobalModalModel.ShowConfirmationCheck, Mode=TwoWay, Converter={StaticResource BoolToVisibilityConverter}}">
-                            <CheckBox Content="{Binding Source={x:Static localApp:App.Localization}, Converter={StaticResource Translate}, ConverterParameter=Global_Modal_Dont_Show}" FontSize="16" FontWeight="Regular" FontFamily="Arial" Margin="0" Checked="CheckBox_Checked" Unchecked="CheckBox_Unchecked"/>
-                        </WrapPanel>
+
+                        <CheckBox Content="{Binding Source={x:Static localApp:App.Localization}, Converter={StaticResource Translate}, ConverterParameter=Global_Modal_Dont_Show}"
+                                  FontSize="13"
+                                  FontFamily="{StaticResource MTE.Font.Primary}"
+                                  Margin="0 18 0 0"
+                                  Visibility="{Binding GlobalModalModel.ShowConfirmationCheck, Mode=TwoWay, Converter={StaticResource BoolToVisibilityConverter}}"
+                                  Checked="CheckBox_Checked"
+                                  Unchecked="CheckBox_Unchecked" />
                     </StackPanel>
-                </StackPanel>
+                </Grid>
 
-                <StackPanel Grid.Row="2">
-                    <WrapPanel Height="80" HorizontalAlignment="Right" VerticalAlignment="Center">
-                        <Button Content="{Binding GlobalModalModel.SaveButton.Text, Mode=TwoWay}" 
-                    Visibility="{Binding GlobalModalModel.SaveButton.IsVisible, Mode=TwoWay, Converter={StaticResource BoolToVisibilityConverter}}"
-                    Command="{Binding NextCommand}"
-                    Style="{StaticResource MaterialDesignRaisedButton}" BorderBrush="{x:Null}" materialDesign:ShadowAssist.ShadowDepth="Depth0" HorizontalAlignment="Left" Foreground="White"  Background="#3498db" materialDesign:ButtonAssist.CornerRadius="4" Width="90" Height="48" Margin="0 15 10 0" FontFamily="Arial" FontSize="16" FontWeight="Bold" />
+                <!-- ===== Footer (Save / Cancel / Ok) ===== -->
+                <Border Grid.Row="2" Style="{StaticResource MTE.Divider}"
+                        VerticalAlignment="Top" Margin="28 0 28 0" />
 
-                        <Button Content="{Binding GlobalModalModel.CancelButton.Text, Mode=TwoWay}" 
-                    Visibility="{Binding GlobalModalModel.CancelButton.IsVisible, Mode=TwoWay, Converter={StaticResource BoolToVisibilityConverter}}"
-                    Command="{Binding CancelCommand}"
-                    Style="{StaticResource MaterialDesignRaisedButton}" BorderBrush="{x:Null}" materialDesign:ShadowAssist.ShadowDepth="Depth0" HorizontalAlignment="Left" Foreground="White"  Background="#e74c3c" materialDesign:ButtonAssist.CornerRadius="4" Width="90" Height="48" Margin="0 15 20 0" FontFamily="Arial" FontSize="16" FontWeight="Bold" />
+                <Grid Grid.Row="2" Margin="28 16 28 22">
+                    <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
+                        <Button Content="{Binding GlobalModalModel.CancelButton.Text, Mode=TwoWay}"
+                                Visibility="{Binding GlobalModalModel.CancelButton.IsVisible, Mode=TwoWay, Converter={StaticResource BoolToVisibilityConverter}}"
+                                Command="{Binding CancelCommand}"
+                                Style="{StaticResource MTE.Button.Danger}"
+                                MinWidth="96"
+                                Margin="0 0 10 0" />
 
-                        <Button Content="{Binding GlobalModalModel.OkButton.Text, Mode=TwoWay}" 
-                    Visibility="{Binding GlobalModalModel.OkButton.IsVisible, Mode=TwoWay, Converter={StaticResource BoolToVisibilityConverter}}"
-                    Command="{Binding OkCommand}"
-                    Style="{StaticResource MaterialDesignRaisedButton}" BorderBrush="{x:Null}" materialDesign:ShadowAssist.ShadowDepth="Depth0" HorizontalAlignment="Left" Foreground="White" Background="#2ecc71" materialDesign:ButtonAssist.CornerRadius="4" Width="90" Height="48" Margin="0 15 20 0" FontFamily="Arial" FontSize="16" FontWeight="Bold" />
-                    </WrapPanel>
-                </StackPanel>
+                        <Button Content="{Binding GlobalModalModel.SaveButton.Text, Mode=TwoWay}"
+                                Visibility="{Binding GlobalModalModel.SaveButton.IsVisible, Mode=TwoWay, Converter={StaticResource BoolToVisibilityConverter}}"
+                                Command="{Binding NextCommand}"
+                                Style="{StaticResource MTE.Button.Primary}"
+                                MinWidth="96"
+                                Margin="0 0 10 0" />
+
+                        <Button Content="{Binding GlobalModalModel.OkButton.Text, Mode=TwoWay}"
+                                Visibility="{Binding GlobalModalModel.OkButton.IsVisible, Mode=TwoWay, Converter={StaticResource BoolToVisibilityConverter}}"
+                                Command="{Binding OkCommand}"
+                                Style="{StaticResource MTE.Button.Success}"
+                                MinWidth="96" />
+                    </StackPanel>
+                </Grid>
             </Grid>
         </materialDesign:Card>
     </Grid>

@@ -26,11 +26,13 @@ public partial class App : Application, INotifyPropertyChanged
 
     public StartupResult? StartupResult { get; private set; }
 
+    public string? PendingFileToOpen { get; private set; }
+
     public static LocalizationHelper Localization { get; private set; } = null!;
 
     public string DatabaseFileName { get; } = "mte-lite.dll";
 
-    public string ApplicationVersion { get; } = "1.0.1";
+    public string ApplicationVersion { get; } = "2.0.0";
 
     public string ApplicationIdentifier { get; set; } = string.Empty;
 
@@ -120,6 +122,11 @@ public partial class App : Application, INotifyPropertyChanged
         ConfigureServices(services);
         Services = services.BuildServiceProvider();
 
+        if (e.Args.Length > 0 && File.Exists(e.Args[0]))
+            PendingFileToOpen = e.Args[0];
+
+        // Critical startup must run before base.OnStartup(e) so the SplashScreen is created
+        // with the persisted theme already applied. Do not move this back to SplashScreenWindowVM.
         InitializeApplicationStateBeforeSplash();
 
         base.OnStartup(e);

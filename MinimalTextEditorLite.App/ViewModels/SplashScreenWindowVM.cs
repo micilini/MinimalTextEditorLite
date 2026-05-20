@@ -9,6 +9,8 @@ public partial class SplashScreenWindowVM : ObservableObject
     [ObservableProperty]
     private int progressValue;
 
+    // Database/settings initialization already runs in App.InitializeApplicationStateBeforeSplash()
+    // before the SplashScreen is created. This VM only drives the visual loading transition.
     public async Task InitializeAsync()
     {
         await Task.Run(() =>

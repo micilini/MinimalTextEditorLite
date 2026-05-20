@@ -29,7 +29,43 @@ namespace MinimalTextEditorLite.Core.Models
 
         public NoteModel()
         {
-            NoteJson = "{\"blocks\":[{\"id\":\"XTDk7okQN4\",\"type\":\"header\",\"data\":{\"text\":\"Minimal Text Editor Lite (V 1.0.1)\",\"level\":2}},{\"id\":\"BcnFSGuUCV\",\"type\":\"paragraph\",\"data\":{\"text\":\"Create, edit, and export your notes universally (<i>j</i>son, <i>pdf</i>, <i>doc</i>, and <i>html</i>) with the <b>Minimal Text Editor Lite</b>&nbsp;??\"}},{\"id\":\"E_tePyX9Ux\",\"type\":\"paragraph\",\"data\":{\"text\":\"With this open-source minimalist text editor, you will have access to a variety of features that will help you create and format your content efficiently.\"}},{\"id\":\"20cd4gcdg9\",\"type\":\"paragraph\",\"data\":{\"text\":\"Happy Writing ??\"}}]}";
+            NoteJson = """
+            {
+              "time": 0,
+              "blocks": [
+                {
+                  "id": "mte-welcome-title",
+                  "type": "header",
+                  "data": {
+                    "text": "MinimalTextEditor (V 2.0.0)",
+                    "level": 2
+                  }
+                },
+                {
+                  "id": "mte-welcome-intro",
+                  "type": "paragraph",
+                  "data": {
+                    "text": "Create, edit, import, and export your notes universally (<i>json</i>, <i>markdown</i>, <i>html</i>, <i>pdf</i>, and <i>doc</i>) with <b>MinimalTextEditor</b>. \u2728"
+                  }
+                },
+                {
+                  "id": "mte-welcome-features",
+                  "type": "paragraph",
+                  "data": {
+                    "text": "With this open-source minimalist editor, you can write efficiently with structured blocks, images, Markdown, dark mode, Focus Mode, recent files, and clipboard export."
+                  }
+                },
+                {
+                  "id": "mte-welcome-happy-writing",
+                  "type": "paragraph",
+                  "data": {
+                    "text": "Happy writing \uD83D\uDE80"
+                  }
+                }
+              ],
+              "version": "2.30.6"
+            }
+            """;
             CreatedAt = DateTime.UtcNow;
             UpdatedAt = DateTime.UtcNow;
         }

@@ -8,7 +8,10 @@ using MinimalTextEditorLite.App.View.Components;
 using MinimalTextEditorLite.App.View.ExportModal;
 using MinimalTextEditorLite.App.View.MetadataModal;
 using MinimalTextEditorLite.App.View.SettingsModal;
+using MinimalTextEditorLite.Core.Models;
+using MinimalTextEditorLite.Core.Repositories;
 using MinimalTextEditorLite.Core.Services;
+using System.Collections.ObjectModel;
 using System.IO;
 using System.Windows;
 using System.Windows.Controls;
@@ -19,6 +22,7 @@ namespace MinimalTextEditorLite.App.ViewModels;
 public partial class MainScreenWindowVM : ObservableObject
 {
     private readonly IImportService importService;
+    private readonly IRecentFilesRepository recentFilesRepository;
     private BackgroundService? backgroundService;
     private EditorControl editorControl = null!;
     private AddOverlayForModals addOverlayForModals = null!;
@@ -39,9 +43,75 @@ public partial class MainScreenWindowVM : ObservableObject
     [ObservableProperty]
     private object? menuContent;
 
-    public MainScreenWindowVM(IImportService importService)
+    [ObservableProperty]
+    private bool isFocusMode;
+
+    partial void OnIsFocusModeChanged(bool value)
+    {
+        HeaderVisibility = value ? Visibility.Collapsed : Visibility.Visible;
+        HeaderRowHeight = value ? new GridLength(0) : new GridLength(80);
+
+        FocusModeFooterVisibility = value ? Visibility.Visible : Visibility.Collapsed;
+        FocusModeFooterText = value
+            ? App.Localization.Translate("Focus_Mode_Footer_Message")
+            : string.Empty;
+    }
+
+    [ObservableProperty]
+    private Visibility headerVisibility = Visibility.Visible;
+
+    [ObservableProperty]
+    private GridLength headerRowHeight = new(80);
+
+    [ObservableProperty]
+    private Visibility focusModeFooterVisibility = Visibility.Collapsed;
+
+    [ObservableProperty]
+    private string focusModeFooterText = string.Empty;
+
+    [ObservableProperty]
+    private int wordCount;
+
+    partial void OnWordCountChanged(int value)
+    {
+        UpdateFooterStatusText();
+    }
+
+    [ObservableProperty]
+    private int readingTimeMinutes = 1;
+
+    partial void OnReadingTimeMinutesChanged(int value)
+    {
+        UpdateFooterStatusText();
+    }
+
+    [ObservableProperty]
+    private string footerStatusText = string.Empty;
+
+    [ObservableProperty]
+    private bool isDirty;
+
+    partial void OnIsDirtyChanged(bool value)
+    {
+        WindowTitle = value
+            ? "* MinimalTextEditor"
+            : "MinimalTextEditor";
+    }
+
+    [ObservableProperty]
+    private string windowTitle = "MinimalTextEditor";
+
+    public ObservableCollection<RecentFileModel> RecentFiles { get; } = new();
+
+    partial void OnLastSaveTextBlockChanged(string value)
+    {
+        UpdateFooterStatusText();
+    }
+
+    public MainScreenWindowVM(IImportService importService, IRecentFilesRepository recentFilesRepository)
     {
         this.importService = importService;
+        this.recentFilesRepository = recentFilesRepository;
         SaveNoteCompleted = true;
     }
 
@@ -57,10 +127,12 @@ public partial class MainScreenWindowVM : ObservableObject
         var app = (App)Application.Current;
         app.PropertyChanged += App_PropertyChanged;
         LastSaveTextBlock = app.LastNoteUpdated;
+        UpdateFooterStatusText();
 
         MainScreenWindow.Loaded += MainScreenWindow_Loaded;
         MainScreenWindow.Unloaded += MainScreenWindow_Unloaded;
 
+        _ = LoadRecentFilesSafeAsync();
     }
 
     public void AddToMainGrid()
@@ -123,6 +195,7 @@ public partial class MainScreenWindowVM : ObservableObject
 
         ((App)Application.Current).PropertyChanged += App_PropertyChanged;
         _ = CheckIfBackupFolderHasReachedSizeLimitSafeAsync();
+        _ = OpenPendingFileSafeAsync();
     }
 
     private void MainScreenWindow_Unloaded(object sender, RoutedEventArgs e)
@@ -195,6 +268,150 @@ public partial class MainScreenWindowVM : ObservableObject
         return totalSize;
     }
 
+    private async Task LoadRecentFilesSafeAsync()
+    {
+        try
+        {
+            await LoadRecentFilesAsync();
+        }
+        catch
+        {
+            // Recent files are non-critical.
+        }
+    }
+
+    private async Task LoadRecentFilesAsync()
+    {
+        var files = await recentFilesRepository.GetAllAsync();
+
+        RecentFiles.Clear();
+
+        foreach (var file in files)
+            RecentFiles.Add(file);
+    }
+
+    public async Task OpenRecentFileAsync(RecentFileModel recentFile)
+    {
+        if (recentFile == null)
+            return;
+
+        if (!File.Exists(recentFile.FilePath))
+        {
+            AddToMainGrid();
+            var remove = ModalMessages.ShowConfirmModal(
+                App.Localization.Translate("Recent_File_Not_Found_Title"),
+                App.Localization.Translate("Recent_File_Not_Found_Description"),
+                recentFile.FileName);
+            RemoveToMainGrid();
+
+            if (remove)
+            {
+                await recentFilesRepository.RemoveAsync(recentFile.FilePath);
+                await LoadRecentFilesAsync();
+            }
+
+            return;
+        }
+
+        var importResult = await importService.ImportAsync(recentFile.FilePath);
+
+        if (!importResult.Success)
+        {
+            ModalMessages.showErrorModal(App.Localization.Translate(importResult.ErrorKey ?? "Error_Note_Import"));
+            return;
+        }
+
+        editorControl.LoadCurrentNote();
+        await LoadRecentFilesAsync();
+    }
+
+    private async Task OpenPendingFileSafeAsync()
+    {
+        try
+        {
+            if (Application.Current is not App { PendingFileToOpen: { } path })
+                return;
+
+            if (!File.Exists(path))
+                return;
+
+            await Task.Delay(TimeSpan.FromSeconds(2));
+
+            var importResult = await importService.ImportAsync(path);
+
+            if (!importResult.Success)
+            {
+                ModalMessages.showErrorModal(App.Localization.Translate(importResult.ErrorKey ?? "Error_Note_Import"));
+                return;
+            }
+
+            editorControl.LoadCurrentNote();
+            await LoadRecentFilesAsync();
+        }
+        catch
+        {
+            ModalMessages.showErrorModal(App.Localization.Translate("Error_Note_Import"));
+        }
+    }
+
+    public void UpdateEditorStats(int words, int readingTimeMinutes)
+    {
+        WordCount = Math.Max(0, words);
+        ReadingTimeMinutes = WordCount == 0 ? 0 : Math.Max(1, readingTimeMinutes);
+    }
+
+    private void UpdateFooterStatusText()
+    {
+        var statsText = string.Format(
+            App.Localization.Translate("Footer_Stats_Text"),
+            WordCount,
+            ReadingTimeMinutes);
+
+        FooterStatusText = string.IsNullOrWhiteSpace(LastSaveTextBlock)
+            ? statsText
+            : $"{LastSaveTextBlock}     ·     {statsText}";
+    }
+
+    public void MarkDirty()
+    {
+        IsDirty = true;
+    }
+
+    public void MarkClean()
+    {
+        IsDirty = false;
+    }
+
+    public void ToggleFocusMode()
+    {
+        if (IsFocusMode)
+        {
+            ExitFocusMode();
+            return;
+        }
+
+        IsFocusMode = true;
+    }
+
+    public void ExitFocusMode()
+    {
+        IsFocusMode = false;
+    }
+
+    private void ToggleFullscreen()
+    {
+        if (MainScreenWindow.WindowState == WindowState.Maximized &&
+            MainScreenWindow.WindowStyle == WindowStyle.None)
+        {
+            MainScreenWindow.WindowStyle = WindowStyle.SingleBorderWindow;
+            MainScreenWindow.WindowState = WindowState.Normal;
+            return;
+        }
+
+        MainScreenWindow.WindowStyle = WindowStyle.None;
+        MainScreenWindow.WindowState = WindowState.Maximized;
+    }
+
     public void OpenNewNote()
     {
         _ = OpenNewNoteSafeAsync();
@@ -246,6 +463,7 @@ public partial class MainScreenWindowVM : ObservableObject
         }
 
         editorControl.LoadCurrentNote();
+        await LoadRecentFilesAsync();
     }
 
     [RelayCommand]
@@ -369,10 +587,39 @@ public partial class MainScreenWindowVM : ObservableObject
             return;
         }
 
+        if (e.Key == Key.E && Keyboard.Modifiers == ModifierKeys.Control)
+        {
+            ExportNoteDialog();
+            e.Handled = true;
+            return;
+        }
+
+        if (e.Key == Key.F && Keyboard.Modifiers == (ModifierKeys.Control | ModifierKeys.Shift))
+        {
+            ToggleFocusMode();
+            e.Handled = true;
+            return;
+        }
+
+        if (e.Key == Key.Escape && IsFocusMode)
+        {
+            ExitFocusMode();
+            e.Handled = true;
+            return;
+        }
+
+        if (e.Key == Key.F11 && Keyboard.Modifiers == ModifierKeys.None)
+        {
+            ToggleFullscreen();
+            e.Handled = true;
+            return;
+        }
+
         if (e.Key == Key.OemComma && Keyboard.Modifiers == ModifierKeys.Control)
         {
             OpenSettingsDialog();
             e.Handled = true;
+            return;
         }
     }
 
@@ -387,6 +634,15 @@ public partial class MainScreenWindowVM : ObservableObject
 
     [RelayCommand]
     private void ExportNote() => ExportNoteDialog();
+
+    [RelayCommand]
+    private void FocusMode() => ToggleFocusMode();
+
+    [RelayCommand]
+    private async Task OpenRecentFile(RecentFileModel recentFile)
+    {
+        await OpenRecentFileAsync(recentFile);
+    }
 
     [RelayCommand]
     private void Metadata() => OpenMetadataDialog();

@@ -2,7 +2,7 @@
   <img width="128" align="center" src="images/logo_mte.png">
 </p>
 <h1 align="center">
-  Minimal Text Editor (Lite) For Windows (1.0.1)
+  MinimalTextEditor For Windows (2.0.0)
 </h1>
 <p align="center">
   Create notes and export them in universal format :)
@@ -13,8 +13,10 @@
   </a>
 </p>
 
-# Minimal Text Editor (Lite) 
-With **Minimal Text Editor (Lite)**, you can create, save and organize your notes in several different formats (json, pdf, doc and html). Your notes are saved automatically, where you can set such saves from time to time. With this app, you will be able to create your notes using structured blocks, with support for:
+# MinimalTextEditor
+With **MinimalTextEditor**, you can create, edit, import, and export notes in universal formats such as JSON, Markdown, HTML, PDF, and DOC. Your notes are saved automatically, and the application now includes dark mode, Focus Mode, recent files, clipboard export, image support, and Markdown front matter.
+
+With this app, you will be able to create your notes using structured blocks, with support for:
 
 - Headers
 - Paragraphs

@@ -8,6 +8,7 @@ using MinimalTextEditorLite.Core.Services;
 using System.IO;
 using System.Text.Json;
 using System.Windows;
+using System.Windows.Threading;
 using WindowsInput;
 
 namespace MinimalTextEditorLite.App.ViewModels;
@@ -20,6 +21,7 @@ public partial class EditorControlVM : ObservableObject, IDisposable
     private readonly string virtualHostName = "minimaltexteditorlite.localhost";
     private readonly MainScreenWindowVM mainScreenWindow;
     private readonly WebView2 myWebView;
+    private readonly DispatcherTimer statsTimer = new();
 
     private bool userCanSaveNote;
     private bool isFirstTimeLoadingNote = true;
@@ -47,11 +49,15 @@ public partial class EditorControlVM : ObservableObject, IDisposable
         this.backupService = backupService;
         this.editorJsSecurityService = editorJsSecurityService;
 
+        statsTimer.Interval = TimeSpan.FromSeconds(2);
+        statsTimer.Tick += (_, _) => _ = RequestStatsSafeAsync();
+
         _ = InitializeWebViewSafeAsync();
     }
 
     public void Dispose()
     {
+        statsTimer.Stop();
     }
 
     private async Task InitializeWebViewSafeAsync()
@@ -142,6 +148,7 @@ public partial class EditorControlVM : ObservableObject, IDisposable
 
     public async Task SaveContentAsync()
     {
+        mainScreenWindow.MarkDirty();
         ProgressBarVisibility = Visibility.Visible;
         await Task.Delay(1200);
         await PostEditorMessageAsync(new
@@ -169,6 +176,7 @@ public partial class EditorControlVM : ObservableObject, IDisposable
 
     public async Task SaveContentDebouncedAsync()
     {
+        mainScreenWindow.MarkDirty();
         ProgressBarVisibility = Visibility.Visible;
 
         await PostEditorMessageAsync(new
@@ -219,6 +227,11 @@ public partial class EditorControlVM : ObservableObject, IDisposable
         WebViewVisibility = Visibility.Visible;
         userCanSaveNote = true;
         mainScreenWindow.SaveNoteCompleted = true;
+
+        if (!statsTimer.IsEnabled)
+            statsTimer.Start();
+
+        await RequestStatsSafeAsync();
     }
 
     public void SendThemeToEditor(string? themeName)
@@ -313,9 +326,56 @@ public partial class EditorControlVM : ObservableObject, IDisposable
         switch (eventName)
         {
             case "bridgeReady":
+                _ = RequestStatsSafeAsync();
+                break;
+
             case "stats":
+                HandleStatsEvent(root);
+                break;
+
+            case "dirty":
+                Application.Current.Dispatcher.Invoke(mainScreenWindow.MarkDirty);
                 break;
         }
+    }
+
+    private void HandleStatsEvent(JsonElement root)
+    {
+        if (!root.TryGetProperty("data", out var data))
+            return;
+
+        var words = data.TryGetProperty("words", out var wordsElement) && wordsElement.TryGetInt32(out var wordsValue)
+            ? wordsValue
+            : 0;
+
+        var readingTime = data.TryGetProperty("readingTimeMin", out var readingElement) && readingElement.TryGetInt32(out var readingValue)
+            ? readingValue
+            : 1;
+
+        Application.Current.Dispatcher.Invoke(() =>
+        {
+            mainScreenWindow.UpdateEditorStats(words, readingTime);
+        });
+    }
+
+    private async Task RequestStatsSafeAsync()
+    {
+        try
+        {
+            await RequestStatsAsync();
+        }
+        catch
+        {
+            // Stats are non-critical.
+        }
+    }
+
+    private async Task RequestStatsAsync()
+    {
+        await PostEditorMessageAsync(new
+        {
+            action = "getStats"
+        });
     }
 
     private void MyWebView_CoreWebView2_ContextMenuRequested(object? sender, CoreWebView2ContextMenuRequestedEventArgs args)
@@ -374,6 +434,7 @@ public partial class EditorControlVM : ObservableObject, IDisposable
                 await noteRepository.UpdateJsonAsync(validation.NormalizedJson);
 
             await InsertContentAsync(validation.NormalizedJson);
+            mainScreenWindow.MarkClean();
         }
         else
         {
@@ -423,6 +484,8 @@ public partial class EditorControlVM : ObservableObject, IDisposable
 
                 ((App)Application.Current).LastNoteUpdated = App.Localization.Translate("Last_Save_Note") + currentDate;
                 await backupService.CreateBackupAsync(jsonData, currentDate);
+                mainScreenWindow.MarkClean();
+                await RequestStatsSafeAsync();
             }
             else
             {
