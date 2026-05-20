@@ -126,7 +126,7 @@ zip-*.sh
 .zip-staging-*/
 
 # ------------------------------------------------------------
-# EditorJS React source
+# MinimalTextEditorLite.EditorJS - React source
 # ------------------------------------------------------------
 node_modules/
 MinimalTextEditorLite.EditorJS/node_modules/
