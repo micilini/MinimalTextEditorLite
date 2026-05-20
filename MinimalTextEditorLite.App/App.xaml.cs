@@ -6,6 +6,7 @@ using MinimalTextEditorLite.Core.Database;
 using MinimalTextEditorLite.Core.Exporters;
 using MinimalTextEditorLite.Core.Importers;
 using MinimalTextEditorLite.Core.Models;
+using MinimalTextEditorLite.Core.Rendering;
 using MinimalTextEditorLite.Core.Repositories;
 using MinimalTextEditorLite.Core.Security;
 using MinimalTextEditorLite.Core.Services;
@@ -160,6 +161,7 @@ public partial class App : Application, INotifyPropertyChanged
         services.AddSingleton<EditorJsImageValidator>();
         services.AddSingleton<EditorJsInlineHtmlSanitizer>();
         services.AddSingleton<IIsolatedTempFileService, IsolatedTempFileService>();
+        services.AddSingleton<IPdfRenderer, WebView2PdfRenderer>();
 
         services.AddSingleton<HtmlDocumentBuilder>();
 
