@@ -3,8 +3,10 @@ using Microsoft.Web.WebView2.Core;
 using Microsoft.Web.WebView2.Wpf;
 using MinimalTextEditorLite.App.Helpers;
 using MinimalTextEditorLite.Core.Repositories;
+using MinimalTextEditorLite.Core.Security;
 using MinimalTextEditorLite.Core.Services;
 using System.IO;
+using System.Text.Json;
 using System.Windows;
 using WindowsInput;
 
@@ -14,12 +16,14 @@ public partial class EditorControlVM : ObservableObject, IDisposable
 {
     private readonly INoteRepository noteRepository;
     private readonly IBackupService backupService;
+    private readonly IEditorJsSecurityService editorJsSecurityService;
     private readonly string virtualHostName = "minimaltexteditorlite.localhost";
     private readonly MainScreenWindowVM mainScreenWindow;
     private readonly WebView2 myWebView;
 
     private bool userCanSaveNote;
     private bool isFirstTimeLoadingNote = true;
+    private bool saveValidationErrorShown;
 
     [ObservableProperty]
     private int progressValue;
@@ -30,12 +34,18 @@ public partial class EditorControlVM : ObservableObject, IDisposable
     [ObservableProperty]
     private Visibility progressBarVisibility = Visibility.Visible;
 
-    public EditorControlVM(MainScreenWindowVM mainScreen, WebView2 webView, INoteRepository noteRepository, IBackupService backupService)
+    public EditorControlVM(
+        MainScreenWindowVM mainScreen,
+        WebView2 webView,
+        INoteRepository noteRepository,
+        IBackupService backupService,
+        IEditorJsSecurityService editorJsSecurityService)
     {
         mainScreenWindow = mainScreen;
         myWebView = webView;
         this.noteRepository = noteRepository;
         this.backupService = backupService;
+        this.editorJsSecurityService = editorJsSecurityService;
 
         InitializeWebView();
     }
@@ -98,18 +108,26 @@ public partial class EditorControlVM : ObservableObject, IDisposable
     {
         ProgressBarVisibility = Visibility.Visible;
         await Task.Delay(1200);
-        myWebView.CoreWebView2.ExecuteScriptAsync("window.handleSave();");
+        await ExecuteEditorScriptAsync("window.handleSave();");
     }
 
-    public void InsertContent(string noteJson)
+    public async void InsertContent(string noteJson)
     {
-        var escapedJson = noteJson.Replace("\\", "\\\\").Replace("'", "\\'");
-        myWebView.CoreWebView2.ExecuteScriptAsync($"window.handleLoad('{escapedJson}');");
+        var safeJsonArgument = JsonSerializer.Serialize(noteJson);
+        await ExecuteEditorScriptAsync($"window.handleLoad({safeJsonArgument});");
 
         ProgressBarVisibility = Visibility.Collapsed;
         WebViewVisibility = Visibility.Visible;
         userCanSaveNote = true;
         mainScreenWindow.SaveNoteCompleted = true;
+    }
+
+    private async Task ExecuteEditorScriptAsync(string script)
+    {
+        if (myWebView.CoreWebView2 == null)
+            return;
+
+        await myWebView.CoreWebView2.ExecuteScriptAsync(script);
     }
 
     private void MyWebView_CoreWebView2_WebMessageReceived(object? sender, CoreWebView2WebMessageReceivedEventArgs e)
@@ -144,9 +162,24 @@ public partial class EditorControlVM : ObservableObject, IDisposable
         var currentNote = await noteRepository.GetCurrentAsync();
 
         if (currentNote != null)
-            InsertContent(currentNote.NoteJson);
+        {
+            var validation = await editorJsSecurityService.ValidateAndNormalizeJsonAsync(currentNote.NoteJson);
+            if (!validation.Success || string.IsNullOrWhiteSpace(validation.NormalizedJson))
+            {
+                ModalMessages.showErrorModal(App.Localization.Translate("Error_Invalid_Json"));
+                InsertContent("{\"blocks\":[]}");
+                return;
+            }
+
+            if (!string.Equals(currentNote.NoteJson, validation.NormalizedJson, StringComparison.Ordinal))
+                await noteRepository.UpdateJsonAsync(validation.NormalizedJson);
+
+            InsertContent(validation.NormalizedJson);
+        }
         else
+        {
             ModalMessages.showErrorModal(App.Localization.Translate("Error_Notes_Not_Found"));
+        }
     }
 
     private async void UpdateNoteContent(string jsonData)
@@ -155,10 +188,24 @@ public partial class EditorControlVM : ObservableObject, IDisposable
 
         try
         {
+            var validation = await editorJsSecurityService.ValidateAndNormalizeJsonAsync(jsonData);
+            if (!validation.Success || string.IsNullOrWhiteSpace(validation.NormalizedJson))
+            {
+                if (!saveValidationErrorShown)
+                {
+                    ModalMessages.showErrorModal(App.Localization.Translate("Error_Invalid_Json"));
+                    saveValidationErrorShown = true;
+                }
+
+                return;
+            }
+
+            jsonData = validation.NormalizedJson;
             var updateSuccess = await noteRepository.UpdateJsonAsync(jsonData);
 
             if (updateSuccess)
             {
+                saveValidationErrorShown = false;
                 string currentDate = ((App)Application.Current).AppLanguage == "pt_br"
                     ? DateTime.Now.ToString("dd/MM/yyyy H:mm:ss")
                     : DateTime.Now.ToString("MM/dd/yyyy h:mm:ss tt");

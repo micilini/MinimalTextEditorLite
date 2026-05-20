@@ -1,10 +1,11 @@
 using MinimalTextEditorLite.Exporters.Contracts.EditorJs;
+using MinimalTextEditorLite.Core.Security;
 using System.Diagnostics;
 using System.Text.Json;
 
 namespace MinimalTextEditorLite.Core.Exporters;
 
-public sealed class PdfExporter : IExporter
+public sealed class PdfExporter(IIsolatedTempFileService tempFileService) : IExporter
 {
     public string Id => "pdf";
     public string DisplayName => "PDF";
@@ -17,13 +18,16 @@ public sealed class PdfExporter : IExporter
         return ExportWithExternalToolAsync(document, toolPath);
     }
 
-    private static async Task<byte[]> ExportWithExternalToolAsync(EditorJsDocument document, string toolPath)
+    private async Task<byte[]> ExportWithExternalToolAsync(EditorJsDocument document, string toolPath)
     {
         string? tempJsonFilePath = null;
 
         try
         {
-            tempJsonFilePath = Path.GetTempFileName();
+            if (!File.Exists(toolPath))
+                throw new FileNotFoundException("Exporter executable was not found.", toolPath);
+
+            tempJsonFilePath = tempFileService.CreateTempJsonPath();
             var json = JsonSerializer.Serialize(document, EditorJsJson.Options);
             await File.WriteAllTextAsync(tempJsonFilePath, json);
 
@@ -35,20 +39,28 @@ public sealed class PdfExporter : IExporter
                 RedirectStandardError = true,
                 UseShellExecute = false,
                 CreateNoWindow = true,
-                WorkingDirectory = Path.GetTempPath()
+                WorkingDirectory = AppContext.BaseDirectory
             };
 
             using var process = new Process { StartInfo = processStartInfo };
+            using var memoryStream = new MemoryStream();
+
             process.Start();
 
-            using var memoryStream = new MemoryStream();
-            await process.StandardOutput.BaseStream.CopyToAsync(memoryStream);
-            await process.WaitForExitAsync();
+            var stdoutTask = process.StandardOutput.BaseStream.CopyToAsync(memoryStream);
+            var stderrTask = process.StandardError.ReadToEndAsync();
+            var waitTask = process.WaitForExitAsync();
+
+            await Task.WhenAll(stdoutTask, stderrTask, waitTask);
+
+            var stderr = await stderrTask;
 
             if (process.ExitCode != 0)
             {
-                var error = await process.StandardError.ReadToEndAsync();
-                throw new InvalidOperationException(error);
+                throw new InvalidOperationException(
+                    string.IsNullOrWhiteSpace(stderr)
+                        ? $"Exporter failed with exit code {process.ExitCode}."
+                        : stderr);
             }
 
             return memoryStream.ToArray();

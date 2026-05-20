@@ -5,6 +5,7 @@ using MinimalTextEditorLite.Core.Database;
 using MinimalTextEditorLite.Core.Exporters;
 using MinimalTextEditorLite.Core.Models;
 using MinimalTextEditorLite.Core.Repositories;
+using MinimalTextEditorLite.Core.Security;
 using MinimalTextEditorLite.Core.Services;
 using MinimalTextEditorLite.Core.Startup;
 using System.ComponentModel;
@@ -109,6 +110,8 @@ public partial class App : Application, INotifyPropertyChanged
         });
 
         services.AddSingleton<ISqliteConnectionFactory, SqliteConnectionFactory>();
+        services.AddSingleton<IDpapiKeyStore, DpapiKeyStore>();
+        services.AddSingleton<DatabaseKeyMigrationService>();
         services.AddSingleton<StartupAppConfiguration>();
 
         services.AddSingleton<INoteRepository, NoteRepository>();
@@ -118,6 +121,10 @@ public partial class App : Application, INotifyPropertyChanged
         services.AddSingleton<IBackupService, BackupService>();
         services.AddSingleton<IImportService, ImportService>();
         services.AddSingleton<IExportService, ExportService>();
+        services.AddSingleton<IEditorJsSecurityService, EditorJsSecurityService>();
+        services.AddSingleton<EditorJsImageValidator>();
+        services.AddSingleton<EditorJsInlineHtmlSanitizer>();
+        services.AddSingleton<IIsolatedTempFileService, IsolatedTempFileService>();
 
         services.AddSingleton<IExporter, JsonExporter>();
         services.AddSingleton<IExporter, HtmlExporter>();

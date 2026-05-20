@@ -11,6 +11,9 @@ public sealed class SqliteConnectionFactory(DatabaseOptions options) : ISqliteCo
         if (_connection != null)
             return _connection;
 
+        if (string.IsNullOrWhiteSpace(options.EncryptionKey))
+            throw new InvalidOperationException("Database encryption key was not initialized.");
+
         var connectionString = new SQLiteConnectionString(
             options.DatabasePath,
             storeDateTimeAsTicks: true,
