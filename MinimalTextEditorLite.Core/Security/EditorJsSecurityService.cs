@@ -5,7 +5,9 @@ using System.Text.Json;
 
 namespace MinimalTextEditorLite.Core.Security;
 
-public sealed class EditorJsSecurityService(EditorJsImageValidator imageValidator) : IEditorJsSecurityService
+public sealed class EditorJsSecurityService(
+    EditorJsImageValidator imageValidator,
+    EditorJsInlineHtmlSanitizer htmlSanitizer) : IEditorJsSecurityService
 {
     private readonly Lazy<Task<JsonSchema>> schema = new(LoadSchemaAsync);
 
@@ -62,34 +64,159 @@ public sealed class EditorJsSecurityService(EditorJsImageValidator imageValidato
     {
         return block.Type switch
         {
-            "header" => NormalizeKnownBlock<EditorJsHeaderData>(block, IsValidHeaderData),
-            "paragraph" => NormalizeKnownBlock<EditorJsParagraphData>(block, data => data.Text != null),
-            "list" => NormalizeKnownBlock<EditorJsListData>(block, data => data.Items != null),
-            "checklist" => NormalizeKnownBlock<EditorJsChecklistData>(block, data => data.Items != null),
-            "quote" => NormalizeKnownBlock<EditorJsQuoteData>(block, data => data.Text != null || data.Caption != null),
-            "warning" => NormalizeKnownBlock<EditorJsWarningData>(block, data => data.Title != null || data.Message != null),
-            "code" => NormalizeKnownBlock<EditorJsCodeData>(block, data => data.Code != null),
+            "header" => NormalizeHeaderBlock(block),
+            "paragraph" => NormalizeParagraphBlock(block),
+            "list" => NormalizeListBlock(block),
+            "checklist" => NormalizeChecklistBlock(block),
+            "quote" => NormalizeQuoteBlock(block),
+            "warning" => NormalizeWarningBlock(block),
+            "code" => NormalizeCodeBlock(block),
             "delimiter" => new EditorJsBlock { Id = block.Id, Type = block.Type, Data = block.Data },
-            "table" => NormalizeKnownBlock<EditorJsTableData>(block, data => data.Content != null),
+            "table" => NormalizeTableBlock(block),
             "image" => NormalizeImageBlock(block),
             _ => null
         };
     }
 
-    private EditorJsBlock NormalizeKnownBlock<T>(EditorJsBlock block, Func<T, bool> isValid)
+    private EditorJsBlock NormalizeHeaderBlock(EditorJsBlock block)
     {
         try
         {
-            var data = block.Data.Deserialize<T>(EditorJsJson.Options);
-            if (data == null || !isValid(data))
+            var data = block.Data.Deserialize<EditorJsHeaderData>(EditorJsJson.Options);
+            if (data == null || data.Text == null || data.Level is < 1 or > 6)
                 return CreateInvalidBlockPlaceholder(block.Id);
 
-            return new EditorJsBlock
-            {
-                Id = block.Id,
-                Type = block.Type,
-                Data = JsonSerializer.SerializeToElement(data, EditorJsJson.Options)
-            };
+            data.Text = htmlSanitizer.SanitizeInlineHtml(data.Text);
+            return CreateBlock(block.Id, "header", data);
+        }
+        catch (JsonException)
+        {
+            return CreateInvalidBlockPlaceholder(block.Id);
+        }
+    }
+
+    private EditorJsBlock NormalizeParagraphBlock(EditorJsBlock block)
+    {
+        try
+        {
+            var data = block.Data.Deserialize<EditorJsParagraphData>(EditorJsJson.Options);
+            if (data == null || data.Text == null)
+                return CreateInvalidBlockPlaceholder(block.Id);
+
+            data.Text = htmlSanitizer.SanitizeInlineHtml(data.Text);
+            return CreateBlock(block.Id, "paragraph", data);
+        }
+        catch (JsonException)
+        {
+            return CreateInvalidBlockPlaceholder(block.Id);
+        }
+    }
+
+    private EditorJsBlock NormalizeListBlock(EditorJsBlock block)
+    {
+        try
+        {
+            var data = block.Data.Deserialize<EditorJsListData>(EditorJsJson.Options);
+            if (data?.Items == null)
+                return CreateInvalidBlockPlaceholder(block.Id);
+
+            data.Items = data.Items
+                .Select(item => htmlSanitizer.SanitizeInlineHtml(item))
+                .ToList();
+
+            return CreateBlock(block.Id, "list", data);
+        }
+        catch (JsonException)
+        {
+            return CreateInvalidBlockPlaceholder(block.Id);
+        }
+    }
+
+    private EditorJsBlock NormalizeChecklistBlock(EditorJsBlock block)
+    {
+        try
+        {
+            var data = block.Data.Deserialize<EditorJsChecklistData>(EditorJsJson.Options);
+            if (data?.Items == null)
+                return CreateInvalidBlockPlaceholder(block.Id);
+
+            foreach (var item in data.Items)
+                item.Text = htmlSanitizer.SanitizeInlineHtml(item.Text);
+
+            return CreateBlock(block.Id, "checklist", data);
+        }
+        catch (JsonException)
+        {
+            return CreateInvalidBlockPlaceholder(block.Id);
+        }
+    }
+
+    private EditorJsBlock NormalizeQuoteBlock(EditorJsBlock block)
+    {
+        try
+        {
+            var data = block.Data.Deserialize<EditorJsQuoteData>(EditorJsJson.Options);
+            if (data == null || (data.Text == null && data.Caption == null))
+                return CreateInvalidBlockPlaceholder(block.Id);
+
+            data.Text = htmlSanitizer.SanitizeInlineHtml(data.Text);
+            data.Caption = htmlSanitizer.SanitizeInlineHtml(data.Caption);
+            return CreateBlock(block.Id, "quote", data);
+        }
+        catch (JsonException)
+        {
+            return CreateInvalidBlockPlaceholder(block.Id);
+        }
+    }
+
+    private EditorJsBlock NormalizeWarningBlock(EditorJsBlock block)
+    {
+        try
+        {
+            var data = block.Data.Deserialize<EditorJsWarningData>(EditorJsJson.Options);
+            if (data == null || (data.Title == null && data.Message == null))
+                return CreateInvalidBlockPlaceholder(block.Id);
+
+            data.Title = htmlSanitizer.SanitizeInlineHtml(data.Title);
+            data.Message = htmlSanitizer.SanitizeInlineHtml(data.Message);
+            return CreateBlock(block.Id, "warning", data);
+        }
+        catch (JsonException)
+        {
+            return CreateInvalidBlockPlaceholder(block.Id);
+        }
+    }
+
+    private EditorJsBlock NormalizeCodeBlock(EditorJsBlock block)
+    {
+        try
+        {
+            var data = block.Data.Deserialize<EditorJsCodeData>(EditorJsJson.Options);
+            if (data == null || data.Code == null)
+                return CreateInvalidBlockPlaceholder(block.Id);
+
+            data.Code = htmlSanitizer.SanitizePlainText(data.Code);
+            return CreateBlock(block.Id, "code", data);
+        }
+        catch (JsonException)
+        {
+            return CreateInvalidBlockPlaceholder(block.Id);
+        }
+    }
+
+    private EditorJsBlock NormalizeTableBlock(EditorJsBlock block)
+    {
+        try
+        {
+            var data = block.Data.Deserialize<EditorJsTableData>(EditorJsJson.Options);
+            if (data?.Content == null)
+                return CreateInvalidBlockPlaceholder(block.Id);
+
+            data.Content = data.Content
+                .Select(row => row.Select(cell => htmlSanitizer.SanitizeInlineHtml(cell)).ToList())
+                .ToList();
+
+            return CreateBlock(block.Id, "table", data);
         }
         catch (JsonException)
         {
@@ -105,12 +232,8 @@ public sealed class EditorJsSecurityService(EditorJsImageValidator imageValidato
             if (data == null || !imageValidator.IsValidImageUrl(data.Url, out _))
                 return CreateInvalidBlockPlaceholder(block.Id);
 
-            return new EditorJsBlock
-            {
-                Id = block.Id,
-                Type = block.Type,
-                Data = JsonSerializer.SerializeToElement(data, EditorJsJson.Options)
-            };
+            data.Caption = htmlSanitizer.SanitizeInlineHtml(data.Caption);
+            return CreateBlock(block.Id, "image", data);
         }
         catch (JsonException)
         {
@@ -118,21 +241,22 @@ public sealed class EditorJsSecurityService(EditorJsImageValidator imageValidato
         }
     }
 
-    private static bool IsValidHeaderData(EditorJsHeaderData data)
-    {
-        return data.Text != null && data.Level is >= 1 and <= 6;
-    }
-
-    private static EditorJsBlock CreateInvalidBlockPlaceholder(string? id)
+    private static EditorJsBlock CreateBlock<T>(string? id, string type, T data)
     {
         return new EditorJsBlock
         {
             Id = id,
-            Type = "paragraph",
-            Data = JsonSerializer.SerializeToElement(
-                new EditorJsParagraphData { Text = "[Invalid block removed]" },
-                EditorJsJson.Options)
+            Type = type,
+            Data = JsonSerializer.SerializeToElement(data, EditorJsJson.Options)
         };
+    }
+
+    private static EditorJsBlock CreateInvalidBlockPlaceholder(string? id)
+    {
+        return CreateBlock(
+            id,
+            "paragraph",
+            new EditorJsParagraphData { Text = "[Invalid block removed]" });
     }
 
     private static async Task<JsonSchema> LoadSchemaAsync()

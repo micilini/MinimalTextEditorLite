@@ -123,6 +123,7 @@ public partial class App : Application, INotifyPropertyChanged
         services.AddSingleton<IExportService, ExportService>();
         services.AddSingleton<IEditorJsSecurityService, EditorJsSecurityService>();
         services.AddSingleton<EditorJsImageValidator>();
+        services.AddSingleton<EditorJsInlineHtmlSanitizer>();
         services.AddSingleton<IIsolatedTempFileService, IsolatedTempFileService>();
 
         services.AddSingleton<IExporter, JsonExporter>();

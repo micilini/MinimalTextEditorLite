@@ -162,9 +162,24 @@ public partial class EditorControlVM : ObservableObject, IDisposable
         var currentNote = await noteRepository.GetCurrentAsync();
 
         if (currentNote != null)
-            InsertContent(currentNote.NoteJson);
+        {
+            var validation = await editorJsSecurityService.ValidateAndNormalizeJsonAsync(currentNote.NoteJson);
+            if (!validation.Success || string.IsNullOrWhiteSpace(validation.NormalizedJson))
+            {
+                ModalMessages.showErrorModal(App.Localization.Translate("Error_Invalid_Json"));
+                InsertContent("{\"blocks\":[]}");
+                return;
+            }
+
+            if (!string.Equals(currentNote.NoteJson, validation.NormalizedJson, StringComparison.Ordinal))
+                await noteRepository.UpdateJsonAsync(validation.NormalizedJson);
+
+            InsertContent(validation.NormalizedJson);
+        }
         else
+        {
             ModalMessages.showErrorModal(App.Localization.Translate("Error_Notes_Not_Found"));
+        }
     }
 
     private async void UpdateNoteContent(string jsonData)
