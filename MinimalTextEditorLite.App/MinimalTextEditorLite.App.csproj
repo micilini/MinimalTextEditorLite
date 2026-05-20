@@ -1,0 +1,46 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>WinExe</OutputType>
+    <TargetFramework>net8.0-windows</TargetFramework>
+    <RootNamespace>MinimalTextEditorLite.App</RootNamespace>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <UseWPF>true</UseWPF>
+    <ApplicationIcon>logo-mte.ico</ApplicationIcon>
+    <StartupObject>MinimalTextEditorLite.App.App</StartupObject>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="../MinimalTextEditorLite.Core/MinimalTextEditorLite.Core.csproj" />
+    <ProjectReference Include="../MinimalTextEditorLite.Exporters.Contracts/MinimalTextEditorLite.Exporters.Contracts.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="CommunityToolkit.Mvvm" Version="8.4.0" />
+    <PackageReference Include="InputSimulator" Version="1.0.4" />
+    <PackageReference Include="MaterialDesignColors" Version="2.0.1" />
+    <PackageReference Include="MaterialDesignThemes" Version="4.1.0" />
+    <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="10.0.0" />
+    <PackageReference Include="Microsoft.Web.WebView2" Version="1.0.2903.40" />
+    <PackageReference Include="Microsoft.Xaml.Behaviors.Wpf" Version="1.1.135" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Remove="Assets/Images/**/*.*" />
+    <None Remove="View/logo-mte.ico" />
+
+    <Resource Include="Assets/Images/**/*.*" />
+    <Resource Include="View/logo-mte.ico" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Content Include="logo-mte.ico" CopyToOutputDirectory="PreserveNewest" />
+    <None Update="logo-mte-ico.ico" CopyToOutputDirectory="PreserveNewest" />
+    <None Update="LICENSE" CopyToOutputDirectory="PreserveNewest" />
+    <None Update="Languages/*.json" CopyToOutputDirectory="Always" />
+    <None Update="EditorModules/EditorJS/**/*.*" CopyToOutputDirectory="Always" />
+    <None Update="Modules/Export/x64/*.exe" CopyToOutputDirectory="Always" />
+  </ItemGroup>
+
+</Project>

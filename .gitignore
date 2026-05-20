@@ -1,31 +1,122 @@
-# Ignorar arquivos e pastas dentro de "Minimal Text Editor (Lite)"
+﻿# ------------------------------------------------------------
+# MinimalTextEditorLite
+# Visual Studio / .NET / WPF
+# ------------------------------------------------------------
 
-# Build folders
-Minimal Text Editor (Lite)/bin/
-Minimal Text Editor (Lite)/obj/
+# Build outputs
+[Bb]in/
+[Oo]bj/
+[Dd]ebug/
+[Dd]ebugPublic/
+[Rr]elease/
+[Rr]eleases/
+x64/
+x86/
+[Aa][Rr][Mm]/
+[Aa][Rr][Mm]64/
+bld/
+[Bb]uild/
+[Ll]og/
+[Ll]ogs/
 
-# User-specific files
-Minimal Text Editor (Lite)/*.suo
-Minimal Text Editor (Lite)/*.user
-Minimal Text Editor (Lite)/*.userosscache
-Minimal Text Editor (Lite)/*.sln.docstates
+# Keep native/exporter executables used by the app.
+# Do not add a global *.exe ignore rule.
+!MinimalTextEditorLite.App/Modules/
+!MinimalTextEditorLite.App/Modules/Export/
+!MinimalTextEditorLite.App/Modules/Export/x64/
+!MinimalTextEditorLite.App/Modules/Export/x64/*.exe
 
-# Logs
-Minimal Text Editor (Lite)/*.log
+# Visual Studio
+.vs/
+*.user
+*.rsuser
+*.suo
+*.userosscache
+*.sln.docstates
+*.userprefs
 
-# Temporary files
-Minimal Text Editor (Lite)/*.tmp
-Minimal Text Editor (Lite)/*.temp
-Minimal Text Editor (Lite)/*.bak
-Minimal Text Editor (Lite)/*.swp
-Minimal Text Editor (Lite)/*~.nib
-Minimal Text Editor (Lite)/*.orig
+# Visual Studio cache/options
+*.VC.db
+*.VC.VC.opendb
+.vsconfig.tmp
 
-# Dependencies
-Minimal Text Editor (Lite)/node_modules/
-Minimal Text Editor (Lite)/packages/
+# Rider / JetBrains
+.idea/
+*.sln.iml
 
-# Configurations
-Minimal Text Editor (Lite)/*.DS_Store
-Minimal Text Editor (Lite)/*.appsettings.json
-Minimal Text Editor (Lite)/secrets.json
+# VS Code
+.vscode/*
+!.vscode/settings.json
+!.vscode/tasks.json
+!.vscode/launch.json
+!.vscode/extensions.json
+
+# NuGet
+*.nupkg
+*.snupkg
+packages/
+*.nuget.props
+*.nuget.targets
+project.lock.json
+project.assets.json
+.nuget/
+
+# Test results / coverage
+TestResults/
+[Tt]est[Rr]esult*/
+coverage/
+coverage.xml
+coverage.json
+*.coverage
+*.coveragexml
+*.trx
+
+# Publish outputs
+publish/
+Publish/
+app.publish/
+*.pubxml.user
+
+# Installer / ClickOnce / deployment temporary files
+*.application
+*.appref-ms
+*.deploy
+*.manifest
+*.tmp
+*.bak
+
+# OS files
+.DS_Store
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+
+# Windows shortcuts / temp
+*.lnk
+*.tmp
+*.temp
+*.log
+
+# Local environment files
+.env
+.env.*
+*.local
+
+# SQLite/local app database files accidentally created in repo
+*.db
+*.db-shm
+*.db-wal
+*.sqlite
+*.sqlite3
+
+# User-specific certificates / keys
+*.pfx
+*.p12
+*.key
+*.pem
+
+# Backup files
+*.orig
+*.rej
+*.swp
+*~

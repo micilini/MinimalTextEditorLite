@@ -1,0 +1,15 @@
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+
+namespace MinimalTextEditorLite.Core.Models
+{
+    public class NoteJsonModel
+    {
+        public long Time { get; set; }
+        public List<BlockModel> Blocks { get; set; }
+        public string Version { get; set; }
+    }
+}
