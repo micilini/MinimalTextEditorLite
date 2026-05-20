@@ -144,7 +144,37 @@ public partial class EditorControlVM : ObservableObject, IDisposable
     {
         ProgressBarVisibility = Visibility.Visible;
         await Task.Delay(1200);
-        await ExecuteEditorScriptAsync("window.handleSave();");
+        await PostEditorMessageAsync(new
+        {
+            action = "save"
+        });
+    }
+
+    public void SaveContentDebounced()
+    {
+        _ = SaveContentDebouncedSafeAsync();
+    }
+
+    private async Task SaveContentDebouncedSafeAsync()
+    {
+        try
+        {
+            await SaveContentDebouncedAsync();
+        }
+        catch
+        {
+            ModalMessages.showErrorModal(App.Localization.Translate("Error_Update_Note"));
+        }
+    }
+
+    public async Task SaveContentDebouncedAsync()
+    {
+        ProgressBarVisibility = Visibility.Visible;
+
+        await PostEditorMessageAsync(new
+        {
+            action = "saveDebounced"
+        });
     }
 
     public void InsertContent(string noteJson)
@@ -166,13 +196,37 @@ public partial class EditorControlVM : ObservableObject, IDisposable
 
     public async Task InsertContentAsync(string noteJson)
     {
-        var safeJsonArgument = JsonSerializer.Serialize(noteJson);
-        await ExecuteEditorScriptAsync($"window.handleLoad({safeJsonArgument});");
+        JsonElement document;
+
+        try
+        {
+            document = JsonSerializer.Deserialize<JsonElement>(noteJson);
+        }
+        catch
+        {
+            document = JsonSerializer.Deserialize<JsonElement>("{\"blocks\":[]}");
+        }
+
+        await PostEditorMessageAsync(new
+        {
+            action = "load",
+            data = document
+        });
 
         ProgressBarVisibility = Visibility.Collapsed;
         WebViewVisibility = Visibility.Visible;
         userCanSaveNote = true;
         mainScreenWindow.SaveNoteCompleted = true;
+    }
+
+    private Task PostEditorMessageAsync(object message)
+    {
+        if (myWebView.CoreWebView2 == null)
+            return Task.CompletedTask;
+
+        var payload = JsonSerializer.Serialize(message);
+        myWebView.CoreWebView2.PostWebMessageAsJson(payload);
+        return Task.CompletedTask;
     }
 
     private async Task ExecuteEditorScriptAsync(string script)
@@ -185,8 +239,59 @@ public partial class EditorControlVM : ObservableObject, IDisposable
 
     private void MyWebView_CoreWebView2_WebMessageReceived(object? sender, CoreWebView2WebMessageReceivedEventArgs e)
     {
-        string jsonData = e.TryGetWebMessageAsString();
-        _ = UpdateNoteContentSafeAsync(jsonData);
+        try
+        {
+            string rawMessage = e.WebMessageAsJson;
+
+            using var document = JsonDocument.Parse(rawMessage);
+            var root = document.RootElement;
+
+            if (root.ValueKind == JsonValueKind.Object && root.TryGetProperty("event", out var eventProperty))
+            {
+                HandleBridgeEvent(eventProperty.GetString(), root);
+                return;
+            }
+
+            if (root.ValueKind == JsonValueKind.String)
+            {
+                var jsonData = root.GetString();
+
+                if (!string.IsNullOrWhiteSpace(jsonData))
+                    _ = UpdateNoteContentSafeAsync(jsonData);
+
+                return;
+            }
+
+            if (root.ValueKind == JsonValueKind.Object && root.TryGetProperty("blocks", out _))
+            {
+                _ = UpdateNoteContentSafeAsync(root.GetRawText());
+                return;
+            }
+        }
+        catch
+        {
+            try
+            {
+                string jsonData = e.TryGetWebMessageAsString();
+
+                if (!string.IsNullOrWhiteSpace(jsonData))
+                    _ = UpdateNoteContentSafeAsync(jsonData);
+            }
+            catch
+            {
+                ModalMessages.showErrorModal(App.Localization.Translate("Error_Update_Note"));
+            }
+        }
+    }
+
+    private void HandleBridgeEvent(string? eventName, JsonElement root)
+    {
+        switch (eventName)
+        {
+            case "bridgeReady":
+            case "stats":
+                break;
+        }
     }
 
     private void MyWebView_CoreWebView2_ContextMenuRequested(object? sender, CoreWebView2ContextMenuRequestedEventArgs args)
@@ -318,6 +423,9 @@ public partial class EditorControlVM : ObservableObject, IDisposable
             case "Save":
                 Save_Action();
                 break;
+            case "SaveDebounced":
+                Save_Debounced_Action();
+                break;
             case "Remove":
                 Delete_Action();
                 break;
@@ -334,6 +442,12 @@ public partial class EditorControlVM : ObservableObject, IDisposable
     {
         if (userCanSaveNote)
             SaveContent();
+    }
+
+    private void Save_Debounced_Action()
+    {
+        if (userCanSaveNote)
+            SaveContentDebounced();
     }
 
     private void Delete_Action()

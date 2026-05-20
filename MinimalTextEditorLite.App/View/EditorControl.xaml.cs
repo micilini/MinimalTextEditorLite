@@ -25,6 +25,11 @@ public partial class EditorControl : UserControl
         EditorControlVM.LoadCurrentNote();
     }
 
+    public void SaveContentDebounced()
+    {
+        EditorControlVM.SaveContentDebounced();
+    }
+
     public void DoAction(string action)
     {
         EditorControlVM.DoAction(action);
