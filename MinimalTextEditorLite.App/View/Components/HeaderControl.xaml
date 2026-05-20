@@ -82,7 +82,7 @@
         
         <StackPanel Grid.Column="0">
             <WrapPanel Margin="15">
-                <Image RenderOptions.BitmapScalingMode="HighQuality" Source="/Assets/Images/logo-mte.png" HorizontalAlignment="Left" Width="27" Height="27"></Image>
+                <Image RenderOptions.BitmapScalingMode="HighQuality" Source="pack://application:,,,/Assets/Images/logo-mte.png" HorizontalAlignment="Left" Width="27" Height="27"></Image>
                 <TextBlock Text="Minimal Text Editor" FontSize="22" FontWeight="Bold" FontFamily="Arial" HorizontalAlignment="Left" VerticalAlignment="Center" Margin="8 0 0 0"></TextBlock>
             </WrapPanel>
             <TextBlock Text="{Binding Source={x:Static localApp:App.Localization}, Converter={StaticResource Translate}, ConverterParameter=Header_App_Version}" FontSize="16" FontWeight="Bold" FontFamily="Arial" HorizontalAlignment="Left" Foreground="#2c3e50" VerticalAlignment="Center" Margin="50 -15 0 0"></TextBlock>
@@ -91,22 +91,22 @@
         <StackPanel Grid.Column="1">
             <WrapPanel Margin="0 18 20 0" HorizontalAlignment="Right">
                 <Button Style="{StaticResource IconButtonClickScale}" Command="{Binding OpenNoteCommand}" Padding="0" Background="{x:Null}" BorderBrush="{x:Null}" Foreground="{DynamicResource PrimaryHueLightForegroundBrush}" Width="45" Height="45" materialDesign:RippleAssist.Feedback="White" Margin="0 0 0 0">
-                    <Image RenderOptions.BitmapScalingMode="HighQuality" Source="/Assets/Images/editor-open-icon-2.png" Width="45" Height="45"/>
+                    <Image RenderOptions.BitmapScalingMode="HighQuality" Source="pack://application:,,,/Assets/Images/editor-open-icon-2.png" Width="45" Height="45"/>
                 </Button>
                 <Button Style="{StaticResource IconButtonClickScale}" Command="{Binding SearchNoteCommand}" Padding="0" Background="{x:Null}" BorderBrush="{x:Null}" Foreground="{DynamicResource PrimaryHueLightForegroundBrush}" Width="45" Height="45" materialDesign:RippleAssist.Feedback="White" Margin="20 0 0 0">
-                    <Image RenderOptions.BitmapScalingMode="HighQuality" Source="/Assets/Images/search-icon-2.png" Width="45" Height="45"/>
+                    <Image RenderOptions.BitmapScalingMode="HighQuality" Source="pack://application:,,,/Assets/Images/search-icon-2.png" Width="45" Height="45"/>
                 </Button>
                 <Button Style="{StaticResource IconButtonClickScale}" Command="{Binding SaveNoteCommand}" Padding="0" Background="{x:Null}" BorderBrush="{x:Null}" Foreground="{DynamicResource PrimaryHueLightForegroundBrush}" Width="45" Height="45" materialDesign:RippleAssist.Feedback="White" Margin="20 0 0 0">
-                    <Image RenderOptions.BitmapScalingMode="HighQuality" Source="/Assets/Images/editor-save-icon-2.png" Width="45" Height="45"/>
+                    <Image RenderOptions.BitmapScalingMode="HighQuality" Source="pack://application:,,,/Assets/Images/editor-save-icon-2.png" Width="45" Height="45"/>
                 </Button>
                 <Button Style="{StaticResource IconButtonClickScale}" Command="{Binding RemoveNoteCommand}" Padding="0" Background="{x:Null}" BorderBrush="{x:Null}" Foreground="{DynamicResource PrimaryHueLightForegroundBrush}" Width="45" Height="45" materialDesign:RippleAssist.Feedback="White" Margin="20 0 0 0">
-                    <Image RenderOptions.BitmapScalingMode="HighQuality" Source="/Assets/Images/editor-trash-icon-2.png" Width="45" Height="45"/>
+                    <Image RenderOptions.BitmapScalingMode="HighQuality" Source="pack://application:,,,/Assets/Images/editor-trash-icon-2.png" Width="45" Height="45"/>
                 </Button>
                 <Button Style="{StaticResource IconButtonClickScale}" Command="{Binding ExportCommand}" Padding="0" Background="{x:Null}" BorderBrush="{x:Null}" Foreground="{DynamicResource PrimaryHueLightForegroundBrush}" Width="45" Height="45" materialDesign:RippleAssist.Feedback="White" Margin="20 0 0 0">
-                    <Image RenderOptions.BitmapScalingMode="HighQuality" Source="/Assets/Images/editor-export-icon-2.png" Width="45" Height="45"/>
+                    <Image RenderOptions.BitmapScalingMode="HighQuality" Source="pack://application:,,,/Assets/Images/editor-export-icon-2.png" Width="45" Height="45"/>
                 </Button>
                 <Button Style="{StaticResource IconButtonClickScale}" Command="{Binding SettingsCommand}" Padding="0" Background="{x:Null}" BorderBrush="{x:Null}" Foreground="{DynamicResource PrimaryHueLightForegroundBrush}" Width="45" Height="45" materialDesign:RippleAssist.Feedback="White" Margin="20 0 0 0">
-                    <Image RenderOptions.BitmapScalingMode="HighQuality" Source="/Assets/Images/editor-gear-icon-2.png" Width="45" Height="45"/>
+                    <Image RenderOptions.BitmapScalingMode="HighQuality" Source="pack://application:,,,/Assets/Images/editor-gear-icon-2.png" Width="45" Height="45"/>
                 </Button>
             </WrapPanel>
         </StackPanel>

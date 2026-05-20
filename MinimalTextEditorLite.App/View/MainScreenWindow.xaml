@@ -9,7 +9,7 @@
         Height="Auto" Width="Auto"
         MinWidth="800" MinHeight="600"
         WindowStartupLocation="CenterScreen"
-        Icon="/View/logo-mte.ico"
+        Icon="pack://application:,,,/View/logo-mte.ico"
         Title="Minimal Text Editor (Lite)">
     <Grid>
         <DockPanel>

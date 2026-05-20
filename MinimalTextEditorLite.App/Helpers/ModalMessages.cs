@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -14,7 +14,7 @@ namespace MinimalTextEditorLite.App.Helpers
         {
             GlobalModalModel globalModalModel = new GlobalModalModel
             {
-                ImageSource = "/Assets/Images/icon-eraser.png",
+                ImageSource = "pack://application:,,,/Assets/Images/icon-eraser.png",
                 HeaderContent = title,
                 ShowTextField = false,
                 LabelTextField = "...",
@@ -35,7 +35,7 @@ namespace MinimalTextEditorLite.App.Helpers
         {
             GlobalModalModel globalModalModel = new GlobalModalModel
             {
-                ImageSource = "/Assets/Images/icon-close.png",
+                ImageSource = "pack://application:,,,/Assets/Images/icon-close.png",
                 HeaderContent = "An Error Ocurred!",
                 ShowTextField = false,
                 LabelTextField = "...",
@@ -56,7 +56,7 @@ namespace MinimalTextEditorLite.App.Helpers
         {
             GlobalModalModel globalModalModel = new GlobalModalModel
             {
-                ImageSource = "/Assets/Images/icon-notes.png",
+                ImageSource = "pack://application:,,,/Assets/Images/icon-notes.png",
                 HeaderContent = title,
                 ShowTextField = false,
                 LabelTextField = "...",
@@ -77,7 +77,7 @@ namespace MinimalTextEditorLite.App.Helpers
         {
             GlobalModalModel globalModalModel = new GlobalModalModel
             {
-                ImageSource = "/Assets/Images/icon-info.png",
+                ImageSource = "pack://application:,,,/Assets/Images/icon-info.png",
                 HeaderContent = title,
                 ShowTextField = false,
                 LabelTextField = "",
@@ -97,7 +97,7 @@ namespace MinimalTextEditorLite.App.Helpers
         {
             GlobalModalModel globalModalModel = new GlobalModalModel
             {
-                ImageSource = "/Assets/Images/icon-check.png",
+                ImageSource = "pack://application:,,,/Assets/Images/icon-check.png",
                 HeaderContent = title,
                 ShowTextField = false,
                 LabelTextField = "...",
@@ -117,7 +117,7 @@ namespace MinimalTextEditorLite.App.Helpers
         {
             GlobalModalModel globalModalModel = new GlobalModalModel
             {
-                ImageSource = "/Assets/Images/icon-info.png",
+                ImageSource = "pack://application:,,,/Assets/Images/icon-info.png",
                 HeaderContent = title,
                 ShowTextField = false,
                 LabelTextField = "...",

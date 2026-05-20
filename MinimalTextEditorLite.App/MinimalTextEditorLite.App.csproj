@@ -27,6 +27,14 @@
   </ItemGroup>
 
   <ItemGroup>
+    <None Remove="Assets/Images/**/*.*" />
+    <None Remove="View/logo-mte.ico" />
+
+    <Resource Include="Assets/Images/**/*.*" />
+    <Resource Include="View/logo-mte.ico" />
+  </ItemGroup>
+
+  <ItemGroup>
     <Content Include="logo-mte.ico" CopyToOutputDirectory="PreserveNewest" />
     <None Update="logo-mte-ico.ico" CopyToOutputDirectory="PreserveNewest" />
     <None Update="LICENSE" CopyToOutputDirectory="PreserveNewest" />
