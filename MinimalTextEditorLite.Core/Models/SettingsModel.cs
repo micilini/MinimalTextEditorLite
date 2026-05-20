@@ -23,8 +23,6 @@ namespace MinimalTextEditorLite.Core.Models
 
         public bool ShowOpenNoteMessage { get; set; }
 
-        public bool ShowNewUpdates { get; set; }
-
         public DateTime CreatedAt { get; set; }
 
         public DateTime UpdatedAt { get; set; }
@@ -36,7 +34,6 @@ namespace MinimalTextEditorLite.Core.Models
             Language = "en_us";
             ShowBackupSizeLimiteMessage = true;
             ShowOpenNoteMessage = true;
-            ShowNewUpdates = true;
             CreatedAt = DateTime.UtcNow;
             UpdatedAt = DateTime.UtcNow;
         }

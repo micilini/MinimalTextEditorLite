@@ -31,7 +31,7 @@ public partial class SettingsModalWindowVM : ObservableObject
     partial void OnSelectedAutoSaveIndexChanged(int value)
     {
         if (AllowUserInteract)
-            UpdateAutoSaveSetting(MapIndexToAutoSaveInterval(value));
+            _ = UpdateAutoSaveSettingSafeAsync(MapIndexToAutoSaveInterval(value));
     }
 
     [ObservableProperty]
@@ -40,7 +40,7 @@ public partial class SettingsModalWindowVM : ObservableObject
     partial void OnSelectedLanguageIndexChanged(int value)
     {
         if (AllowUserInteract)
-            UpdateLanguageInDatabase(value);
+            _ = UpdateLanguageInDatabaseSafeAsync(value);
     }
 
     public SettingsModalWindowVM(SettingsModalWindow settingsWindow, ISettingsRepository settingsRepository, IBackupService backupService)
@@ -124,7 +124,19 @@ public partial class SettingsModalWindowVM : ObservableObject
         };
     }
 
-    private async void UpdateAutoSaveSetting(AutoSaveInterval interval)
+    private async Task UpdateAutoSaveSettingSafeAsync(AutoSaveInterval interval)
+    {
+        try
+        {
+            await UpdateAutoSaveSettingAsync(interval);
+        }
+        catch
+        {
+            ModalMessages.showErrorModal(App.Localization.Translate("Error_AutoSave"));
+        }
+    }
+
+    private async Task UpdateAutoSaveSettingAsync(AutoSaveInterval interval)
     {
         var settings = await settingsRepository.GetCurrentAsync();
 
@@ -145,7 +157,19 @@ public partial class SettingsModalWindowVM : ObservableObject
         }
     }
 
-    private async void UpdateLanguageInDatabase(int newLanguageIndex)
+    private async Task UpdateLanguageInDatabaseSafeAsync(int newLanguageIndex)
+    {
+        try
+        {
+            await UpdateLanguageInDatabaseAsync(newLanguageIndex);
+        }
+        catch
+        {
+            ModalMessages.showErrorModal(App.Localization.Translate("Error_Language_Update"));
+        }
+    }
+
+    private async Task UpdateLanguageInDatabaseAsync(int newLanguageIndex)
     {
         string newLanguage = newLanguageIndex == 0 ? "en_us" : "pt_br";
         var settings = await settingsRepository.GetCurrentAsync();
@@ -212,14 +236,12 @@ public partial class SettingsModalWindowVM : ObservableObject
         {
             settings.ShowBackupSizeLimiteMessage = true;
             settings.ShowOpenNoteMessage = true;
-            settings.ShowNewUpdates = true;
             settings.UpdatedAt = DateTime.UtcNow;
 
             bool isUpdated = await settingsRepository.UpdateAsync(settings);
 
             ((App)Application.Current).ShowBackupSizeLimiteMessage = true;
             ((App)Application.Current).ShowOpenNoteMessage = true;
-            ((App)Application.Current).ShowNewUpdates = true;
 
             if (!isUpdated)
             {
