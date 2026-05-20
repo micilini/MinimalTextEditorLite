@@ -1,74 +1,46 @@
-﻿using MinimalTextEditorLite.Exporters.Contracts.EditorJs;
-using MinimalTextEditorLite.Core.Security;
-using System.Diagnostics;
-using System.Text.Json;
+using MinimalTextEditorLite.Core.Rendering;
 
 namespace MinimalTextEditorLite.Core.Exporters;
 
-public sealed class PdfExporter(IIsolatedTempFileService tempFileService) : IExporter
+public sealed class PdfExporter : IExporter
 {
-    public string Id => "pdf";
-    public string DisplayName => "PDF";
-    public string DefaultFileName => "Note.pdf";
-    public string FileDialogFilter => "PDF Files (*.pdf)|*.pdf";
+    private readonly HtmlDocumentBuilder htmlBuilder;
+    private readonly IPdfRenderer pdfRenderer;
 
-    public Task<byte[]> ExportAsync(ExportContext context)
+    public PdfExporter(HtmlDocumentBuilder htmlBuilder, IPdfRenderer pdfRenderer)
     {
-        var toolPath = Path.Combine(AppContext.BaseDirectory, "Modules", "Export", "x64", "ExportAsPDF.exe");
-        return ExportWithExternalToolAsync(context.Document, toolPath);
+        this.htmlBuilder = htmlBuilder;
+        this.pdfRenderer = pdfRenderer;
     }
 
-    private async Task<byte[]> ExportWithExternalToolAsync(EditorJsDocument document, string toolPath)
+    public string Id => "pdf";
+
+    public string DisplayName => "PDF";
+
+    public string DefaultFileName => "Note.pdf";
+
+    public string FileDialogFilter => "PDF Files (*.pdf)|*.pdf";
+
+    public async Task<byte[]> ExportAsync(ExportContext context)
     {
-        string? tempJsonFilePath = null;
+        ArgumentNullException.ThrowIfNull(context);
 
-        try
+        var html = htmlBuilder.Build(context.Document, new HtmlBuildOptions
         {
-            if (!File.Exists(toolPath))
-                throw new FileNotFoundException("Exporter executable was not found.", toolPath);
+            Variant = HtmlVariant.Print,
+            DocumentTitle = "Note Export"
+        });
 
-            tempJsonFilePath = tempFileService.CreateTempJsonPath();
-            var json = JsonSerializer.Serialize(document, EditorJsJson.Options);
-            await File.WriteAllTextAsync(tempJsonFilePath, json);
-
-            var processStartInfo = new ProcessStartInfo
-            {
-                FileName = toolPath,
-                Arguments = $"\"{tempJsonFilePath}\"",
-                RedirectStandardOutput = true,
-                RedirectStandardError = true,
-                UseShellExecute = false,
-                CreateNoWindow = true,
-                WorkingDirectory = AppContext.BaseDirectory
-            };
-
-            using var process = new Process { StartInfo = processStartInfo };
-            using var memoryStream = new MemoryStream();
-
-            process.Start();
-
-            var stdoutTask = process.StandardOutput.BaseStream.CopyToAsync(memoryStream);
-            var stderrTask = process.StandardError.ReadToEndAsync();
-            var waitTask = process.WaitForExitAsync();
-
-            await Task.WhenAll(stdoutTask, stderrTask, waitTask);
-
-            var stderr = await stderrTask;
-
-            if (process.ExitCode != 0)
-            {
-                throw new InvalidOperationException(
-                    string.IsNullOrWhiteSpace(stderr)
-                        ? $"Exporter failed with exit code {process.ExitCode}."
-                        : stderr);
-            }
-
-            return memoryStream.ToArray();
-        }
-        finally
+        var options = new PdfRenderOptions
         {
-            if (tempJsonFilePath != null && File.Exists(tempJsonFilePath))
-                File.Delete(tempJsonFilePath);
-        }
+            PageWidthInches = 8.27,
+            PageHeightInches = 11.69,
+            MarginInches = 0.75,
+            PrintBackgrounds = true,
+            PrintHeaderFooter = false,
+            Timeout = TimeSpan.FromSeconds(30)
+        };
+
+        return await pdfRenderer.RenderHtmlToPdfAsync(html, options);
     }
 }
