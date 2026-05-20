@@ -1,4 +1,4 @@
-using MinimalTextEditorLite.Core.Database;
+﻿using MinimalTextEditorLite.Core.Database;
 using System.Security.AccessControl;
 using System.Security.Principal;
 

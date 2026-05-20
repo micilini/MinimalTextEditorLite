@@ -1,4 +1,4 @@
-namespace MinimalTextEditorLite.Core.Security;
+﻿namespace MinimalTextEditorLite.Core.Security;
 
 public sealed class EditorJsImageValidator
 {
@@ -25,9 +25,6 @@ public sealed class EditorJsImageValidator
 
         url = url.Trim();
 
-        // IMPORTANT:
-        // Do not validate data URLs through System.Uri.
-        // Large base64 images may be rejected by Uri.TryCreate even when valid.
         if (url.StartsWith("data:", StringComparison.OrdinalIgnoreCase))
             return IsValidDataImage(url, out reason);
 

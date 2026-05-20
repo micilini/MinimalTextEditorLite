@@ -110,8 +110,6 @@ public partial class App : Application, INotifyPropertyChanged
             return;
         }
 
-        // RenderOptions.ProcessRenderMode = RenderMode.SoftwareOnly;
-        // Legado V1: manter comentado na F4 para validar se a aceleracao por hardware causa algum glitch visual.
 
         CreateApplicationFolderIfNeeded();
 
@@ -125,8 +123,6 @@ public partial class App : Application, INotifyPropertyChanged
         if (e.Args.Length > 0 && File.Exists(e.Args[0]))
             PendingFileToOpen = e.Args[0];
 
-        // Critical startup must run before base.OnStartup(e) so the SplashScreen is created
-        // with the persisted theme already applied. Do not move this back to SplashScreenWindowVM.
         InitializeApplicationStateBeforeSplash();
 
         base.OnStartup(e);
@@ -206,7 +202,6 @@ public partial class App : Application, INotifyPropertyChanged
         }
         catch
         {
-            // Keep startup resilient; defaults remain Light/en_us if settings cannot be loaded.
             ThemePreference = AppThemePreference.Light;
             EffectiveTheme = AppThemePreference.Light;
         }

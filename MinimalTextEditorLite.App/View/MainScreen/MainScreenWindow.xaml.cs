@@ -2,7 +2,7 @@
 using MinimalTextEditorLite.App.ViewModels;
 using System.Windows;
 
-namespace MinimalTextEditorLite.App.View;
+namespace MinimalTextEditorLite.App.View.MainScreen;
 
 public partial class MainScreenWindow : Window
 {
@@ -17,3 +17,4 @@ public partial class MainScreenWindow : Window
         PreviewKeyDown += (_, e) => vm.OnPreviewKeyDown(e);
     }
 }
+

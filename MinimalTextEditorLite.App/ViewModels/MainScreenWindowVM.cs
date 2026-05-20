@@ -2,10 +2,12 @@
 using CommunityToolkit.Mvvm.Input;
 using Microsoft.Win32;
 using MinimalTextEditorLite.App.Helpers;
-using MinimalTextEditorLite.App.View;
 using MinimalTextEditorLite.App.View.AboutModal;
+using MinimalTextEditorLite.App.View.AppMenu;
 using MinimalTextEditorLite.App.View.Components;
+using MinimalTextEditorLite.App.View.Editor;
 using MinimalTextEditorLite.App.View.ExportModal;
+using MinimalTextEditorLite.App.View.MainScreen;
 using MinimalTextEditorLite.App.View.MetadataModal;
 using MinimalTextEditorLite.App.View.SettingsModal;
 using MinimalTextEditorLite.Core.Models;
@@ -276,7 +278,6 @@ public partial class MainScreenWindowVM : ObservableObject
         }
         catch
         {
-            // Recent files are non-critical.
         }
     }
 

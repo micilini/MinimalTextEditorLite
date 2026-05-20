@@ -1,8 +1,9 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
+using MinimalTextEditorLite.App.View.MainScreen;
 using MinimalTextEditorLite.App.ViewModels;
 using System.Windows;
 
-namespace MinimalTextEditorLite.App.View;
+namespace MinimalTextEditorLite.App.View.SplashScreen;
 
 public partial class SplashScreenWindow : Window
 {
@@ -31,3 +32,4 @@ public partial class SplashScreenWindow : Window
         });
     }
 }
+

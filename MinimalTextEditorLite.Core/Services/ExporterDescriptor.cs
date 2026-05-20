@@ -1,4 +1,4 @@
-namespace MinimalTextEditorLite.Core.Services;
+﻿namespace MinimalTextEditorLite.Core.Services;
 
 public sealed record ExporterDescriptor(
     string Id,

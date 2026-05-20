@@ -1,4 +1,4 @@
-using MinimalTextEditorLite.Core.Models;
+﻿using MinimalTextEditorLite.Core.Models;
 
 namespace MinimalTextEditorLite.Core.Repositories;
 

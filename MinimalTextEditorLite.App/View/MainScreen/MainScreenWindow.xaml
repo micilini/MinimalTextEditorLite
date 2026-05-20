@@ -1,27 +1,27 @@
-﻿<Window x:Class="MinimalTextEditorLite.App.View.MainScreenWindow"
+﻿<Window x:Class="MinimalTextEditorLite.App.View.MainScreen.MainScreenWindow"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-        xmlns:local="clr-namespace:MinimalTextEditorLite.App.View"
+        xmlns:local="clr-namespace:MinimalTextEditorLite.App.View.MainScreen"
         xmlns:localApp="clr-namespace:MinimalTextEditorLite.App"
         xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
         mc:Ignorable="d"
         Height="Auto" Width="Auto"
         MinWidth="900" MinHeight="640"
         WindowStartupLocation="CenterScreen"
-        Icon="pack://application:,,,/View/logo-mte.ico"
+        Icon="pack://application:,,,/logo-mte.ico"
         FontFamily="{StaticResource MTE.Font.Primary}"
         Background="{DynamicResource MaterialDesignPaper}"
         Title="{Binding WindowTitle}">
 
     <Grid>
         <DockPanel>
-            <!-- Top: app menu -->
+            
             <ContentControl DockPanel.Dock="Top"
                             Content="{Binding MenuContent}" />
 
-            <!-- Divisor sutil sob o menu -->
+            
             <Border DockPanel.Dock="Top"
                     Height="1"
                     Background="{DynamicResource MaterialDesignDivider}"
@@ -34,14 +34,14 @@
                     <RowDefinition Height="32" />
                 </Grid.RowDefinitions>
 
-                <!-- ===== Header (logo + action icons) ===== -->
+                
                 <Grid Grid.Row="0"
                       Background="{DynamicResource MaterialDesignPaper}"
                       Visibility="{Binding HeaderVisibility}">
                     <ContentControl Content="{Binding HeaderContent}" />
                 </Grid>
 
-                <!-- Divisor sutil entre header e área de edição -->
+                
                 <Border Grid.Row="0"
                         VerticalAlignment="Bottom"
                         Height="1"
@@ -49,20 +49,20 @@
                         Opacity="0.4"
                         Visibility="{Binding HeaderVisibility}" />
 
-                <!-- ===== Main content (editor WebView) ===== -->
+                
                 <Grid Grid.Row="1"
                       Background="{DynamicResource MaterialDesignPaper}">
                     <ContentControl Content="{Binding MainContent}" />
                 </Grid>
 
-                <!-- Divisor superior do footer -->
+                
                 <Border Grid.Row="2"
                         VerticalAlignment="Top"
                         Height="1"
                         Background="{DynamicResource MaterialDesignDivider}"
                         Opacity="0.4" />
 
-                <!-- ===== Footer ===== -->
+                
                 <Grid Grid.Row="2"
                       Background="{DynamicResource MaterialDesignPaper}">
                     <TextBlock Text="{Binding FocusModeFooterText, Mode=OneWay}"
@@ -86,3 +86,5 @@
         </DockPanel>
     </Grid>
 </Window>
+
+
