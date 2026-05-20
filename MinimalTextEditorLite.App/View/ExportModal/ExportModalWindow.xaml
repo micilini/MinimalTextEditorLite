@@ -36,6 +36,7 @@
                         <ComboBoxItem Content="JSON" />
                         <ComboBoxItem Content="Word (.doc)" />
                         <ComboBoxItem Content="HTML" />
+                        <ComboBoxItem Content="Markdown (.md)" />
                         <ComboBoxItem Content="PDF" />
                     </ComboBox>
                 </StackPanel>

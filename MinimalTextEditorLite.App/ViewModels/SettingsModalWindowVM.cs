@@ -43,6 +43,15 @@ public partial class SettingsModalWindowVM : ObservableObject
             _ = UpdateLanguageInDatabaseSafeAsync(value);
     }
 
+    [ObservableProperty]
+    private bool exportFrontMatterYaml;
+
+    partial void OnExportFrontMatterYamlChanged(bool value)
+    {
+        if (AllowUserInteract)
+            _ = UpdateExportFrontMatterYamlSafeAsync(value);
+    }
+
     public SettingsModalWindowVM(SettingsModalWindow settingsWindow, ISettingsRepository settingsRepository, IBackupService backupService)
     {
         SettingsModalWindow = settingsWindow;
@@ -61,11 +70,13 @@ public partial class SettingsModalWindowVM : ObservableObject
         {
             SelectedAutoSaveIndex = GetAutoSaveIndexFromValue(settings.AutoSaveNote);
             SelectedLanguageIndex = settings.Language.Equals("pt_br", StringComparison.OrdinalIgnoreCase) ? 1 : 0;
+            ExportFrontMatterYaml = settings.ExportFrontMatterYaml;
         }
         else
         {
             SelectedAutoSaveIndex = 0;
             SelectedLanguageIndex = 0;
+            ExportFrontMatterYaml = true;
         }
     }
 
@@ -190,6 +201,35 @@ public partial class SettingsModalWindowVM : ObservableObject
         {
             ModalMessages.showErrorModal(App.Localization.Translate("Error_Language_Update"));
         }
+    }
+
+    private async Task UpdateExportFrontMatterYamlSafeAsync(bool value)
+    {
+        try
+        {
+            await UpdateExportFrontMatterYamlAsync(value);
+        }
+        catch
+        {
+            ModalMessages.showErrorModal(App.Localization.Translate("Error_Settings_Update"));
+        }
+    }
+
+    private async Task UpdateExportFrontMatterYamlAsync(bool value)
+    {
+        var settings = await settingsRepository.GetCurrentAsync();
+
+        if (settings == null)
+        {
+            ModalMessages.showErrorModal(App.Localization.Translate("Error_App_Settings_Not_Found"));
+            return;
+        }
+
+        settings.ExportFrontMatterYaml = value;
+        settings.UpdatedAt = DateTime.UtcNow;
+
+        if (!await settingsRepository.UpdateAsync(settings))
+            ModalMessages.showErrorModal(App.Localization.Translate("Error_Settings_Update"));
     }
 
     [RelayCommand]

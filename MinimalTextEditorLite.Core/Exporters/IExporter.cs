@@ -1,5 +1,3 @@
-using MinimalTextEditorLite.Exporters.Contracts.EditorJs;
-
 namespace MinimalTextEditorLite.Core.Exporters;
 
 public interface IExporter
@@ -9,5 +7,5 @@ public interface IExporter
     string DefaultFileName { get; }
     string FileDialogFilter { get; }
 
-    Task<byte[]> ExportAsync(EditorJsDocument document);
+    Task<byte[]> ExportAsync(ExportContext context);
 }

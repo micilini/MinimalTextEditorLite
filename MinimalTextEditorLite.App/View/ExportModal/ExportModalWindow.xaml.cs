@@ -31,7 +31,8 @@ public partial class ExportModalWindow : Window
                 0 => "json",
                 1 => "doc",
                 2 => "html",
-                3 => "pdf",
+                3 => "md",
+                4 => "pdf",
                 _ => string.Empty
             };
 

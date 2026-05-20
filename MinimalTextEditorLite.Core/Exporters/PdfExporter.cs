@@ -12,10 +12,10 @@ public sealed class PdfExporter(IIsolatedTempFileService tempFileService) : IExp
     public string DefaultFileName => "Note.pdf";
     public string FileDialogFilter => "PDF Files (*.pdf)|*.pdf";
 
-    public Task<byte[]> ExportAsync(EditorJsDocument document)
+    public Task<byte[]> ExportAsync(ExportContext context)
     {
         var toolPath = Path.Combine(AppContext.BaseDirectory, "Modules", "Export", "x64", "ExportAsPDF.exe");
-        return ExportWithExternalToolAsync(document, toolPath);
+        return ExportWithExternalToolAsync(context.Document, toolPath);
     }
 
     private async Task<byte[]> ExportWithExternalToolAsync(EditorJsDocument document, string toolPath)

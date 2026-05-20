@@ -22,6 +22,7 @@
             <MenuItem Tag="miOpen" Header="{Binding Source={x:Static localApp:App.Localization}, Converter={StaticResource Translate}, ConverterParameter=MenuItem_Header_File_Open, StringFormat='_{0}'}" InputGestureText="Ctrl+O" Command="{Binding OpenNoteCommand}" />
             <Separator/>
             <MenuItem Tag="miSave" Header="{Binding Source={x:Static localApp:App.Localization}, Converter={StaticResource Translate}, ConverterParameter=MenuItem_Header_File_Save, StringFormat='_{0}'}" InputGestureText="Ctrl+S" Command="{Binding SaveNoteCommand}" />
+            <MenuItem Tag="miMetadata" Header="{Binding Source={x:Static localApp:App.Localization}, Converter={StaticResource Translate}, ConverterParameter=MenuItem_Header_File_Metadata, StringFormat='_{0}'}" Command="{Binding MetadataCommand}" />
             <MenuItem Tag="miDelete" Header="{Binding Source={x:Static localApp:App.Localization}, Converter={StaticResource Translate}, ConverterParameter=MenuItem_Header_File_Delete, StringFormat='_{0}'}" InputGestureText="Ctrl+Delete" Command="{Binding DeleteNoteCommand}" />
             <Separator/>
             <MenuItem Tag="miExport" Header="{Binding Source={x:Static localApp:App.Localization}, Converter={StaticResource Translate}, ConverterParameter=MenuItem_Header_File_Export, StringFormat='_{0}'}" InputGestureText="Ctrl+Shift+E" Command="{Binding ExportNoteCommand}" />

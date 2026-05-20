@@ -9,11 +9,13 @@ public sealed class ExportService : IExportService
 {
     private readonly IReadOnlyDictionary<string, IExporter> exporters;
     private readonly INoteRepository noteRepository;
+    private readonly ISettingsRepository settingsRepository;
 
-    public ExportService(IEnumerable<IExporter> exporters, INoteRepository noteRepository)
+    public ExportService(IEnumerable<IExporter> exporters, INoteRepository noteRepository, ISettingsRepository settingsRepository)
     {
         this.exporters = exporters.ToDictionary(exporter => exporter.Id, StringComparer.OrdinalIgnoreCase);
         this.noteRepository = noteRepository;
+        this.settingsRepository = settingsRepository;
     }
 
     public IReadOnlyList<ExporterDescriptor> GetExporters()
@@ -40,6 +42,10 @@ public sealed class ExportService : IExportService
         if (note == null)
             throw new InvalidOperationException("Current note was not found.");
 
+        var settings = await settingsRepository.GetCurrentAsync();
+        if (settings == null)
+            throw new InvalidOperationException("Current settings were not found.");
+
         EditorJsDocument? document;
         try
         {
@@ -53,6 +59,13 @@ public sealed class ExportService : IExportService
         if (document == null)
             throw new InvalidOperationException("Current note JSON is invalid.");
 
-        return await exporter.ExportAsync(document);
+        var context = new ExportContext
+        {
+            Document = document,
+            Note = note,
+            Settings = settings
+        };
+
+        return await exporter.ExportAsync(context);
     }
 }

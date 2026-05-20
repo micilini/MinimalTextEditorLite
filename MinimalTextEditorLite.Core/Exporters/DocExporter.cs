@@ -12,10 +12,10 @@ public sealed class DocExporter(IIsolatedTempFileService tempFileService) : IExp
     public string DefaultFileName => "Note.docx";
     public string FileDialogFilter => "Word Documents (*.docx)|*.docx";
 
-    public Task<byte[]> ExportAsync(EditorJsDocument document)
+    public Task<byte[]> ExportAsync(ExportContext context)
     {
         var toolPath = Path.Combine(AppContext.BaseDirectory, "Modules", "Export", "x64", "ExportAsDOC.exe");
-        return ExportWithExternalToolAsync(document, toolPath);
+        return ExportWithExternalToolAsync(context.Document, toolPath);
     }
 
     private async Task<byte[]> ExportWithExternalToolAsync(EditorJsDocument document, string toolPath)

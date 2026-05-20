@@ -31,6 +31,37 @@ public sealed class NoteRepository(ISqliteConnectionFactory connectionFactory) :
         return await UpdateAsync(note);
     }
 
+    public async Task<bool> UpdateJsonAndMetadataAsync(string json, NoteMetadata metadata)
+    {
+        var note = await GetCurrentAsync();
+        if (note == null)
+            return false;
+
+        note.NoteJson = json;
+        note.Title = metadata.Title;
+        note.Slug = metadata.Slug;
+        note.Tags = metadata.Tags;
+        note.PublishDate = metadata.PublishDate;
+        note.UpdatedAt = DateTime.UtcNow;
+
+        return await UpdateAsync(note);
+    }
+
+    public async Task<bool> UpdateMetadataAsync(NoteMetadata metadata)
+    {
+        var note = await GetCurrentAsync();
+        if (note == null)
+            return false;
+
+        note.Title = metadata.Title;
+        note.Slug = metadata.Slug;
+        note.Tags = metadata.Tags;
+        note.PublishDate = metadata.PublishDate;
+        note.UpdatedAt = DateTime.UtcNow;
+
+        return await UpdateAsync(note);
+    }
+
     public Task<bool> ClearAsync()
     {
         var conn = connectionFactory.GetConnection();
