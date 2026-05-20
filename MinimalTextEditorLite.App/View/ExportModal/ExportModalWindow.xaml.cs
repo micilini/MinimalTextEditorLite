@@ -3,7 +3,6 @@ using Microsoft.Win32;
 using MinimalTextEditorLite.App.Helpers;
 using MinimalTextEditorLite.Core.Services;
 using System.IO;
-using System.Text;
 using System.Windows;
 
 namespace MinimalTextEditorLite.App.View.ExportModal;
@@ -110,43 +109,6 @@ public partial class ExportModalWindow : Window
     {
         ButtonExport.IsEnabled = true;
         ButtonExport.Content = App.Localization.Translate("Export_Button");
-    }
-
-    private async void ButtonCopyHtml_Click(object sender, RoutedEventArgs e)
-    {
-        await CopyExportToClipboardSafeAsync("html");
-    }
-
-    private async void ButtonCopyMarkdown_Click(object sender, RoutedEventArgs e)
-    {
-        await CopyExportToClipboardSafeAsync("md");
-    }
-
-    private async Task CopyExportToClipboardSafeAsync(string exporterId)
-    {
-        ButtonCopyHtml.IsEnabled = false;
-        ButtonCopyMarkdown.IsEnabled = false;
-
-        try
-        {
-            var bytes = await exportService.ExportAsync(exporterId);
-            var text = Encoding.UTF8.GetString(bytes);
-
-            Clipboard.SetText(text);
-
-            ModalMessages.ShowSuccessModal(
-                App.Localization.Translate("Export_Copy_Success_Title"),
-                App.Localization.Translate("Export_Copy_Success_Message"));
-        }
-        catch
-        {
-            ModalMessages.showErrorModal(App.Localization.Translate("Error_Export_1"));
-        }
-        finally
-        {
-            ButtonCopyHtml.IsEnabled = true;
-            ButtonCopyMarkdown.IsEnabled = true;
-        }
     }
 
     private void ButtonClose_Click(object sender, RoutedEventArgs e)

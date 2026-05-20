@@ -1,4 +1,4 @@
-namespace MinimalTextEditorLite.Core.Models;
+﻿namespace MinimalTextEditorLite.Core.Models;
 
 public static class AppThemePreference
 {

@@ -1,4 +1,4 @@
-using MinimalTextEditorLite.Exporters.Contracts.EditorJs;
+﻿using MinimalTextEditorLite.Exporters.Contracts.EditorJs;
 using System.Text;
 using System.Text.Json;
 

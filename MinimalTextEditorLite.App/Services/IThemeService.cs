@@ -1,4 +1,4 @@
-namespace MinimalTextEditorLite.App.Services;
+﻿namespace MinimalTextEditorLite.App.Services;
 
 public interface IThemeService
 {

@@ -1,4 +1,4 @@
-using MinimalTextEditorLite.Core.Importers;
+﻿using MinimalTextEditorLite.Core.Importers;
 using MinimalTextEditorLite.Core.Repositories;
 using MinimalTextEditorLite.Core.Security;
 

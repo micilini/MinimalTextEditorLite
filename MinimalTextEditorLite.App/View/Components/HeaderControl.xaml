@@ -16,7 +16,7 @@
             <ColumnDefinition Width="Auto" />
         </Grid.ColumnDefinitions>
 
-        <!-- ===== Branding ===== -->
+        
         <StackPanel Grid.Column="0" Orientation="Horizontal" VerticalAlignment="Center">
             <Image Source="pack://application:,,,/Assets/Images/logo-mte.png"
                    Width="30" Height="30"
@@ -42,10 +42,10 @@
             </StackPanel>
         </StackPanel>
 
-        <!-- ===== Action toolbar ===== -->
+        
         <StackPanel Grid.Column="2" Orientation="Horizontal" VerticalAlignment="Center">
 
-            <!-- Open -->
+            
             <Button Style="{StaticResource MTE.Button.IconGhost}"
                     Command="{Binding OpenNoteCommand}"
                     ToolTip="{Binding Source={x:Static localApp:App.Localization}, Converter={StaticResource Translate}, ConverterParameter=MenuItem_Header_File_Open}"
@@ -55,7 +55,7 @@
                                          Foreground="{DynamicResource MaterialDesignBody}" />
             </Button>
 
-            <!-- Search -->
+            
             <Button Style="{StaticResource MTE.Button.IconGhost}"
                     Command="{Binding SearchNoteCommand}"
                     ToolTip="Search"
@@ -65,7 +65,7 @@
                                          Foreground="{DynamicResource MaterialDesignBody}" />
             </Button>
 
-            <!-- Save -->
+            
             <Button Style="{StaticResource MTE.Button.IconGhost}"
                     Command="{Binding SaveNoteCommand}"
                     ToolTip="{Binding Source={x:Static localApp:App.Localization}, Converter={StaticResource Translate}, ConverterParameter=MenuItem_Header_File_Save}"
@@ -75,14 +75,14 @@
                                          Foreground="{DynamicResource MaterialDesignBody}" />
             </Button>
 
-            <!-- Divisor vertical sutil -->
+            
             <Border Width="1" Height="22"
                     Background="{DynamicResource MaterialDesignDivider}"
                     Opacity="0.5"
                     Margin="8 0 8 0"
                     VerticalAlignment="Center" />
 
-            <!-- Trash / Reset -->
+            
             <Button Style="{StaticResource MTE.Button.IconGhost}"
                     Command="{Binding RemoveNoteCommand}"
                     ToolTip="{Binding Source={x:Static localApp:App.Localization}, Converter={StaticResource Translate}, ConverterParameter=MenuItem_Header_File_Delete}"
@@ -92,7 +92,7 @@
                                          Foreground="{DynamicResource MaterialDesignBody}" />
             </Button>
 
-            <!-- Export -->
+            
             <Button Style="{StaticResource MTE.Button.IconGhost}"
                     Command="{Binding ExportCommand}"
                     ToolTip="{Binding Source={x:Static localApp:App.Localization}, Converter={StaticResource Translate}, ConverterParameter=MenuItem_Header_File_Export}"
@@ -102,7 +102,7 @@
                                          Foreground="{DynamicResource MaterialDesignBody}" />
             </Button>
 
-            <!-- Settings -->
+            
             <Button Style="{StaticResource MTE.Button.IconGhost}"
                     Command="{Binding SettingsCommand}"
                     ToolTip="{Binding Source={x:Static localApp:App.Localization}, Converter={StaticResource Translate}, ConverterParameter=MenuItem_Header_File_Configuration}">
@@ -113,3 +113,4 @@
         </StackPanel>
     </Grid>
 </UserControl>
+

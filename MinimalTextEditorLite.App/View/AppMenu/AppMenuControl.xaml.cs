@@ -1,9 +1,9 @@
-using MinimalTextEditorLite.App.ViewModels;
+﻿using MinimalTextEditorLite.App.ViewModels;
 using MinimalTextEditorLite.Core.Models;
 using System.Windows;
 using System.Windows.Controls;
 
-namespace MinimalTextEditorLite.App.View;
+namespace MinimalTextEditorLite.App.View.AppMenu;
 
 public partial class AppMenuControl : UserControl
 {

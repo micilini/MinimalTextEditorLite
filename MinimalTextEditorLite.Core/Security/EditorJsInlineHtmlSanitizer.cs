@@ -1,4 +1,4 @@
-using Ganss.Xss;
+﻿using Ganss.Xss;
 
 namespace MinimalTextEditorLite.Core.Security;
 

@@ -1,4 +1,4 @@
-namespace MinimalTextEditorLite.Core.Importers;
+﻿namespace MinimalTextEditorLite.Core.Importers;
 
 public interface IImporter
 {

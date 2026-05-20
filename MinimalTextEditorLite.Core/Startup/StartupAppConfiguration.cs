@@ -1,4 +1,4 @@
-using MinimalTextEditorLite.Core.Database;
+﻿using MinimalTextEditorLite.Core.Database;
 using MinimalTextEditorLite.Core.Models;
 using MinimalTextEditorLite.Core.Security;
 

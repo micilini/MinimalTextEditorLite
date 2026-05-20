@@ -1,4 +1,4 @@
-using Microsoft.Win32;
+﻿using Microsoft.Win32;
 using System.IO;
 
 namespace MinimalTextEditorLite.App.Helpers;

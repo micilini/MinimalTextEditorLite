@@ -2,7 +2,7 @@
 using MinimalTextEditorLite.App.ViewModels;
 using System.Windows.Controls;
 
-namespace MinimalTextEditorLite.App.View;
+namespace MinimalTextEditorLite.App.View.Editor;
 
 public partial class EditorControl : UserControl
 {

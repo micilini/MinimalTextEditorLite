@@ -1,4 +1,4 @@
-using MinimalTextEditorLite.Core.Exporters;
+﻿using MinimalTextEditorLite.Core.Exporters;
 
 namespace MinimalTextEditorLite.Core.Services;
 

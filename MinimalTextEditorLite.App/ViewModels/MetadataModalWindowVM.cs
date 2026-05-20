@@ -1,4 +1,4 @@
-using CommunityToolkit.Mvvm.ComponentModel;
+﻿using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using MinimalTextEditorLite.App.Helpers;
 using MinimalTextEditorLite.App.View.MetadataModal;

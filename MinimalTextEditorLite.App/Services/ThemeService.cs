@@ -1,4 +1,4 @@
-using MaterialDesignThemes.Wpf;
+﻿using MaterialDesignThemes.Wpf;
 using Microsoft.Win32;
 using MinimalTextEditorLite.Core.Models;
 using System.Windows;

@@ -1,4 +1,4 @@
-using System;
+Ôªøusing System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -8,12 +8,12 @@ namespace MinimalTextEditorLite.Core.Models
 {
     public class ButtonModel
     {
-        public string Text { get; set; }      // Texto do bot„o
-        public bool IsVisible { get; set; }   // Visibilidade do bot„o
+        public string Text { get; set; }      // Texto do bot√£o
+        public bool IsVisible { get; set; }   // Visibilidade do bot√£o
 
         public ButtonModel()
         {
-            IsVisible = true; // Valor padr„o
+            IsVisible = true; // Valor padr√£o
         }
     }
 }

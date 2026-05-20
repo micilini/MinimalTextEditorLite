@@ -247,7 +247,6 @@ public partial class EditorControlVM : ObservableObject, IDisposable
         }
         catch
         {
-            // Theme synchronization should not interrupt the editor.
         }
     }
 
@@ -366,7 +365,6 @@ public partial class EditorControlVM : ObservableObject, IDisposable
         }
         catch
         {
-            // Stats are non-critical.
         }
     }
 

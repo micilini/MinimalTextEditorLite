@@ -1,4 +1,4 @@
-using MinimalTextEditorLite.Core.Database;
+﻿using MinimalTextEditorLite.Core.Database;
 using SQLite;
 
 namespace MinimalTextEditorLite.Core.Security;

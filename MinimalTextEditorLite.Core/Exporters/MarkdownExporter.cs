@@ -1,4 +1,4 @@
-using MinimalTextEditorLite.Core.Models;
+﻿using MinimalTextEditorLite.Core.Models;
 using MinimalTextEditorLite.Exporters.Contracts.EditorJs;
 using ReverseMarkdown;
 using System.Net;

@@ -1,4 +1,4 @@
-namespace MinimalTextEditorLite.Core.Exporters;
+﻿namespace MinimalTextEditorLite.Core.Exporters;
 
 public sealed class MarkdownAssetExportResult
 {

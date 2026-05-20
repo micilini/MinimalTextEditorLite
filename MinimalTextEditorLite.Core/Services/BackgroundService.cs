@@ -49,7 +49,6 @@ namespace MinimalTextEditorLite.Core.Services
                 }
                 catch (TaskCanceledException)
                 {
-                    // Task cancellation handled here.
                 }
             }
         }

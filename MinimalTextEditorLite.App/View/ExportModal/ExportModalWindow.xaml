@@ -26,7 +26,7 @@
                     <RowDefinition Height="Auto" />
                 </Grid.RowDefinitions>
 
-                <!-- ===== Header ===== -->
+                
                 <Grid Grid.Row="0" Margin="28 24 28 8">
                     <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
                         <Border Width="44" Height="44"
@@ -53,7 +53,7 @@
                 <Border Grid.Row="0" Style="{StaticResource MTE.Divider}"
                         VerticalAlignment="Bottom" Margin="28 0 28 0" />
 
-                <!-- ===== Body ===== -->
+                
                 <StackPanel Grid.Row="1" Margin="28 16 28 16">
                     <TextBlock Text="{Binding Source={x:Static localApp:App.Localization}, Converter={StaticResource Translate}, ConverterParameter=Export_Note_SubTitle}"
                                Style="{StaticResource MTE.Text.SectionLabel}" />
@@ -87,25 +87,10 @@
                     </StackPanel>
                 </StackPanel>
 
-                <!-- ===== Footer (action buttons) ===== -->
                 <Border Grid.Row="2" Style="{StaticResource MTE.Divider}"
                         VerticalAlignment="Top" Margin="28 0 28 0" />
 
                 <Grid Grid.Row="2" Margin="28 16 28 22">
-                    <StackPanel Orientation="Horizontal" HorizontalAlignment="Left">
-                        <Button x:Name="ButtonCopyHtml"
-                                Content="{Binding Source={x:Static localApp:App.Localization}, Converter={StaticResource Translate}, ConverterParameter=Export_Copy_Html_Button}"
-                                Click="ButtonCopyHtml_Click"
-                                Style="{StaticResource MTE.Button.Secondary}"
-                                MinWidth="118"
-                                Margin="0 0 8 0" />
-                        <Button x:Name="ButtonCopyMarkdown"
-                                Content="{Binding Source={x:Static localApp:App.Localization}, Converter={StaticResource Translate}, ConverterParameter=Export_Copy_Markdown_Button}"
-                                Click="ButtonCopyMarkdown_Click"
-                                Style="{StaticResource MTE.Button.Secondary}"
-                                MinWidth="140" />
-                    </StackPanel>
-
                     <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
                         <Button Content="{Binding Source={x:Static localApp:App.Localization}, Converter={StaticResource Translate}, ConverterParameter=Button_Close}"
                                 Click="ButtonClose_Click"
@@ -123,3 +108,4 @@
         </materialDesign:Card>
     </Grid>
 </Window>
+

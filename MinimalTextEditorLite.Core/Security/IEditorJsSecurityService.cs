@@ -1,4 +1,4 @@
-namespace MinimalTextEditorLite.Core.Security;
+﻿namespace MinimalTextEditorLite.Core.Security;
 
 public interface IEditorJsSecurityService
 {

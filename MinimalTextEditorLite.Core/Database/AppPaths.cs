@@ -1,4 +1,4 @@
-namespace MinimalTextEditorLite.Core.Database;
+﻿namespace MinimalTextEditorLite.Core.Database;
 
 public static class AppPaths
 {

@@ -1,4 +1,4 @@
-namespace MinimalTextEditorLite.Core.Importers;
+﻿namespace MinimalTextEditorLite.Core.Importers;
 
 public sealed class JsonImporter : IImporter
 {

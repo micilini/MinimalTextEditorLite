@@ -1,9 +1,9 @@
-<UserControl x:Class="MinimalTextEditorLite.App.View.AppMenuControl"
+﻿<UserControl x:Class="MinimalTextEditorLite.App.View.AppMenu.AppMenuControl"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
-             xmlns:local="clr-namespace:MinimalTextEditorLite.App.View"
+             xmlns:local="clr-namespace:MinimalTextEditorLite.App.View.AppMenu"
              xmlns:localApp="clr-namespace:MinimalTextEditorLite.App"
              mc:Ignorable="d"
              d:DesignHeight="40"
@@ -16,9 +16,7 @@
           Padding="14 6 8 6">
 
         <Menu.Resources>
-            <!-- Não usar BasedOn para MenuItem via x:Type aqui.
-                 Esse padrão pode criar dependência cíclica quando existe estilo implícito
-                 para MenuItem no mesmo escopo. -->
+            
             <Style x:Key="TopLevelMenuItem" TargetType="MenuItem">
                 <Setter Property="Icon" Value="{x:Null}" />
                 <Setter Property="FontFamily" Value="{StaticResource MTE.Font.Primary}" />
@@ -48,7 +46,7 @@
             </Style>
         </Menu.Resources>
 
-        <!-- ===== File ===== -->
+        
         <MenuItem Header="{Binding Source={x:Static localApp:App.Localization}, Converter={StaticResource Translate}, ConverterParameter=MenuItem_Header_File, StringFormat='_{0}'}"
                   Style="{StaticResource TopLevelMenuItem}">
 
@@ -116,13 +114,13 @@
                       Command="{Binding ExitCommand}" />
         </MenuItem>
 
-        <!-- ===== Focus Mode ===== -->
+        
         <MenuItem Header="{Binding Source={x:Static localApp:App.Localization}, Converter={StaticResource Translate}, ConverterParameter=MenuItem_Header_Focus, StringFormat='_{0}'}"
                   Style="{StaticResource TopLevelMenuItem}"
                   Command="{Binding FocusModeCommand}"
                   InputGestureText="Ctrl+Shift+F" />
 
-        <!-- ===== Help ===== -->
+        
         <MenuItem Header="{Binding Source={x:Static localApp:App.Localization}, Converter={StaticResource Translate}, ConverterParameter=MenuItem_Header_Help, StringFormat='_{0}'}"
                   Style="{StaticResource TopLevelMenuItem}">
             <MenuItem Tag="miAbout"
@@ -132,3 +130,4 @@
         </MenuItem>
     </Menu>
 </UserControl>
+

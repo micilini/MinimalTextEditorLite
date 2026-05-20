@@ -1,4 +1,4 @@
-using Ganss.Xss;
+﻿using Ganss.Xss;
 using MinimalTextEditorLite.Exporters.Contracts.EditorJs;
 using System.Net;
 using System.Text;
