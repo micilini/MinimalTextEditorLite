@@ -42,23 +42,59 @@ public sealed class HtmlDocumentBuilder
 
     private static void AppendCss(StringBuilder htmlBuilder, HtmlVariant variant)
     {
-        // Mantém a base visual próxima do HtmlExporter atual para evitar regressão no HTML exportado.
-        htmlBuilder.Append("body { font-family: Arial, sans-serif; line-height: 1.6; }");
-        htmlBuilder.Append("h1, h2, h3, h4, h5, h6 { margin: 10px 0; }");
-        htmlBuilder.Append("p { margin: 10px 0; }");
-        htmlBuilder.Append("ul, ol { margin: 10px 0; padding-left: 20px; }");
-        htmlBuilder.Append("blockquote { margin: 10px 0; padding: 10px 20px; background: #f9f9f9; border-left: 4px solid #ccc; }");
-        htmlBuilder.Append("code { font-family: 'Courier New', monospace; background: #f4f4f4; padding: 2px 4px; border-radius: 4px; }");
-        htmlBuilder.Append("table { border-collapse: collapse; width: 100%; margin: 10px 0; }");
-        htmlBuilder.Append("th, td { border: 1px solid #ccc; padding: 8px; text-align: left; }");
+        AppendStandardCss(htmlBuilder);
+
+        if (variant == HtmlVariant.Print)
+            AppendPrintCss(htmlBuilder);
+    }
+
+    private static void AppendStandardCss(StringBuilder htmlBuilder)
+    {
+        htmlBuilder.Append("body { font-family: 'Segoe UI', Arial, sans-serif; line-height: 1.6; color: #1a1a1a; }");
+        htmlBuilder.Append("h1, h2, h3, h4, h5, h6 { margin: 16px 0 8px; color: #111; font-weight: 700; }");
+        htmlBuilder.Append("h1 { font-size: 28px; }");
+        htmlBuilder.Append("h2 { font-size: 22px; }");
+        htmlBuilder.Append("h3 { font-size: 18px; }");
+        htmlBuilder.Append("h4 { font-size: 16px; }");
+        htmlBuilder.Append("h5 { font-size: 14px; }");
+        htmlBuilder.Append("h6 { font-size: 13px; text-transform: uppercase; letter-spacing: .04em; }");
+        htmlBuilder.Append("p { margin: 10px 0; font-size: 14px; }");
+        htmlBuilder.Append("ul, ol { margin: 10px 0; padding-left: 24px; }");
+        htmlBuilder.Append("li { margin: 4px 0; }");
+        htmlBuilder.Append("blockquote { margin: 12px 0; padding: 12px 16px; background: #f5f5f5; border-left: 4px solid #999; font-style: italic; }");
+        htmlBuilder.Append("blockquote p { margin: 0 0 6px; }");
+        htmlBuilder.Append("blockquote footer { color: #666; font-size: 13px; font-style: normal; }");
+        htmlBuilder.Append("code { font-family: 'Cascadia Code', 'Consolas', monospace; background: #f4f4f4; padding: 2px 6px; border-radius: 4px; font-size: .92em; }");
+        htmlBuilder.Append("pre { font-family: 'Cascadia Code', 'Consolas', monospace; background: #1e1e1e; color: #d4d4d4; padding: 14px; border-radius: 6px; overflow-x: auto; white-space: pre-wrap; word-break: break-word; }");
+        htmlBuilder.Append("pre code { background: transparent; color: inherit; padding: 0; border-radius: 0; }");
+        htmlBuilder.Append("table { border-collapse: collapse; width: 100%; margin: 14px 0; }");
+        htmlBuilder.Append("th, td { border: 1px solid #ccc; padding: 8px 10px; text-align: left; vertical-align: top; }");
+        htmlBuilder.Append("th { background: #f0f0f0; font-weight: 600; }");
         htmlBuilder.Append("img { max-width: 100%; height: auto; margin: 10px 0; }");
+        htmlBuilder.Append("figure { margin: 16px 0; text-align: center; }");
+        htmlBuilder.Append("figure img { display: inline-block; margin: 0 auto; }");
+        htmlBuilder.Append("figcaption { margin-top: 6px; color: #666; font-size: 13px; font-style: italic; }");
+        htmlBuilder.Append("a { color: #1a4ba8; text-decoration: underline; }");
+        htmlBuilder.Append(".mte-warning { border: 1px solid #f0a020; background: #fff8e5; padding: 12px 16px; border-radius: 4px; margin: 12px 0; }");
+        htmlBuilder.Append(".mte-warning strong { color: #7a4b00; }");
+        htmlBuilder.Append(".mte-delimiter { text-align: center; font-size: 22px; letter-spacing: 8px; margin: 20px 0; color: #999; }");
+    }
 
-        if (variant != HtmlVariant.Print)
-            return;
-
-        // Base mínima para a futura pipeline de PDF. A lapidação tipográfica pesada fica para a FASE 6.
+    private static void AppendPrintCss(StringBuilder htmlBuilder)
+    {
         htmlBuilder.Append("@page { size: A4; margin: 1.5cm; }");
         htmlBuilder.Append("html, body { -webkit-print-color-adjust: exact; print-color-adjust: exact; }");
+        htmlBuilder.Append("body { font-family: 'Segoe UI Variable', 'Segoe UI', 'Segoe UI Emoji', Arial, sans-serif; font-size: 11pt; line-height: 1.55; }");
+        htmlBuilder.Append("h1, h2, h3, h4, h5, h6 { page-break-after: avoid; break-after: avoid; }");
+        htmlBuilder.Append("h1 { font-size: 24pt; }");
+        htmlBuilder.Append("h2 { font-size: 19pt; }");
+        htmlBuilder.Append("h3 { font-size: 15pt; }");
+        htmlBuilder.Append("p, li { orphans: 3; widows: 3; }");
+        htmlBuilder.Append("table, figure, pre, blockquote, .mte-warning { page-break-inside: avoid; break-inside: avoid; }");
+        htmlBuilder.Append("img { page-break-inside: avoid; break-inside: avoid; }");
+        htmlBuilder.Append("pre { white-space: pre-wrap; word-break: break-word; }");
+        htmlBuilder.Append("a { color: #1a4ba8; text-decoration: underline; }");
+        htmlBuilder.Append(".no-print { display: none; }");
     }
 
     private void AppendBlock(StringBuilder htmlBuilder, EditorJsBlock block, HtmlVariant variant)
@@ -113,7 +149,12 @@ public sealed class HtmlDocumentBuilder
             case "warning":
             {
                 var data = block.Data.Deserialize<EditorJsWarningData>(EditorJsJson.Options);
-                htmlBuilder.Append("<div style='border: 1px solid #ffa500; padding: 10px; margin: 10px 0; background: #fff8e5;'>");
+
+                if (variant == HtmlVariant.Print)
+                    htmlBuilder.Append("<div class=\"mte-warning\">");
+                else
+                    htmlBuilder.Append("<div style='border: 1px solid #ffa500; padding: 10px; margin: 10px 0; background: #fff8e5;'>");
+
                 htmlBuilder.Append($"<strong>{SafeInlineHtml(data?.Title)}</strong>: {SafeInlineHtml(data?.Message)}");
                 htmlBuilder.Append("</div>");
                 break;
@@ -133,7 +174,7 @@ public sealed class HtmlDocumentBuilder
                 if (variant == HtmlVariant.Standard)
                     htmlBuilder.Append("<hr>");
                 else
-                    htmlBuilder.Append("<p style='text-align:center; font-size:28px; margin:15px;'>***</p>");
+                    htmlBuilder.Append("<div class=\"mte-delimiter\">***</div>");
 
                 break;
             }
@@ -237,7 +278,15 @@ public sealed class HtmlDocumentBuilder
         return """
 <script>
 (function () {
+  var didSignal = false;
+
   function signalReady() {
+    if (didSignal) {
+      return;
+    }
+
+    didSignal = true;
+
     if (window.chrome && window.chrome.webview) {
       window.chrome.webview.postMessage('mte:print-ready');
     }
@@ -245,33 +294,40 @@ public sealed class HtmlDocumentBuilder
 
   function waitForImages() {
     var imgs = Array.from(document.images);
+
     if (imgs.length === 0) {
       signalReady();
       return;
     }
 
     var pending = imgs.length;
+
     function decrement() {
       pending -= 1;
+
       if (pending <= 0) {
         signalReady();
       }
     }
 
     imgs.forEach(function (img) {
-      if (img.complete && img.naturalHeight !== 0) {
+      if (img.complete) {
         decrement();
-      } else {
-        img.addEventListener('load', decrement, { once: true });
-        img.addEventListener('error', decrement, { once: true });
+        return;
       }
+
+      img.addEventListener('load', decrement, { once: true });
+      img.addEventListener('error', decrement, { once: true });
     });
+
+    window.setTimeout(signalReady, 10000);
   }
 
   if (document.readyState === 'complete') {
     waitForImages();
   } else {
-    window.addEventListener('load', waitForImages);
+    window.addEventListener('load', waitForImages, { once: true });
+    window.setTimeout(waitForImages, 3000);
   }
 })();
 </script>
