@@ -81,8 +81,13 @@ public partial class EditorControlVM : ObservableObject, IDisposable
 
         Directory.CreateDirectory(userDataFolder);
 
-        var env = await CoreWebView2Environment.CreateAsync(null, userDataFolder);
+        var options = new CoreWebView2EnvironmentOptions(
+            "--disable-http-cache --disk-cache-size=1 --media-cache-size=1");
+
+        var env = await CoreWebView2Environment.CreateAsync(null, userDataFolder, options);
         await myWebView.EnsureCoreWebView2Async(env);
+
+        await DisableWebViewCacheSafeAsync();
 
         var folderPath = Path.Combine(Directory.GetCurrentDirectory(), "EditorModules", "EditorJS");
 
@@ -97,7 +102,8 @@ public partial class EditorControlVM : ObservableObject, IDisposable
             folderPath,
             CoreWebView2HostResourceAccessKind.DenyCors);
 
-        myWebView.CoreWebView2.Navigate($"https://{virtualHostName}/index.html");
+        var cacheBuster = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds();
+        myWebView.CoreWebView2.Navigate($"https://{virtualHostName}/index.html?v={cacheBuster}");
         myWebView.CoreWebView2.Settings.AreDefaultContextMenusEnabled = true;
         myWebView.CoreWebView2.Settings.IsWebMessageEnabled = true;
         myWebView.CoreWebView2.Settings.IsZoomControlEnabled = false;
@@ -122,10 +128,35 @@ public partial class EditorControlVM : ObservableObject, IDisposable
 
     private void HandleNavigation(object? sender, CoreWebView2NavigationStartingEventArgs args)
     {
-        if (!args.Uri.Equals($"https://{virtualHostName}/index.html", StringComparison.OrdinalIgnoreCase))
+        var allowedUri = $"https://{virtualHostName}/index.html";
+
+        if (!args.Uri.StartsWith(allowedUri, StringComparison.OrdinalIgnoreCase))
         {
             args.Cancel = true;
-            myWebView.CoreWebView2.Navigate($"https://{virtualHostName}/index.html");
+
+            var cacheBuster = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds();
+            myWebView.CoreWebView2.Navigate($"{allowedUri}?v={cacheBuster}");
+        }
+    }
+
+    private async Task DisableWebViewCacheSafeAsync()
+    {
+        try
+        {
+            if (myWebView.CoreWebView2 is null)
+                return;
+
+            await myWebView.CoreWebView2.CallDevToolsProtocolMethodAsync("Network.enable", "{}");
+            await myWebView.CoreWebView2.CallDevToolsProtocolMethodAsync(
+                "Network.setCacheDisabled",
+                "{\"cacheDisabled\":true}");
+
+            await myWebView.CoreWebView2.CallDevToolsProtocolMethodAsync(
+                "Network.clearBrowserCache",
+                "{}");
+        }
+        catch
+        {
         }
     }
 
