@@ -148,7 +148,7 @@ export default class MteImageTool {
   static get toolbox() {
     return {
       title: 'Image',
-      icon: '<svg width="17" height="15" viewBox="0 0 17 15" xmlns="http://www.w3.org/2000/svg"><path d="M15.25 0H1.75C.78 0 0 .78 0 1.75v11.5C0 14.22.78 15 1.75 15h13.5c.97 0 1.75-.78 1.75-1.75V1.75C17 .78 16.22 0 15.25 0ZM1.5 1.75c0-.14.11-.25.25-.25h13.5c.14 0 .25.11.25.25v8.49l-3.1-3.1a1.25 1.25 0 0 0-1.77 0L7.9 9.87 6.63 8.6a1.25 1.25 0 0 0-1.77 0L1.5 11.96V1.75Zm.25 11.75a.25.25 0 0 1-.25-.25v-.17l4.24-4.24 4.66 4.66H1.75Zm13.5 0h-2.73L8.96 9.94l2.55-2.55 3.99 3.99v1.87c0 .14-.11.25-.25.25ZM5.25 5.5A1.75 1.75 0 1 1 5.25 2a1.75 1.75 0 0 1 0 3.5Z"/></svg>',
+      icon: '<svg width="17" height="15" viewBox="0 0 17 15" xmlns="http://www.w3.org/2000/svg" fill="none"><path d="M2.5 1.5h12A1.5 1.5 0 0 1 16 3v9a1.5 1.5 0 0 1-1.5 1.5h-12A1.5 1.5 0 0 1 1 12V3a1.5 1.5 0 0 1 1.5-1.5Z" stroke="currentColor" stroke-width="1.25"/><path d="M2.7 11.6 5.8 8.5a1 1 0 0 1 1.4 0l2 2 1.35-1.35a1 1 0 0 1 1.4 0l2.35 2.35" stroke="currentColor" stroke-width="1.25" stroke-linecap="round" stroke-linejoin="round"/><circle cx="12.25" cy="4.75" r="1.05" stroke="currentColor" stroke-width="1.25"/></svg>',
     };
   }
 
