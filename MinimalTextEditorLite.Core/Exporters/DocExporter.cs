@@ -1,12 +1,19 @@
-﻿using MinimalTextEditorLite.Exporters.Contracts.EditorJs;
-using MinimalTextEditorLite.Core.Security;
-using System.Diagnostics;
-using System.Text.Json;
+using DocumentFormat.OpenXml.Packaging;
+using DocumentFormat.OpenXml.Wordprocessing;
+using HtmlToOpenXml;
+using MinimalTextEditorLite.Exporters.Contracts.EditorJs;
 
 namespace MinimalTextEditorLite.Core.Exporters;
 
-public sealed class DocExporter(IIsolatedTempFileService tempFileService) : IExporter
+public sealed class DocExporter : IExporter
 {
+    private readonly HtmlDocumentBuilder htmlBuilder;
+
+    public DocExporter(HtmlDocumentBuilder htmlBuilder)
+    {
+        this.htmlBuilder = htmlBuilder;
+    }
+
     public string Id => "doc";
     public string DisplayName => "DOCX";
     public string DefaultFileName => "Note.docx";
@@ -14,61 +21,50 @@ public sealed class DocExporter(IIsolatedTempFileService tempFileService) : IExp
 
     public Task<byte[]> ExportAsync(ExportContext context)
     {
-        var toolPath = Path.Combine(AppContext.BaseDirectory, "Modules", "Export", "x64", "ExportAsDOC.exe");
-        return ExportWithExternalToolAsync(context.Document, toolPath);
+        ArgumentNullException.ThrowIfNull(context);
+
+        // HtmlConverter é síncrono. Mantemos em background para não bloquear a UI
+        // caso o usuário exporte documentos maiores.
+        return Task.Run(() => GenerateDocxBytes(context.Document));
     }
 
-    private async Task<byte[]> ExportWithExternalToolAsync(EditorJsDocument document, string toolPath)
+    private byte[] GenerateDocxBytes(EditorJsDocument document)
     {
-        string? tempJsonFilePath = null;
-
-        try
+        var html = htmlBuilder.Build(document, new HtmlBuildOptions
         {
-            if (!File.Exists(toolPath))
-                throw new FileNotFoundException("Exporter executable was not found.", toolPath);
+            Variant = HtmlVariant.Standard,
+            DocumentTitle = "Note Export"
+        });
 
-            tempJsonFilePath = tempFileService.CreateTempJsonPath();
-            var json = JsonSerializer.Serialize(document, EditorJsJson.Options);
-            await File.WriteAllTextAsync(tempJsonFilePath, json);
+        using var stream = new MemoryStream();
 
-            var processStartInfo = new ProcessStartInfo
+        using (var wordDocument = WordprocessingDocument.Create(
+            stream,
+            DocumentFormat.OpenXml.WordprocessingDocumentType.Document))
+        {
+            var mainPart = wordDocument.AddMainDocumentPart();
+            mainPart.Document = new Document(new Body());
+
+            var converter = new HtmlConverter(mainPart)
             {
-                FileName = toolPath,
-                Arguments = $"\"{tempJsonFilePath}\"",
-                RedirectStandardOutput = true,
-                RedirectStandardError = true,
-                UseShellExecute = false,
-                CreateNoWindow = true,
-                WorkingDirectory = AppContext.BaseDirectory
+                // Mantém hyperlinks clicáveis em vez de descartar âncoras.
+                SupportsAnchorLinks = true,
+
+                // Mantém comportamento esperado para imagens externas absolutas.
+                // data:image/* continua dependendo do suporte interno do HtmlToOpenXml.
+                ImageProcessing = ImageProcessingMode.Embed
             };
 
-            using var process = new Process { StartInfo = processStartInfo };
-            using var memoryStream = new MemoryStream();
+            var body = mainPart.Document.Body;
+            if (body is null)
+                throw new InvalidOperationException("DOCX main document body was not initialized.");
 
-            process.Start();
+            foreach (var element in converter.Parse(html))
+                body.Append(element);
 
-            var stdoutTask = process.StandardOutput.BaseStream.CopyToAsync(memoryStream);
-            var stderrTask = process.StandardError.ReadToEndAsync();
-            var waitTask = process.WaitForExitAsync();
-
-            await Task.WhenAll(stdoutTask, stderrTask, waitTask);
-
-            var stderr = await stderrTask;
-
-            if (process.ExitCode != 0)
-            {
-                throw new InvalidOperationException(
-                    string.IsNullOrWhiteSpace(stderr)
-                        ? $"Exporter failed with exit code {process.ExitCode}."
-                        : stderr);
-            }
-
-            return memoryStream.ToArray();
+            mainPart.Document.Save();
         }
-        finally
-        {
-            if (tempJsonFilePath != null && File.Exists(tempJsonFilePath))
-                File.Delete(tempJsonFilePath);
-        }
+
+        return stream.ToArray();
     }
 }
