@@ -34,7 +34,7 @@
                             VerticalAlignment="Center">
                         <materialDesign:PackIcon Kind="InformationOutline"
                                                  Width="24" Height="24"
-                                                 Foreground="{StaticResource MTE.Brush.Primary}"
+                                                 Foreground="#111827"
                                                  HorizontalAlignment="Center"
                                                  VerticalAlignment="Center" />
                     </Border>
@@ -128,9 +128,10 @@
 
                 <TabControl Margin="0 20 0 0" Height="180">
                     <TabItem Header="MIT License">
-                        <Border Background="{DynamicResource MaterialDesignDivider}"
-                                Opacity="0.18"
-                                CornerRadius="6"
+                        <Border Background="#F8FAFC"
+                                BorderBrush="#D1D5DB"
+                                BorderThickness="1"
+                                CornerRadius="8"
                                 Margin="0 8 0 0">
                             <ScrollViewer VerticalScrollBarVisibility="Auto"
                                           HorizontalScrollBarVisibility="Disabled"
@@ -139,7 +140,7 @@
                                            FontFamily="{StaticResource MTE.Font.Mono}"
                                            FontSize="12"
                                            LineHeight="17"
-                                           Foreground="{DynamicResource MaterialDesignBody}">
+                                           Foreground="#111827">
 MIT License
 
 Copyright (c) 2025-2026 Micilini Roll
