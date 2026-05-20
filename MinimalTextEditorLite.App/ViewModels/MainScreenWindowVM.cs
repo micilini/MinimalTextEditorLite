@@ -94,7 +94,7 @@ public partial class MainScreenWindowVM : ObservableObject
             }
             else if (backgroundService == null)
             {
-                backgroundService = new BackgroundService(SaveNote, newInterval);
+                backgroundService = new BackgroundService(AutoSaveNote, newInterval);
                 backgroundService.Start();
             }
             else
@@ -113,7 +113,7 @@ public partial class MainScreenWindowVM : ObservableObject
 
         if (autoSaveInterval > 0)
         {
-            backgroundService = new BackgroundService(SaveNote, autoSaveInterval);
+            backgroundService = new BackgroundService(AutoSaveNote, autoSaveInterval);
             backgroundService.Start();
         }
 
@@ -256,6 +256,19 @@ public partial class MainScreenWindowVM : ObservableObject
             editorControl.DoAction("Save");
         else
             Application.Current.Dispatcher.Invoke(() => editorControl.DoAction("Save"));
+    }
+
+    private void AutoSaveNote()
+    {
+        if (!SaveNoteCompleted)
+            return;
+
+        SaveNoteCompleted = false;
+
+        if (Application.Current.Dispatcher.CheckAccess())
+            editorControl.SaveContentDebounced();
+        else
+            Application.Current.Dispatcher.Invoke(() => editorControl.SaveContentDebounced());
     }
 
     public void RemoveNote()
