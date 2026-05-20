@@ -500,3 +500,11 @@ export default class MteImageTool {
     }, 5000);
   }
 }
+
+export async function createMteImageDataFromFile(file) {
+  return await MteImageTool.createDataFromFile(file);
+}
+
+export function isSupportedMteImageFile(file) {
+  return isSupportedImageFile(file);
+}

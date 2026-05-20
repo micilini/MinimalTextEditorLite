@@ -23,19 +23,27 @@ public sealed class EditorJsImageValidator
             return false;
         }
 
-        if (Uri.TryCreate(url, UriKind.Absolute, out var uri))
+        url = url.Trim();
+
+        // IMPORTANT:
+        // Do not validate data URLs through System.Uri.
+        // Large base64 images may be rejected by Uri.TryCreate even when valid.
+        if (url.StartsWith("data:", StringComparison.OrdinalIgnoreCase))
+            return IsValidDataImage(url, out reason);
+
+        if (!Uri.TryCreate(url, UriKind.Absolute, out var uri))
         {
-            if (uri.Scheme is "http" or "https")
-                return true;
-
-            if (uri.Scheme.Equals("data", StringComparison.OrdinalIgnoreCase))
-                return IsValidDataImage(url, out reason);
-
-            reason = $"Image scheme '{uri.Scheme}' is not allowed.";
+            reason = "Image URL is invalid.";
             return false;
         }
 
-        reason = "Image URL is invalid.";
+        if (uri.Scheme.Equals(Uri.UriSchemeHttps, StringComparison.OrdinalIgnoreCase) ||
+            uri.Scheme.Equals(Uri.UriSchemeHttp, StringComparison.OrdinalIgnoreCase))
+        {
+            return true;
+        }
+
+        reason = $"Image scheme '{uri.Scheme}' is not allowed.";
         return false;
     }
 
@@ -77,6 +85,16 @@ public sealed class EditorJsImageValidator
         if (estimatedBytes > MaxImageBytes)
         {
             reason = "Image too large.";
+            return false;
+        }
+
+        try
+        {
+            Convert.FromBase64String(base64);
+        }
+        catch (FormatException)
+        {
+            reason = "Data image base64 is invalid.";
             return false;
         }
 

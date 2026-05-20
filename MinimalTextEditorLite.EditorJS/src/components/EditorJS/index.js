@@ -13,7 +13,10 @@ import LinkTool from '@editorjs/link';
 import Embed from '@editorjs/embed';
 import Table from '@editorjs/table';
 import Undo from 'editorjs-undo';
-import MteImageTool from './tools/MteImageTool';
+import MteImageTool, {
+  createMteImageDataFromFile,
+  isSupportedMteImageFile,
+} from './tools/MteImageTool';
 
 import './editorJS.css';
 
@@ -192,6 +195,107 @@ const EditorJSComponent = () => {
       };
     }
 
+    function getDroppedImageFiles(event) {
+      const files = Array.from(event.dataTransfer?.files || []);
+      return files.filter(isSupportedMteImageFile);
+    }
+
+    function getPastedImageFiles(event) {
+      const items = Array.from(event.clipboardData?.items || []);
+      return items
+        .filter((item) => item.kind === 'file')
+        .map((item) => item.getAsFile())
+        .filter(Boolean)
+        .filter(isSupportedMteImageFile);
+    }
+
+    function stopNativeImageEvent(event) {
+      event.preventDefault();
+      event.stopPropagation();
+
+      if (typeof event.stopImmediatePropagation === 'function') {
+        event.stopImmediatePropagation();
+      }
+    }
+
+    function isInsideMteImageTool(event) {
+      return Boolean(event.target?.closest?.('.mte-image-tool'));
+    }
+
+    function handleGlobalImageDragOver(event) {
+      const files = getDroppedImageFiles(event);
+
+      if (files.length === 0) {
+        return;
+      }
+
+      stopNativeImageEvent(event);
+    }
+
+    async function handleGlobalImageDrop(event) {
+      const files = getDroppedImageFiles(event);
+
+      if (files.length === 0) {
+        return;
+      }
+
+      if (isInsideMteImageTool(event)) {
+        return;
+      }
+
+      stopNativeImageEvent(event);
+
+      try {
+        await editor.isReady;
+
+        for (const file of files) {
+          const imageData = await createMteImageDataFromFile(file);
+          editor.blocks.insert('image', imageData);
+        }
+
+        saveDebounced();
+      } catch (error) {
+        console.log('[MTEBridge] Error inserting dropped image globally:', error);
+        postToHost({
+          event: 'editorError',
+          data: {
+            action: 'globalDropImage',
+            message: String(error && error.message ? error.message : error),
+          },
+        });
+      }
+    }
+
+    async function handleGlobalImagePaste(event) {
+      const files = getPastedImageFiles(event);
+
+      if (files.length === 0) {
+        return;
+      }
+
+      stopNativeImageEvent(event);
+
+      try {
+        await editor.isReady;
+
+        for (const file of files) {
+          const imageData = await createMteImageDataFromFile(file);
+          editor.blocks.insert('image', imageData);
+        }
+
+        saveDebounced();
+      } catch (error) {
+        console.log('[MTEBridge] Error inserting pasted image globally:', error);
+        postToHost({
+          event: 'editorError',
+          data: {
+            action: 'globalPasteImage',
+            message: String(error && error.message ? error.message : error),
+          },
+        });
+      }
+    }
+
     window.MTEBridge = {
       version: '2.0.0-react',
 
@@ -290,6 +394,13 @@ const EditorJSComponent = () => {
       });
     }
 
+    window.addEventListener('dragover', handleGlobalImageDragOver, true);
+    window.addEventListener('drop', handleGlobalImageDrop, true);
+    window.addEventListener('paste', handleGlobalImagePaste, true);
+    document.addEventListener('dragover', handleGlobalImageDragOver, true);
+    document.addEventListener('drop', handleGlobalImageDrop, true);
+    document.addEventListener('paste', handleGlobalImagePaste, true);
+
     return () => {
       if (saveTimer.current) {
         clearTimeout(saveTimer.current);
@@ -298,6 +409,13 @@ const EditorJSComponent = () => {
       if (window.chrome && window.chrome.webview) {
         window.chrome.webview.removeEventListener('message', handleHostMessage);
       }
+
+      window.removeEventListener('dragover', handleGlobalImageDragOver, true);
+      window.removeEventListener('drop', handleGlobalImageDrop, true);
+      window.removeEventListener('paste', handleGlobalImagePaste, true);
+      document.removeEventListener('dragover', handleGlobalImageDragOver, true);
+      document.removeEventListener('drop', handleGlobalImageDrop, true);
+      document.removeEventListener('paste', handleGlobalImagePaste, true);
 
       delete window.MTEBridge;
       delete window.handleSave;
