@@ -229,8 +229,11 @@ public sealed class EditorJsSecurityService(
         try
         {
             var data = block.Data.Deserialize<EditorJsImageData>(EditorJsJson.Options);
-            if (data == null || !imageValidator.IsValidImageUrl(data.Url, out _))
+            if (data == null)
                 return CreateInvalidBlockPlaceholder(block.Id);
+
+            if (!imageValidator.IsValidImageUrl(data.Url, out _))
+                return CreateInvalidImagePlaceholder(block.Id, data.Caption, data.Url);
 
             data.Caption = htmlSanitizer.SanitizeInlineHtml(data.Caption);
             return CreateBlock(block.Id, "image", data);
@@ -257,6 +260,18 @@ public sealed class EditorJsSecurityService(
             id,
             "paragraph",
             new EditorJsParagraphData { Text = "[Invalid block removed]" });
+    }
+
+    private EditorJsBlock CreateInvalidImagePlaceholder(string? id, string? caption, string? url)
+    {
+        var text = string.IsNullOrWhiteSpace(caption)
+            ? "[Image removed: unsupported image source]"
+            : $"[Image removed: {htmlSanitizer.SanitizePlainText(caption)}]";
+
+        return CreateBlock(
+            id,
+            "paragraph",
+            new EditorJsParagraphData { Text = text });
     }
 
     private static async Task<JsonSchema> LoadSchemaAsync()

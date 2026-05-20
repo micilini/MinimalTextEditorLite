@@ -18,6 +18,15 @@ import Undo from 'editorjs-undo';
 import './editorJS.css';
 
 const DEBOUNCE_MS = 400;
+const MAX_IMAGE_BYTES = 50 * 1024 * 1024;
+
+const ALLOWED_IMAGE_TYPES = new Set([
+  'image/png',
+  'image/jpeg',
+  'image/gif',
+  'image/webp',
+  'image/svg+xml',
+]);
 
 function normalizeDocument(data) {
   if (!data) {
@@ -45,6 +54,103 @@ function postToHost(message) {
   if (window.chrome && window.chrome.webview) {
     window.chrome.webview.postMessage(message);
   }
+}
+
+function isSupportedImageFile(file) {
+  return file && ALLOWED_IMAGE_TYPES.has(file.type) && file.size <= MAX_IMAGE_BYTES;
+}
+
+function readFileAsDataUrl(file) {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+
+    reader.onload = () => resolve(reader.result);
+    reader.onerror = () => reject(reader.error || new Error('Could not read image file.'));
+
+    reader.readAsDataURL(file);
+  });
+}
+
+async function insertImageFile(editor, file) {
+  if (!isSupportedImageFile(file)) {
+    postToHost({
+      event: 'editorError',
+      data: {
+        action: 'insertImage',
+        message: 'Unsupported image file or image is too large.',
+      },
+    });
+
+    return false;
+  }
+
+  const dataUrl = await readFileAsDataUrl(file);
+
+  await editor.isReady;
+
+  editor.blocks.insert('image', {
+    url: dataUrl,
+    caption: file.name || '',
+  });
+
+  return true;
+}
+
+function getImageFilesFromDataTransfer(dataTransfer) {
+  if (!dataTransfer) {
+    return [];
+  }
+
+  const files = Array.from(dataTransfer.files || []);
+  return files.filter((file) => file.type && file.type.startsWith('image/'));
+}
+
+async function blobUrlToDataUrl(url) {
+  const response = await fetch(url);
+  const blob = await response.blob();
+
+  return await new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onload = () => resolve(reader.result);
+    reader.onerror = () => reject(reader.error || new Error('Could not read blob image.'));
+    reader.readAsDataURL(blob);
+  });
+}
+
+async function normalizeImagesBeforePost(document) {
+  const normalizedBlocks = [];
+
+  for (const block of document.blocks || []) {
+    if (block.type !== 'image') {
+      normalizedBlocks.push(block);
+      continue;
+    }
+
+    const url = block.data?.url || '';
+
+    if (url.startsWith('blob:')) {
+      try {
+        const dataUrl = await blobUrlToDataUrl(url);
+        normalizedBlocks.push({
+          ...block,
+          data: {
+            ...block.data,
+            url: dataUrl,
+          },
+        });
+        continue;
+      } catch (error) {
+        console.log('[MTEBridge] Could not convert blob image:', error);
+      }
+    }
+
+    normalizedBlocks.push(block);
+  }
+
+  return {
+    ...document,
+    blocks: normalizedBlocks,
+  };
 }
 
 const EditorJSComponent = () => {
@@ -107,7 +213,8 @@ const EditorJSComponent = () => {
       try {
         await editorInstance.current.isReady;
         const outputData = await editorInstance.current.save();
-        postToHost(outputData);
+        const normalizedOutputData = await normalizeImagesBeforePost(outputData);
+        postToHost(normalizedOutputData);
       } catch (error) {
         console.log('[MTEBridge] Error on saving:', error);
         postToHost({
@@ -190,6 +297,66 @@ const EditorJSComponent = () => {
       };
     }
 
+    async function handleImageDrop(event) {
+      const imageFiles = getImageFilesFromDataTransfer(event.dataTransfer);
+
+      if (imageFiles.length === 0) {
+        return;
+      }
+
+      event.preventDefault();
+      event.stopPropagation();
+
+      try {
+        for (const file of imageFiles) {
+          await insertImageFile(editor, file);
+        }
+
+        saveDebounced();
+      } catch (error) {
+        console.log('[MTEBridge] Error inserting dropped image:', error);
+        postToHost({
+          event: 'editorError',
+          data: {
+            action: 'dropImage',
+            message: String(error && error.message ? error.message : error),
+          },
+        });
+      }
+    }
+
+    async function handleImagePaste(event) {
+      const items = Array.from(event.clipboardData?.items || []);
+      const imageFiles = items
+        .filter((item) => item.kind === 'file' && item.type.startsWith('image/'))
+        .map((item) => item.getAsFile())
+        .filter(Boolean);
+
+      if (imageFiles.length === 0) {
+        return;
+      }
+
+      event.preventDefault();
+      event.stopPropagation();
+
+      try {
+        for (const file of imageFiles) {
+          await insertImageFile(editor, file);
+        }
+
+        saveDebounced();
+      } catch (error) {
+        console.log('[MTEBridge] Error inserting pasted image:', error);
+        postToHost({
+          event: 'editorError',
+          data: {
+            action: 'pasteImage',
+            message: String(error && error.message ? error.message : error),
+          },
+        });
+      }
+    }
+
     window.MTEBridge = {
       version: '2.0.0-react',
 
@@ -263,6 +430,9 @@ const EditorJSComponent = () => {
       });
     }
 
+    window.addEventListener('drop', handleImageDrop, true);
+    window.addEventListener('paste', handleImagePaste, true);
+
     return () => {
       if (saveTimer.current) {
         clearTimeout(saveTimer.current);
@@ -271,6 +441,9 @@ const EditorJSComponent = () => {
       if (window.chrome && window.chrome.webview) {
         window.chrome.webview.removeEventListener('message', handleHostMessage);
       }
+
+      window.removeEventListener('drop', handleImageDrop, true);
+      window.removeEventListener('paste', handleImagePaste, true);
 
       delete window.MTEBridge;
       delete window.handleSave;

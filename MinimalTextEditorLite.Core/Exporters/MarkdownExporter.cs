@@ -7,7 +7,7 @@ using System.Text.Json;
 
 namespace MinimalTextEditorLite.Core.Exporters;
 
-public sealed class MarkdownExporter : IExporter
+public sealed class MarkdownExporter : IExporter, IMarkdownAssetExporter
 {
     private readonly Converter inlineConverter = new(new Config
     {
@@ -35,7 +35,62 @@ public sealed class MarkdownExporter : IExporter
         return Task.FromResult(Encoding.UTF8.GetBytes(builder.ToString().TrimEnd() + Environment.NewLine));
     }
 
+    public async Task<MarkdownAssetExportResult> ExportWithAssetsAsync(ExportContext context, string outputDirectory)
+    {
+        if (string.IsNullOrWhiteSpace(outputDirectory))
+            throw new ArgumentException("Output directory is required.", nameof(outputDirectory));
+
+        Directory.CreateDirectory(outputDirectory);
+
+        var baseName = GetSafeBaseFileName(context.Note);
+        var uniqueBaseName = GetUniqueBaseName(outputDirectory, baseName);
+
+        var markdownFilePath = Path.Combine(outputDirectory, uniqueBaseName + ".md");
+        var assetsDirectoryName = uniqueBaseName + ".assets";
+        var assetsDirectoryPath = Path.Combine(outputDirectory, assetsDirectoryName);
+        var assetsDirectoryCreated = false;
+        var assetIndex = 1;
+
+        var builder = new StringBuilder();
+
+        if (context.Settings.ExportFrontMatterYaml)
+            AppendFrontMatter(builder, context.Note);
+
+        var assetContext = new MarkdownAssetContext(
+            assetsDirectoryPath,
+            assetsDirectoryName,
+            () =>
+            {
+                if (!assetsDirectoryCreated)
+                {
+                    Directory.CreateDirectory(assetsDirectoryPath);
+                    assetsDirectoryCreated = true;
+                }
+
+                return assetIndex++;
+            });
+
+        foreach (var block in context.Document.Blocks)
+            AppendBlock(builder, block, assetContext);
+
+        await File.WriteAllTextAsync(markdownFilePath, builder.ToString().TrimEnd() + Environment.NewLine, Encoding.UTF8);
+
+        return new MarkdownAssetExportResult
+        {
+            MarkdownFilePath = markdownFilePath,
+            AssetsDirectoryPath = assetsDirectoryPath,
+            AssetsWritten = Directory.Exists(assetsDirectoryPath)
+                ? Directory.GetFiles(assetsDirectoryPath).Length
+                : 0
+        };
+    }
+
     private void AppendBlock(StringBuilder builder, EditorJsBlock block)
+    {
+        AppendBlock(builder, block, assetContext: null);
+    }
+
+    private void AppendBlock(StringBuilder builder, EditorJsBlock block, MarkdownAssetContext? assetContext)
     {
         switch (block.Type)
         {
@@ -113,7 +168,8 @@ public sealed class MarkdownExporter : IExporter
             {
                 var data = block.Data.Deserialize<EditorJsImageData>(EditorJsJson.Options);
                 var caption = ConvertInline(data?.Caption);
-                AppendSeparated(builder, $"![{caption}]({data?.Url ?? string.Empty})");
+                var imageUrl = ResolveImageUrlForMarkdown(data?.Url, assetContext);
+                AppendSeparated(builder, $"![{caption}]({imageUrl})");
                 break;
             }
         }
@@ -219,5 +275,120 @@ public sealed class MarkdownExporter : IExporter
             trimmed.Contains('\r');
 
         return needsQuotes ? $"\"{trimmed.Replace("\"", "\\\"")}\"" : trimmed;
+    }
+
+    private string ResolveImageUrlForMarkdown(string? url, MarkdownAssetContext? assetContext)
+    {
+        if (string.IsNullOrWhiteSpace(url))
+            return string.Empty;
+
+        if (assetContext == null)
+            return url;
+
+        if (url.StartsWith("http://", StringComparison.OrdinalIgnoreCase) ||
+            url.StartsWith("https://", StringComparison.OrdinalIgnoreCase))
+        {
+            return url;
+        }
+
+        if (!TryParseDataImage(url, out var mimeType, out var bytes))
+            return url;
+
+        var extension = GetExtensionFromMimeType(mimeType);
+        var fileName = $"image-{assetContext.NextIndex():000}{extension}";
+        var filePath = Path.Combine(assetContext.AssetsDirectoryPath, fileName);
+
+        File.WriteAllBytes(filePath, bytes);
+
+        return $"{assetContext.AssetsDirectoryName}/{fileName}";
+    }
+
+    private static bool TryParseDataImage(string url, out string mimeType, out byte[] bytes)
+    {
+        mimeType = string.Empty;
+        bytes = [];
+
+        if (!url.StartsWith("data:image/", StringComparison.OrdinalIgnoreCase))
+            return false;
+
+        var commaIndex = url.IndexOf(',');
+        if (commaIndex < 0)
+            return false;
+
+        var metadata = url[..commaIndex];
+        var payload = url[(commaIndex + 1)..];
+        var metadataParts = metadata.Split(';', StringSplitOptions.RemoveEmptyEntries);
+        if (metadataParts.Length < 2 || !metadataParts.Any(part => part.Equals("base64", StringComparison.OrdinalIgnoreCase)))
+            return false;
+
+        mimeType = metadataParts[0]["data:".Length..];
+
+        try
+        {
+            bytes = Convert.FromBase64String(payload);
+            return true;
+        }
+        catch
+        {
+            bytes = [];
+            return false;
+        }
+    }
+
+    private static string GetExtensionFromMimeType(string mimeType)
+    {
+        return mimeType.ToLowerInvariant() switch
+        {
+            "image/png" => ".png",
+            "image/jpeg" => ".jpg",
+            "image/gif" => ".gif",
+            "image/webp" => ".webp",
+            "image/svg+xml" => ".svg",
+            _ => ".img"
+        };
+    }
+
+    private static string GetSafeBaseFileName(NoteModel note)
+    {
+        var candidate =
+            !string.IsNullOrWhiteSpace(note.Slug) ? note.Slug :
+            !string.IsNullOrWhiteSpace(note.Title) ? note.Title :
+            "Note";
+
+        var invalidChars = Path.GetInvalidFileNameChars();
+        var safe = new string(candidate
+            .Select(ch => invalidChars.Contains(ch) ? '-' : ch)
+            .ToArray())
+            .Trim('-', ' ', '.');
+
+        return string.IsNullOrWhiteSpace(safe) ? "Note" : safe;
+    }
+
+    private static string GetUniqueBaseName(string outputDirectory, string baseName)
+    {
+        var candidate = baseName;
+        var index = 1;
+
+        while (File.Exists(Path.Combine(outputDirectory, candidate + ".md")) ||
+               Directory.Exists(Path.Combine(outputDirectory, candidate + ".assets")))
+        {
+            candidate = $"{baseName}-{index++}";
+        }
+
+        return candidate;
+    }
+
+    private sealed class MarkdownAssetContext
+    {
+        public MarkdownAssetContext(string assetsDirectoryPath, string assetsDirectoryName, Func<int> nextIndex)
+        {
+            AssetsDirectoryPath = assetsDirectoryPath;
+            AssetsDirectoryName = assetsDirectoryName;
+            NextIndex = nextIndex;
+        }
+
+        public string AssetsDirectoryPath { get; }
+        public string AssetsDirectoryName { get; }
+        public Func<int> NextIndex { get; }
     }
 }

@@ -12,9 +12,9 @@
         AllowsTransparency="true"
         WindowStyle="None"
         WindowStartupLocation="CenterScreen"
-        Title="ExportModalWindow" Height="480" Width="665">
+        Title="ExportModalWindow" Height="540" Width="665">
     <Grid>
-        <materialDesign:Card Background="{DynamicResource MaterialDesignPaper}" UniformCornerRadius="15" materialDesign:ShadowAssist.ShadowDepth="Depth4" Width="526" Height="324">
+        <materialDesign:Card Background="{DynamicResource MaterialDesignPaper}" UniformCornerRadius="15" materialDesign:ShadowAssist.ShadowDepth="Depth4" Width="526" Height="385">
             <Grid>
                 <Grid.RowDefinitions>
                     <RowDefinition Height="70" />
@@ -32,13 +32,20 @@
                 <StackPanel Grid.Row="1" Margin="20">
                     <TextBlock Text="{Binding Source={x:Static localApp:App.Localization}, Converter={StaticResource Translate}, ConverterParameter=Export_Note_SubTitle}" Foreground="#2d2d2d" FontFamily="Arial" FontSize="18" Margin="0 0 0 0" />
                     <TextBlock Text="{Binding Source={x:Static localApp:App.Localization}, Converter={StaticResource Translate}, ConverterParameter=Export_Note_Message}" Foreground="#2d2d2d" FontFamily="Arial" FontSize="14" FontWeight="Regular" Padding="0" Margin="0 5 0 0" Height="Auto" TextWrapping="Wrap" />
-                    <ComboBox x:Name="ExportComboBox" Width="315" Height="30" VerticalAlignment="Top" HorizontalAlignment="Left" Padding="0" Margin="0 20 0 0" FontFamily="Arial" FontSize="18" FontWeight="Regular">
+                    <ComboBox x:Name="ExportComboBox" Width="315" Height="30" VerticalAlignment="Top" HorizontalAlignment="Left" Padding="0" Margin="0 20 0 0" FontFamily="Arial" FontSize="18" FontWeight="Regular" SelectionChanged="ExportComboBox_SelectionChanged">
                         <ComboBoxItem Content="JSON" />
                         <ComboBoxItem Content="Word (.doc)" />
                         <ComboBoxItem Content="HTML" />
                         <ComboBoxItem Content="Markdown (.md)" />
                         <ComboBoxItem Content="PDF" />
                     </ComboBox>
+                    <StackPanel x:Name="MarkdownImageOptionsPanel" Visibility="Collapsed" Margin="0 16 0 0">
+                        <TextBlock Text="{Binding Source={x:Static localApp:App.Localization}, Converter={StaticResource Translate}, ConverterParameter=Export_Markdown_ImageOptions_Title}" Foreground="#2d2d2d" FontFamily="Arial" FontSize="14" FontWeight="Regular" TextWrapping="Wrap" />
+                        <ComboBox x:Name="MarkdownImageModeComboBox" Width="315" Height="30" VerticalAlignment="Top" HorizontalAlignment="Left" Padding="0" Margin="0 8 0 0" FontFamily="Arial" FontSize="16" FontWeight="Regular">
+                            <ComboBoxItem Content="{Binding Source={x:Static localApp:App.Localization}, Converter={StaticResource Translate}, ConverterParameter=Export_Markdown_ImageMode_Embedded}" />
+                            <ComboBoxItem Content="{Binding Source={x:Static localApp:App.Localization}, Converter={StaticResource Translate}, ConverterParameter=Export_Markdown_ImageMode_Folder}" />
+                        </ComboBox>
+                    </StackPanel>
                 </StackPanel>
 
                 <StackPanel Grid.Row="2">

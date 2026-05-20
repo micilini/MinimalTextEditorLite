@@ -38,6 +38,24 @@ public sealed class ExportService : IExportService
         if (!exporters.TryGetValue(exporterId, out var exporter))
             throw new InvalidOperationException($"Exporter '{exporterId}' was not found.");
 
+        var context = await CreateContextAsync();
+        return await exporter.ExportAsync(context);
+    }
+
+    public async Task<MarkdownAssetExportResult> ExportMarkdownWithAssetsAsync(string outputDirectory)
+    {
+        if (!exporters.TryGetValue("md", out var exporter))
+            throw new InvalidOperationException("Markdown exporter was not found.");
+
+        if (exporter is not IMarkdownAssetExporter markdownAssetExporter)
+            throw new InvalidOperationException("Markdown exporter does not support asset folder export.");
+
+        var context = await CreateContextAsync();
+        return await markdownAssetExporter.ExportWithAssetsAsync(context, outputDirectory);
+    }
+
+    private async Task<ExportContext> CreateContextAsync()
+    {
         var note = await noteRepository.GetCurrentAsync();
         if (note == null)
             throw new InvalidOperationException("Current note was not found.");
@@ -66,6 +84,6 @@ public sealed class ExportService : IExportService
             Settings = settings
         };
 
-        return await exporter.ExportAsync(context);
+        return context;
     }
 }

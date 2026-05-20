@@ -13,11 +13,24 @@ namespace MinimalTextEditorLite.Core.Importers;
 
 public sealed class MarkdownImporter : IImporter
 {
+    private const long MaxImageBytes = 50L * 1024 * 1024;
+
+    private static readonly Dictionary<string, string> ImageMimeTypes = new(StringComparer.OrdinalIgnoreCase)
+    {
+        [".png"] = "image/png",
+        [".jpg"] = "image/jpeg",
+        [".jpeg"] = "image/jpeg",
+        [".gif"] = "image/gif",
+        [".webp"] = "image/webp",
+        [".svg"] = "image/svg+xml"
+    };
+
     public string Extension => ".md";
 
     public Task<ImportedNoteContent> ImportAsync(string content, string filePath)
     {
         var (metadata, markdownBody) = SplitFrontMatter(content);
+        var markdownDirectory = Path.GetDirectoryName(Path.GetFullPath(filePath)) ?? Directory.GetCurrentDirectory();
         var pipeline = new MarkdownPipelineBuilder()
             .UseAdvancedExtensions()
             .UsePipeTables()
@@ -28,7 +41,7 @@ public sealed class MarkdownImporter : IImporter
         var blocks = new List<EditorJsBlock>();
 
         foreach (var block in markdownDocument)
-            AppendBlock(blocks, block);
+            AppendBlock(blocks, block, markdownDirectory);
 
         var editorDocument = new EditorJsDocument
         {
@@ -44,7 +57,7 @@ public sealed class MarkdownImporter : IImporter
         });
     }
 
-    private static void AppendBlock(List<EditorJsBlock> blocks, Block block)
+    private static void AppendBlock(List<EditorJsBlock> blocks, Block block, string markdownDirectory)
     {
         switch (block)
         {
@@ -57,7 +70,7 @@ public sealed class MarkdownImporter : IImporter
                 break;
 
             case ParagraphBlock paragraph:
-                AppendParagraphBlock(blocks, paragraph);
+                AppendParagraphBlock(blocks, paragraph, markdownDirectory);
                 break;
 
             case ListBlock list:
@@ -88,6 +101,9 @@ public sealed class MarkdownImporter : IImporter
                 blocks.Add(CreateBlock("table", new EditorJsTableData { Content = ReadTable(table) }));
                 break;
 
+            case HtmlBlock:
+                break;
+
             default:
                 var text = RenderBlocksAsInline(block);
                 if (!string.IsNullOrWhiteSpace(text))
@@ -96,14 +112,14 @@ public sealed class MarkdownImporter : IImporter
         }
     }
 
-    private static void AppendParagraphBlock(List<EditorJsBlock> blocks, ParagraphBlock paragraph)
+    private static void AppendParagraphBlock(List<EditorJsBlock> blocks, ParagraphBlock paragraph, string markdownDirectory)
     {
-        if (TryGetSingleImage(paragraph.Inline, out var url, out var caption))
+        if (TryGetSingleImage(paragraph.Inline, markdownDirectory, out var image))
         {
             blocks.Add(CreateBlock("image", new EditorJsImageData
             {
-                Url = url,
-                Caption = caption
+                Url = image.Url,
+                Caption = image.Caption
             }));
             return;
         }
@@ -260,10 +276,9 @@ public sealed class MarkdownImporter : IImporter
         }
     }
 
-    private static bool TryGetSingleImage(ContainerInline? inline, out string url, out string caption)
+    private static bool TryGetSingleImage(ContainerInline? inline, string markdownDirectory, out MarkdownImageSource imageSource)
     {
-        url = string.Empty;
-        caption = string.Empty;
+        imageSource = new MarkdownImageSource(string.Empty, string.Empty);
 
         if (inline == null)
             return false;
@@ -272,9 +287,62 @@ public sealed class MarkdownImporter : IImporter
         if (children.Count != 1 || children[0] is not LinkInline { IsImage: true } image)
             return false;
 
-        url = image.Url ?? string.Empty;
-        caption = GetPlainText(image);
+        var originalUrl = image.Url ?? string.Empty;
+        var caption = GetPlainText(image);
+        var resolvedUrl = ResolveMarkdownImageUrl(originalUrl, markdownDirectory);
+        imageSource = new MarkdownImageSource(resolvedUrl, caption);
         return true;
+    }
+
+    private static string ResolveMarkdownImageUrl(string url, string markdownDirectory)
+    {
+        if (string.IsNullOrWhiteSpace(url))
+            return url;
+
+        if (url.StartsWith("data:image/", StringComparison.OrdinalIgnoreCase))
+            return url;
+
+        if (Path.IsPathRooted(url))
+            return TryConvertLocalImageToDataUrl(url) ?? url;
+
+        if (Uri.TryCreate(url, UriKind.Absolute, out var absoluteUri))
+        {
+            if (absoluteUri.Scheme is "http" or "https")
+                return url;
+
+            if (absoluteUri.Scheme.Equals("file", StringComparison.OrdinalIgnoreCase))
+                return TryConvertLocalImageToDataUrl(absoluteUri.LocalPath) ?? url;
+
+            return url;
+        }
+
+        var localPath = Path.GetFullPath(Path.Combine(markdownDirectory, url.Replace('/', Path.DirectorySeparatorChar)));
+
+        return TryConvertLocalImageToDataUrl(localPath) ?? url;
+    }
+
+    private static string? TryConvertLocalImageToDataUrl(string path)
+    {
+        try
+        {
+            if (string.IsNullOrWhiteSpace(path) || !File.Exists(path))
+                return null;
+
+            var extension = Path.GetExtension(path);
+            if (!ImageMimeTypes.TryGetValue(extension, out var mimeType))
+                return null;
+
+            var info = new FileInfo(path);
+            if (info.Length > MaxImageBytes)
+                return null;
+
+            var bytes = File.ReadAllBytes(path);
+            return $"data:{mimeType};base64,{Convert.ToBase64String(bytes)}";
+        }
+        catch
+        {
+            return null;
+        }
     }
 
     private static string GetPlainText(ContainerInline inline)
@@ -383,4 +451,6 @@ public sealed class MarkdownImporter : IImporter
             trimmed.Split(',', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries)
                 .Select(tag => tag.Trim('"')));
     }
+
+    private sealed record MarkdownImageSource(string Url, string Caption);
 }
