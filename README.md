@@ -41,28 +41,35 @@ This application was made using the following technologies:
 
 - C#
 - Windows Presentation Foundation (WPF)
-- Python
 - ReactJS
 - SQLite
+- WebView2 / Chromium PDF rendering
+- OpenXML-based DOCX generation
 
 In conjunction with the following libraries:
 
 - [Editor.js](https://editorjs.io/)
-- [InputSimulator](https://github.com/michaelnoonan/inputsimulator)  
-- [MaterialDesignThemes](https://github.com/MaterialDesignInXAML/MaterialDesignInXamlToolkit)  
-- [WebView2](https://learn.microsoft.com/en-us/microsoft-edge/webview2/)  
-- [Newtonsoft.Json](https://www.newtonsoft.com/json) 
+- [InputSimulator](https://github.com/michaelnoonan/inputsimulator)
+- [MaterialDesignThemes](https://github.com/MaterialDesignInXAML/MaterialDesignInXamlToolkit)
+- [WebView2](https://learn.microsoft.com/en-us/microsoft-edge/webview2/)
+- [HtmlToOpenXml](https://github.com/onizet/html2openxml)
+- [HtmlSanitizer](https://github.com/mganss/HtmlSanitizer)
 
 To run this application on your local machine, make sure you have the latest version of **Visual Studio Community 2022**.
 
 First of all, **clone the repository to your local machine**, and then simply open the **Minimal Text Editor (Lite).sln** file to open the project.
 
-## Correlated Repositories
+DOCX and PDF export are generated in-process. No external Python executables are required.
+DOCX is generated through OpenXML/HtmlToOpenXml, and PDF is generated through WebView2's Chromium print pipeline.
 
-Minimal Text Editor (Lite) For Windows is closely related to the following repositories:
+## Historical Exporter Repositories
 
-- [ExportAsDoc](https://github.com/micilini/ExportAsPDF) (A Python executable for Windows)
-- [ExportAsPDF](https://github.com/micilini/ExportAsPDF) (A Python executable for Windows)
+Earlier versions of Minimal Text Editor (Lite) used external Python executables for DOCX and PDF export.
+
+Those standalone repositories are still available as independent projects, but this application no longer consumes them at runtime. Starting with V2.1, DOCX and PDF exports are generated in-process.
+
+- [ExportAsDoc](https://github.com/micilini/ExportAsDoc)
+- [ExportAsPDF](https://github.com/micilini/ExportAsPDF)
 
 ## Contribuite
 

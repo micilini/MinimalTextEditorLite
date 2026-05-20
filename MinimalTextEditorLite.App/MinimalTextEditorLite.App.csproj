@@ -45,7 +45,6 @@
     <None Update="LICENSE" CopyToOutputDirectory="PreserveNewest" />
     <None Update="Languages/*.json" CopyToOutputDirectory="Always" />
     <None Update="EditorModules/EditorJS/**/*.*" CopyToOutputDirectory="Always" />
-    <None Update="Modules/Export/x64/*.exe" CopyToOutputDirectory="Always" />
   </ItemGroup>
 
 </Project>
