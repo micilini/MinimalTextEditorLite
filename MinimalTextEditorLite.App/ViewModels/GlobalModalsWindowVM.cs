@@ -50,7 +50,12 @@ public partial class GlobalModalsWindowVM : ObservableObject
         GlobalModalsWindow.DialogResult = false;
     }
 
-    public async void UpdateShowOpenNoteMessage(bool value)
+    public void UpdateShowOpenNoteMessage(bool value)
+    {
+        _ = UpdateShowOpenNoteMessageSafeAsync(value);
+    }
+
+    private async Task UpdateShowOpenNoteMessageSafeAsync(bool value)
     {
         try
         {
@@ -74,7 +79,12 @@ public partial class GlobalModalsWindowVM : ObservableObject
         }
     }
 
-    public async void UpdateShowBackupSizeMessage(bool value)
+    public void UpdateShowBackupSizeMessage(bool value)
+    {
+        _ = UpdateShowBackupSizeMessageSafeAsync(value);
+    }
+
+    private async Task UpdateShowBackupSizeMessageSafeAsync(bool value)
     {
         try
         {

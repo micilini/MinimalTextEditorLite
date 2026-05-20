@@ -47,14 +47,26 @@ public partial class EditorControlVM : ObservableObject, IDisposable
         this.backupService = backupService;
         this.editorJsSecurityService = editorJsSecurityService;
 
-        InitializeWebView();
+        _ = InitializeWebViewSafeAsync();
     }
 
     public void Dispose()
     {
     }
 
-    private async void InitializeWebView()
+    private async Task InitializeWebViewSafeAsync()
+    {
+        try
+        {
+            await InitializeWebViewAsync();
+        }
+        catch
+        {
+            ModalMessages.showErrorModal(App.Localization.Translate("Error_Editor_Folder"));
+        }
+    }
+
+    private async Task InitializeWebViewAsync()
     {
         string userDataFolder = Path.Combine(
             Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData),
@@ -88,10 +100,17 @@ public partial class EditorControlVM : ObservableObject, IDisposable
         myWebView.CoreWebView2.WebMessageReceived += MyWebView_CoreWebView2_WebMessageReceived;
         myWebView.CoreWebView2.NavigationCompleted += async (_, _) =>
         {
-            myWebView.CoreWebView2.ContextMenuRequested += MyWebView_CoreWebView2_ContextMenuRequested;
-            await Task.Delay(1200);
-            LoadCurrentNote();
-            isFirstTimeLoadingNote = false;
+            try
+            {
+                myWebView.CoreWebView2.ContextMenuRequested += MyWebView_CoreWebView2_ContextMenuRequested;
+                await Task.Delay(1200);
+                await LoadCurrentNoteAsync();
+                isFirstTimeLoadingNote = false;
+            }
+            catch
+            {
+                ModalMessages.showErrorModal(App.Localization.Translate("Error_Notes_Not_Found"));
+            }
         };
     }
 
@@ -104,14 +123,48 @@ public partial class EditorControlVM : ObservableObject, IDisposable
         }
     }
 
-    public async void SaveContent()
+    public void SaveContent()
+    {
+        _ = SaveContentSafeAsync();
+    }
+
+    private async Task SaveContentSafeAsync()
+    {
+        try
+        {
+            await SaveContentAsync();
+        }
+        catch
+        {
+            ModalMessages.showErrorModal(App.Localization.Translate("Error_Update_Note"));
+        }
+    }
+
+    public async Task SaveContentAsync()
     {
         ProgressBarVisibility = Visibility.Visible;
         await Task.Delay(1200);
         await ExecuteEditorScriptAsync("window.handleSave();");
     }
 
-    public async void InsertContent(string noteJson)
+    public void InsertContent(string noteJson)
+    {
+        _ = InsertContentSafeAsync(noteJson);
+    }
+
+    private async Task InsertContentSafeAsync(string noteJson)
+    {
+        try
+        {
+            await InsertContentAsync(noteJson);
+        }
+        catch
+        {
+            ModalMessages.showErrorModal(App.Localization.Translate("Error_App_Update_Note"));
+        }
+    }
+
+    public async Task InsertContentAsync(string noteJson)
     {
         var safeJsonArgument = JsonSerializer.Serialize(noteJson);
         await ExecuteEditorScriptAsync($"window.handleLoad({safeJsonArgument});");
@@ -133,7 +186,7 @@ public partial class EditorControlVM : ObservableObject, IDisposable
     private void MyWebView_CoreWebView2_WebMessageReceived(object? sender, CoreWebView2WebMessageReceivedEventArgs e)
     {
         string jsonData = e.TryGetWebMessageAsString();
-        UpdateNoteContent(jsonData);
+        _ = UpdateNoteContentSafeAsync(jsonData);
     }
 
     private void MyWebView_CoreWebView2_ContextMenuRequested(object? sender, CoreWebView2ContextMenuRequestedEventArgs args)
@@ -150,7 +203,24 @@ public partial class EditorControlVM : ObservableObject, IDisposable
             args.MenuItems.Remove(item);
     }
 
-    public async void LoadCurrentNote()
+    public void LoadCurrentNote()
+    {
+        _ = LoadCurrentNoteSafeAsync();
+    }
+
+    private async Task LoadCurrentNoteSafeAsync()
+    {
+        try
+        {
+            await LoadCurrentNoteAsync();
+        }
+        catch
+        {
+            ModalMessages.showErrorModal(App.Localization.Translate("Error_Notes_Not_Found"));
+        }
+    }
+
+    public async Task LoadCurrentNoteAsync()
     {
         if (!isFirstTimeLoadingNote)
         {
@@ -167,14 +237,14 @@ public partial class EditorControlVM : ObservableObject, IDisposable
             if (!validation.Success || string.IsNullOrWhiteSpace(validation.NormalizedJson))
             {
                 ModalMessages.showErrorModal(App.Localization.Translate("Error_Invalid_Json"));
-                InsertContent("{\"blocks\":[]}");
+                await InsertContentAsync("{\"blocks\":[]}");
                 return;
             }
 
             if (!string.Equals(currentNote.NoteJson, validation.NormalizedJson, StringComparison.Ordinal))
                 await noteRepository.UpdateJsonAsync(validation.NormalizedJson);
 
-            InsertContent(validation.NormalizedJson);
+            await InsertContentAsync(validation.NormalizedJson);
         }
         else
         {
@@ -182,7 +252,19 @@ public partial class EditorControlVM : ObservableObject, IDisposable
         }
     }
 
-    private async void UpdateNoteContent(string jsonData)
+    private async Task UpdateNoteContentSafeAsync(string jsonData)
+    {
+        try
+        {
+            await UpdateNoteContentAsync(jsonData);
+        }
+        catch
+        {
+            ModalMessages.showErrorModal(App.Localization.Translate("Error_Update_Note"));
+        }
+    }
+
+    private async Task UpdateNoteContentAsync(string jsonData)
     {
         ProgressBarVisibility = Visibility.Visible;
 
@@ -269,7 +351,7 @@ public partial class EditorControlVM : ObservableObject, IDisposable
             App.Localization.Translate("Confirm_Reset_Note_Bold"));
 
         if (result)
-            RemoveCurrentNote();
+            _ = RemoveCurrentNoteSafeAsync();
 
         mainScreenWindow.RemoveToMainGrid();
     }
@@ -284,12 +366,24 @@ public partial class EditorControlVM : ObservableObject, IDisposable
             App.Localization.Translate("Confirm_Reset_Note_Bold"));
 
         if (result)
-            RemoveCurrentNote();
+            _ = RemoveCurrentNoteSafeAsync();
 
         mainScreenWindow.RemoveToMainGrid();
     }
 
-    private async void RemoveCurrentNote()
+    private async Task RemoveCurrentNoteSafeAsync()
+    {
+        try
+        {
+            await RemoveCurrentNoteAsync();
+        }
+        catch
+        {
+            ModalMessages.showErrorModal(App.Localization.Translate("Error_App_Update_Note"));
+        }
+    }
+
+    private async Task RemoveCurrentNoteAsync()
     {
         WebViewVisibility = Visibility.Collapsed;
         ProgressBarVisibility = Visibility.Visible;
@@ -303,7 +397,7 @@ public partial class EditorControlVM : ObservableObject, IDisposable
             return;
         }
 
-        LoadCurrentNote();
+        await LoadCurrentNoteAsync();
     }
 
     private void OpenSearchBox()

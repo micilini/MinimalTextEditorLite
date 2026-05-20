@@ -92,10 +92,5 @@
   "MenuItem_Header_Help_About": "Sobre Este Aplicativo",
   "About_Title": "Sobre a Aplicação",
   "About_Title_Id": "Identificador da Aplicação:",
-  "About_Title_Current_Version": "Versão Atual:",
-  "About_Check_Updates": "(verificar atualizações)",
-  "Updates_Title_OK": "Atualização Disponível",
-  "Updates_Title_Fail": "Sem Atualizações",
-  "Updates_Description_OK": "Uma nova versão ({0}) está disponível! Deseja fazer o download?",
-  "Updates_Description_Fail": "Nenhuma atualização disponível no momento!"
+  "About_Title_Current_Version": "Versão Atual:"
 }

@@ -60,7 +60,6 @@ public partial class MainScreenWindowVM : ObservableObject
         MainScreenWindow.Loaded += MainScreenWindow_Loaded;
         MainScreenWindow.Unloaded += MainScreenWindow_Unloaded;
 
-        SearchForUpdates();
     }
 
     public void AddToMainGrid()
@@ -119,7 +118,7 @@ public partial class MainScreenWindowVM : ObservableObject
         }
 
         ((App)Application.Current).PropertyChanged += App_PropertyChanged;
-        CheckIfBackupFolderHasReachedSizeLimit();
+        _ = CheckIfBackupFolderHasReachedSizeLimitSafeAsync();
     }
 
     private void MainScreenWindow_Unloaded(object sender, RoutedEventArgs e)
@@ -127,13 +126,19 @@ public partial class MainScreenWindowVM : ObservableObject
         backgroundService?.Dispose();
     }
 
-    private void SearchForUpdates()
+    private async Task CheckIfBackupFolderHasReachedSizeLimitSafeAsync()
     {
-        UpdatesCheck updatesCheck = new UpdatesCheck();
-        updatesCheck.CheckForUpdates();
+        try
+        {
+            await CheckIfBackupFolderHasReachedSizeLimitAsync();
+        }
+        catch
+        {
+            ModalMessages.showErrorModal(App.Localization.Translate("Error_Backup_Folder_Stats"));
+        }
     }
 
-    private async void CheckIfBackupFolderHasReachedSizeLimit()
+    private async Task CheckIfBackupFolderHasReachedSizeLimitAsync()
     {
         await Task.Delay(TimeSpan.FromSeconds(3));
 
@@ -186,7 +191,24 @@ public partial class MainScreenWindowVM : ObservableObject
         return totalSize;
     }
 
-    public async void OpenNewNote()
+    public void OpenNewNote()
+    {
+        _ = OpenNewNoteSafeAsync();
+    }
+
+    private async Task OpenNewNoteSafeAsync()
+    {
+        try
+        {
+            await OpenNewNoteAsync();
+        }
+        catch
+        {
+            ModalMessages.showErrorModal(App.Localization.Translate("Error_Note_Import"));
+        }
+    }
+
+    public async Task OpenNewNoteAsync()
     {
         if (((App)Application.Current).ShowOpenNoteMessage)
         {

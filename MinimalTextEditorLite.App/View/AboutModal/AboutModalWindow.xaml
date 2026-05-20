@@ -6,7 +6,6 @@
         xmlns:local="clr-namespace:MinimalTextEditorLite.App.View.AboutModal"
         xmlns:localApp="clr-namespace:MinimalTextEditorLite.App"
         xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
-        xmlns:i="http://schemas.microsoft.com/xaml/behaviors"
         mc:Ignorable="d"
         TextElement.Foreground="{DynamicResource MaterialDesignBody}"
         Background="{x:Null}"
@@ -37,23 +36,6 @@
                 <WrapPanel>
                     <TextBlock Text="{Binding Source={x:Static localApp:App.Localization}, Converter={StaticResource Translate}, ConverterParameter=About_Title_Current_Version}" FontFamily="Arial" FontSize="16" FontWeight="Bold" />
                     <TextBlock x:Name="AppV" Text="" FontFamily="Arial" FontSize="16" FontWeight="Light" Margin="6 0 0 0" Foreground="#636e72" />
-
-                    <TextBlock Text="{Binding Source={x:Static localApp:App.Localization}, Converter={StaticResource Translate}, ConverterParameter=About_Check_Updates}"
-                               FontFamily="Arial"
-                               FontSize="16"
-                               FontWeight="Regular"
-                               Margin="6 0 0 0"
-                               Foreground="Blue"
-                               Cursor="Hand">
-                        <i:Interaction.Triggers>
-                          <i:EventTrigger EventName="MouseLeftButtonUp">
-                            <i:CallMethodAction TargetObject="{Binding RelativeSource={RelativeSource AncestorType=Window}}"
-                                    MethodName="CheckForUpdates"/>
-                          </i:EventTrigger>
-                        </i:Interaction.Triggers>
-                    </TextBlock>
-
-
                 </WrapPanel>
 
 

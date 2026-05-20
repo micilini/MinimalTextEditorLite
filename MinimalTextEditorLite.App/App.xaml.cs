@@ -11,8 +11,6 @@ using MinimalTextEditorLite.Core.Startup;
 using System.ComponentModel;
 using System.IO;
 using System.Windows;
-using System.Windows.Media;
-using System.Windows.Interop;
 
 namespace MinimalTextEditorLite.App;
 
@@ -52,8 +50,6 @@ public partial class App : Application, INotifyPropertyChanged
 
     public bool ShowOpenNoteMessage { get; set; }
 
-    public bool ShowNewUpdates { get; set; }
-
     private string lastNoteUpdated = string.Empty;
     public string LastNoteUpdated
     {
@@ -80,7 +76,8 @@ public partial class App : Application, INotifyPropertyChanged
             return;
         }
 
-        RenderOptions.ProcessRenderMode = RenderMode.SoftwareOnly;
+        // RenderOptions.ProcessRenderMode = RenderMode.SoftwareOnly;
+        // Legado V1: manter comentado na F4 para validar se a aceleracao por hardware causa algum glitch visual.
 
         CreateApplicationFolderIfNeeded();
 
@@ -146,7 +143,6 @@ public partial class App : Application, INotifyPropertyChanged
         AppLanguage = settings.Language;
         ShowBackupSizeLimiteMessage = settings.ShowBackupSizeLimiteMessage;
         ShowOpenNoteMessage = settings.ShowOpenNoteMessage;
-        ShowNewUpdates = settings.ShowNewUpdates;
     }
 
     private static void CreateApplicationFolderIfNeeded()

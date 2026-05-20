@@ -92,10 +92,5 @@
   "MenuItem_Header_Help_About": "About This Application",
   "About_Title": "About This Application",
   "About_Title_Id": "Application Identifier:",
-  "About_Title_Current_Version": "Current Version:",
-  "About_Check_Updates": "(check for updates)",
-  "Updates_Title_OK": "Update Available",
-  "Updates_Title_Fail": "No Updates Available",
-  "Updates_Description_OK": "A new version ({0}) is available! Would you like to download it?",
-  "Updates_Description_Fail": "No updates are available at the moment!"
+  "About_Title_Current_Version": "Current Version:"
 }
