@@ -33,8 +33,8 @@ public static class ShellExtensionInstaller
         Registry.CurrentUser.DeleteSubKeyTree($@"Software\Classes\{LegacyJsonProgId}", throwOnMissingSubKey: false);
         Registry.CurrentUser.DeleteSubKeyTree($@"Software\Classes\{LegacyMarkdownProgId}", throwOnMissingSubKey: false);
 
-        RegisterExtension(".json", JsonProgId, "MinimalTextEditor JSON", exePath);
-        RegisterExtension(".md", MarkdownProgId, "MinimalTextEditor Markdown", exePath);
+        RegisterExtension(".json", JsonProgId, "Minimal Text Editor Lite JSON", exePath);
+        RegisterExtension(".md", MarkdownProgId, "Minimal Text Editor Lite Markdown", exePath);
     }
 
     public static void Uninstall()

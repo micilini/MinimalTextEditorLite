@@ -37,7 +37,7 @@ namespace MinimalTextEditorLite.Core.Models
                   "id": "mte-welcome-title",
                   "type": "header",
                   "data": {
-                    "text": "MinimalTextEditor (V 2.0.0)",
+                    "text": "Minimal Text Editor Lite (V 2.1.0)",
                     "level": 2
                   }
                 },
@@ -45,7 +45,7 @@ namespace MinimalTextEditorLite.Core.Models
                   "id": "mte-welcome-intro",
                   "type": "paragraph",
                   "data": {
-                    "text": "Create, edit, import, and export your notes universally (<i>json</i>, <i>markdown</i>, <i>html</i>, <i>pdf</i>, and <i>doc</i>) with <b>MinimalTextEditor</b>. \u2728"
+                    "text": "Create, edit, import, and export your notes universally (<i>json</i>, <i>markdown</i>, <i>html</i>, <i>pdf</i>, and <i>docx</i>) with <b>Minimal Text Editor Lite</b>. \u2728"
                   }
                 },
                 {

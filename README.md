@@ -1,113 +1,241 @@
 <p align="center">
-  <img width="128" align="center" src="images/logo_mte.png">
+  <img width="128" align="center" src="images/logo_mte.png" alt="Minimal Text Editor Lite logo">
 </p>
+
 <h1 align="center">
-  MinimalTextEditor For Windows (2.0.0)
+  Minimal Text Editor Lite For Windows (2.1.0)
 </h1>
+
 <p align="center">
-  Create notes and export them in universal format :)
+  A minimalist block-based note editor for Windows.
 </p>
+
 <p align="center">
   <a href="https://micilini.com/apps/mte-lite" target="_blank">
-    <img src="images/buttonDownload.png" width="300" alt="Download Link" />
+    <img src="images/buttonDownload.png" width="300" alt="Download Minimal Text Editor Lite" />
   </a>
 </p>
 
-# MinimalTextEditor
-With **MinimalTextEditor**, you can create, edit, import, and export notes in universal formats such as JSON, Markdown, HTML, PDF, and DOC. Your notes are saved automatically, and the application now includes dark mode, Focus Mode, recent files, clipboard export, image support, and Markdown front matter.
+<p align="center">
+  <img alt=".NET 8" src="https://img.shields.io/badge/.NET-8.0-512BD4?style=for-the-badge&logo=dotnet&logoColor=white">
+  <img alt="WPF" src="https://img.shields.io/badge/WPF-Windows-0078D6?style=for-the-badge&logo=windows&logoColor=white">
+  <img alt="Editor.js" src="https://img.shields.io/badge/Editor.js-Blocks-111111?style=for-the-badge">
+  <img alt="WebView2" src="https://img.shields.io/badge/WebView2-Chromium-2F7D32?style=for-the-badge&logo=microsoftedge&logoColor=white">
+  <img alt="License" src="https://img.shields.io/badge/License-MIT-green?style=for-the-badge">
+</p>
 
-With this app, you will be able to create your notes using structured blocks, with support for:
+---
 
-- Headers
-- Paragraphs
-- Images
-- Checklists
-- Lists (ordered and unordered)
-- Quotes
-- Code blocks
-- Tables
-- Links
-- Embeds (e.g., videos, tweets)
-- Delimiters
-- Raw HTML
+> Minimal Text Editor Lite is a Windows-native note editor focused on structured writing, fast local editing, automatic saving, and clean exports to portable formats.
 
-The idea is that you can export your notes in JSON format, allowing other applications to interpret them universally, and thus organize your note with customized layouts (which were defined by your application).
+---
 
-Additionally, you can open your notes within the application (as long as they are in JSON format). You can download the executable installer in your [homepage](https://micilini.com/apps/mte-lite).
+# Minimal Text Editor Lite
 
-## How to runs this application locally?
+Minimal Text Editor Lite lets you create, edit, import, and export notes using structured Editor.js blocks.
 
-This application was made using the following technologies:
+It is designed for quick notes, documentation drafts, technical writing, study notes, article outlines, snippets, checklists, and lightweight knowledge organization.
 
-- C#
-- Windows Presentation Foundation (WPF)
-- ReactJS
-- SQLite
-- WebView2 / Chromium PDF rendering
-- OpenXML-based DOCX generation
+The application stores notes locally, supports dark mode and Focus Mode, keeps recent files, exports to multiple formats, and now generates DOCX and PDF files in-process without external Python executables.
 
-In conjunction with the following libraries:
+## Highlights
 
-- [Editor.js](https://editorjs.io/)
-- [InputSimulator](https://github.com/michaelnoonan/inputsimulator)
-- [MaterialDesignThemes](https://github.com/MaterialDesignInXAML/MaterialDesignInXamlToolkit)
-- [WebView2](https://learn.microsoft.com/en-us/microsoft-edge/webview2/)
-- [HtmlToOpenXml](https://github.com/onizet/html2openxml)
-- [HtmlSanitizer](https://github.com/mganss/HtmlSanitizer)
+- Block-based writing powered by Editor.js.
+- Automatic local saving.
+- Recent files list.
+- Light mode, dark mode, and system theme support.
+- Focus Mode for distraction-free writing.
+- JSON import/export for portable structured notes.
+- Markdown import/export with optional YAML front matter.
+- HTML export for browser-friendly documents.
+- DOCX export generated in-process with OpenXML/HtmlToOpenXml.
+- PDF export generated in-process through WebView2 / Chromium printing.
+- Image support, including embedded base64 images.
+- Clipboard export support.
+- File association support for JSON and Markdown files.
+- No external exporter executables required since version 2.1.0.
 
-To run this application on your local machine, make sure you have the latest version of **Visual Studio Community 2022**.
+## Supported Editor Blocks
 
-First of all, **clone the repository to your local machine**, and then simply open the **Minimal Text Editor (Lite).sln** file to open the project.
+Minimal Text Editor Lite currently supports these note blocks:
+
+| Block | Description |
+|---|---|
+| Headers | H1 to H6 document headings |
+| Paragraphs | Rich inline text with basic formatting |
+| Images | Embedded or linked images |
+| Checklists | Task-style items |
+| Lists | Ordered and unordered lists |
+| Quotes | Highlighted quote blocks |
+| Warning blocks | Attention or callout blocks |
+| Code blocks | Monospace code sections |
+| Tables | Structured tabular content |
+| Links | Clickable hyperlinks |
+| Delimiters | Visual content separators |
+| Raw HTML | Sanitized inline HTML where supported |
+
+## Export Formats
+
+| Format | Status | Notes |
+|---|---|---|
+| JSON | Supported | Native structured format for notes |
+| Markdown | Supported | Includes optional YAML front matter |
+| HTML | Supported | Browser-friendly output |
+| DOCX | Supported | Generated in-process with OpenXML/HtmlToOpenXml |
+| PDF | Supported | Generated in-process with WebView2 / Chromium |
+
+## Application Images
+
+Current screenshot:
+
+<p align="center">
+  <img src="images/mte-app-print.png" alt="Minimal Text Editor Lite screenshot" width="800">
+</p>
+
+Recommended images to add later:
+
+| Suggested file | What to show |
+|---|---|
+| `images/mte-home-light.png` | Main editor in light mode |
+| `images/mte-home-dark.png` | Main editor in dark mode |
+| `images/mte-focus-mode.png` | Focus Mode active |
+| `images/mte-export-modal.png` | Export modal with JSON, Markdown, HTML, DOCX, and PDF |
+| `images/mte-settings.png` | Settings modal with theme, language, backup, Markdown, and file association options |
+| `images/mte-recent-files.png` | Recent files menu/list |
+| `images/mte-pdf-output.png` | Generated PDF preview with headings, tables, images, and emoji |
+| `images/mte-docx-output.png` | Generated DOCX preview after the 2.1.0 OpenXML polish |
+
+## Architecture Overview
+
+```text
+Editor.js WebView2 UI
+        │
+        ▼
+WPF application layer
+        │
+        ▼
+Core services
+        ├─ ImportService
+        ├─ ExportService
+        ├─ BackupService
+        ├─ SettingsRepository
+        └─ RecentFilesRepository
+        │
+        ▼
+Exporters
+        ├─ JsonExporter
+        ├─ MarkdownExporter
+        ├─ HtmlExporter
+        ├─ DocExporter  ──→ HtmlDocumentBuilder ──→ HtmlToOpenXml / OpenXML
+        └─ PdfExporter  ──→ HtmlDocumentBuilder ──→ WebView2PdfRenderer ──→ Chromium PDF
+```
+
+The export pipeline is centered around `HtmlDocumentBuilder`, which converts the Editor.js document model into reusable HTML. HTML, DOCX, and PDF exports share the same document-building path, reducing duplicated rendering logic.
+
+## What Changed Since Version 2.0.0
+
+Version 2.1.0 removes the old external exporter binaries and replaces them with in-process C# export pipelines.
+
+### In-process DOCX Export
+
+- Removed the runtime dependency on the old DOCX exporter executable.
+- Added DOCX generation through OpenXML and HtmlToOpenXml.
+- Improved export speed by avoiding external process startup.
+- Improved output spacing and document readability.
+- Added stronger table styling and page layout polish.
+
+### In-process PDF Export
+
+- Removed the runtime dependency on the old PDF exporter executable.
+- Added PDF generation through WebView2's Chromium print pipeline.
+- Improved heading rendering.
+- Improved emoji rendering through the Chromium engine.
+- Added print-friendly CSS with better page breaks.
+- Preserved backgrounds for quote, warning, and code blocks.
+
+### Security and Distribution
+
+- Removed PyInstaller-based exporter binaries from the application runtime.
+- Reduced false-positive antivirus risk from external executable exporters.
+- Simplified local build and distribution.
+
+## How to Run Locally
+
+Requirements:
+
+- Windows 10 or 11 x64
+- Visual Studio Community 2022 or newer
+- .NET 8 SDK
+- .NET desktop development workload
+- WebView2 Runtime installed on Windows
+
+Steps:
+
+1. Clone the repository.
+2. Open the solution file in Visual Studio.
+3. Restore NuGet packages.
+4. Build and run the WPF application with `F5`.
 
 DOCX and PDF export are generated in-process. No external Python executables are required.
-DOCX is generated through OpenXML/HtmlToOpenXml, and PDF is generated through WebView2's Chromium print pipeline.
+
+## Built With
+
+- C# / .NET 8
+- Windows Presentation Foundation (WPF)
+- WebView2
+- Editor.js
+- React
+- SQLite
+- HtmlToOpenXml
+- HtmlSanitizer
+- Markdig
+- ReverseMarkdown
+- MaterialDesignThemes
+- CommunityToolkit.Mvvm
+
+## Version History
+
+### Version 2.1.0
+
+Major export pipeline update. Replaces external DOCX/PDF exporter executables with in-process C# exporters, adds WebView2-based PDF generation, improves DOCX output readability, removes PyInstaller exporter runtime dependencies, and updates the project presentation.
+
+### Version 2.0.0
+
+Adds a more complete note workflow with dark mode, Focus Mode, recent files, Markdown/front matter improvements, clipboard export, image support, and broader import/export behavior.
+
+### Version 1.0.0
+
+Initial public version of the lightweight Windows note editor.
 
 ## Historical Exporter Repositories
 
-Earlier versions of Minimal Text Editor (Lite) used external Python executables for DOCX and PDF export.
+Earlier versions used external Python executables for DOCX and PDF export.
 
-Those standalone repositories are still available as independent projects, but this application no longer consumes them at runtime. Starting with V2.1, DOCX and PDF exports are generated in-process.
+Those standalone repositories are still available as independent projects, but this application no longer consumes them at runtime.
 
 - [ExportAsDoc](https://github.com/micilini/ExportAsDoc)
 - [ExportAsPDF](https://github.com/micilini/ExportAsPDF)
 
-## Contribuite
-
-Want to create new features for **Minimal Text Editor (Lite)**? Then make sure you create a new feature (or a new translation file) and submit a new **Pull Request** (PR).
-
-Feel free to open new **Pull Requests** (PR) whenever you create new bug fixes or new translations.
-
-<div style="text-align: center;">
-  <img src="images/mte-app-print.png" alt="Minimal Text Editor (Lite)" width="800">
-</div>
-
 ## Translation
 
-To help translate, follow these instructions.
+Minimal Text Editor Lite supports application-level translations through JSON language files.
 
-### Adding a new language (requires Visual Community 2022)
-- Ensure you have Visual Studio 2022.
-- Fork and clone this repository.
-- Open the project in Visual Studio Community 2022.
-- Inside the folder `Languages`, you can find all languages used in the app (Yes, is in `JSON` format).
-- Create a new `JSON` file related with the new language (for example: `pt_pt.json`).
-- Translate all the `keys` to your specific language.
-- Inside `View > Settings Modal > SettingsModalWindow.xaml`, localize the `ComboBox` with name `LanguageComboBox` and create a new `ComboBoxItem`.
-- Don't forget to update all other languages files (`JSON`) so that they recognize the text of the new language that has been added.
-- Inside `ViewModel > SettingsModalWindowVM.cs`, and update the `UpdateLanguageInDatabase` method to accommodate the new language.
-- Test the application to make sure your new language is currently working.
-- And finally create a Pull Request (PR).
+To add a new language:
 
-### Improving an existing language (can be done with any text editor)
+1. Create a new JSON file inside the `Languages` folder.
+2. Translate every key from the existing language files.
+3. Add the new option to the settings language selector.
+4. Update the language handling logic if needed.
+5. Test the app and submit a Pull Request.
 
-- Inside the folder `Languages`, you can find all languages used in the app (Yes, is in `JSON` format).
-- Open that file and update the `values`.
-- And finally create a Pull Request (PR).
+Note: Editor.js block content itself is not automatically translated.
 
-**Note**: Currently, language switching only works at the application level, in this case, Editor.JS blocks are not yet translatable.
+## Contributing
 
----
+Want to improve Minimal Text Editor Lite?
+
+You can open issues for bugs, improvements, translations, documentation updates, or feature suggestions. Pull Requests are welcome.
 
 ## License
 
-This script is open-source and available under the MIT License.
+This project is open-source and available under the MIT License.

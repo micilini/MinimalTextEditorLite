@@ -23,6 +23,8 @@ namespace MinimalTextEditorLite.App.ViewModels;
 
 public partial class MainScreenWindowVM : ObservableObject
 {
+    private const string AppDisplayName = "Minimal Text Editor Lite";
+
     private readonly IImportService importService;
     private readonly IRecentFilesRepository recentFilesRepository;
     private BackgroundService? backgroundService;
@@ -96,12 +98,12 @@ public partial class MainScreenWindowVM : ObservableObject
     partial void OnIsDirtyChanged(bool value)
     {
         WindowTitle = value
-            ? "* MinimalTextEditor"
-            : "MinimalTextEditor";
+            ? $"* {AppDisplayName}"
+            : AppDisplayName;
     }
 
     [ObservableProperty]
-    private string windowTitle = "MinimalTextEditor";
+    private string windowTitle = AppDisplayName;
 
     public ObservableCollection<RecentFileModel> RecentFiles { get; } = new();
 

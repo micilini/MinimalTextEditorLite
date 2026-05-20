@@ -33,7 +33,7 @@ public partial class App : Application, INotifyPropertyChanged
 
     public string DatabaseFileName { get; } = "mte-lite.dll";
 
-    public string ApplicationVersion { get; } = "2.0.0";
+    public string ApplicationVersion { get; } = "2.1.0";
 
     public string ApplicationIdentifier { get; set; } = string.Empty;
 
@@ -101,7 +101,7 @@ public partial class App : Application, INotifyPropertyChanged
 
     protected override void OnStartup(StartupEventArgs e)
     {
-        const string appName = @"Local\MinimalTextEditorLite";
+        const string appName = @"Local\Minimal Text Editor Lite";
 
         _appMutex = new Mutex(true, appName, out var createdNew);
 

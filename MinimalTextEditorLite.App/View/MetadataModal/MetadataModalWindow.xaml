@@ -49,16 +49,19 @@
             </Grid>
 
             <Border Grid.Row="0" Style="{StaticResource MTE.Divider}"
-                    VerticalAlignment="Bottom" Margin="28 0 28 0" />
+                    VerticalAlignment="Bottom" Margin="36 0 36 0" />
 
             
             <ScrollViewer Grid.Row="1"
                           VerticalScrollBarVisibility="Auto"
                           HorizontalScrollBarVisibility="Disabled"
-                          Padding="28 16 28 8">
-                <StackPanel>
+                          Padding="0">
+                <StackPanel Margin="36 18 36 10">
 
-                    
+                    <TextBlock Text="{Binding Source={x:Static localApp:App.Localization}, Converter={StaticResource Translate}, ConverterParameter=Metadata_Description}"
+                               Style="{StaticResource MTE.Text.Body}"
+                               Margin="0 0 0 18" />
+
                     <TextBlock Text="{Binding Source={x:Static localApp:App.Localization}, Converter={StaticResource Translate}, ConverterParameter=Metadata_Field_Title}"
                                Style="{StaticResource MTE.Text.SectionLabel}" />
                     <TextBox Text="{Binding Title, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
@@ -107,9 +110,9 @@
 
             
             <Border Grid.Row="2" Style="{StaticResource MTE.Divider}"
-                    VerticalAlignment="Top" Margin="28 0 28 0" />
+                    VerticalAlignment="Top" Margin="36 0 36 0" />
 
-            <Grid Grid.Row="2" Margin="28 16 28 22">
+            <Grid Grid.Row="2" Margin="36 16 36 22">
                 <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
                     <Button Content="{Binding Source={x:Static localApp:App.Localization}, Converter={StaticResource Translate}, ConverterParameter=Button_Close}"
                             Command="{Binding CloseCommand}"
