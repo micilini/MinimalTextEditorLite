@@ -1,40 +1,134 @@
-﻿<UserControl x:Class="MinimalTextEditorLite.App.View.AppMenuControl"
+<UserControl x:Class="MinimalTextEditorLite.App.View.AppMenuControl"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
-             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:local="clr-namespace:MinimalTextEditorLite.App.View"
              xmlns:localApp="clr-namespace:MinimalTextEditorLite.App"
              mc:Ignorable="d"
-             d:DesignHeight="450" d:DesignWidth="800">
-    <Menu DockPanel.Dock="Top" Background="{DynamicResource MaterialDesignPaper}" FontSize="14" Padding="12 5 5 5">
+             d:DesignHeight="40"
+             d:DesignWidth="800">
+
+    <Menu DockPanel.Dock="Top"
+          Background="{DynamicResource MaterialDesignPaper}"
+          FontFamily="{StaticResource MTE.Font.Primary}"
+          FontSize="13.5"
+          Padding="14 6 8 6">
 
         <Menu.Resources>
-            <Style TargetType="MenuItem"
-             BasedOn="{StaticResource {x:Type MenuItem}}">
-                <Setter Property="Icon" Value="{x:Null}"/>
-                <Setter Property="FontSize" Value="14"/>
+            <!-- Não usar BasedOn para MenuItem via x:Type aqui.
+                 Esse padrão pode criar dependência cíclica quando existe estilo implícito
+                 para MenuItem no mesmo escopo. -->
+            <Style x:Key="TopLevelMenuItem" TargetType="MenuItem">
+                <Setter Property="Icon" Value="{x:Null}" />
+                <Setter Property="FontFamily" Value="{StaticResource MTE.Font.Primary}" />
+                <Setter Property="FontSize" Value="13.5" />
+                <Setter Property="FontWeight" Value="Medium" />
+                <Setter Property="Height" Value="30" />
+                <Setter Property="Padding" Value="10 0" />
+                <Setter Property="Margin" Value="2 0" />
+            </Style>
+
+            <Style x:Key="SubMenuItem" TargetType="MenuItem">
+                <Setter Property="Icon" Value="{x:Null}" />
+                <Setter Property="FontFamily" Value="{StaticResource MTE.Font.Primary}" />
+                <Setter Property="FontSize" Value="13" />
+                <Setter Property="FontWeight" Value="Normal" />
+                <Setter Property="Padding" Value="8 6" />
+            </Style>
+
+            <Style x:Key="RecentFileMenuItem" TargetType="MenuItem">
+                <Setter Property="Header" Value="{Binding FileName}" />
+                <Setter Property="ToolTip" Value="{Binding FilePath}" />
+                <Setter Property="Icon" Value="{x:Null}" />
+                <Setter Property="FontFamily" Value="{StaticResource MTE.Font.Primary}" />
+                <Setter Property="FontSize" Value="13" />
+                <Setter Property="Padding" Value="8 6" />
+                <EventSetter Event="Click" Handler="RecentFileMenuItem_Click" />
             </Style>
         </Menu.Resources>
 
-        <MenuItem Header="{Binding Source={x:Static localApp:App.Localization}, Converter={StaticResource Translate}, ConverterParameter=MenuItem_Header_File, StringFormat='_{0}'}" Height="26">
-            <MenuItem Tag="miNew" Header="{Binding Source={x:Static localApp:App.Localization}, Converter={StaticResource Translate}, ConverterParameter=MenuItem_Header_File_New, StringFormat='_{0}'}" InputGestureText="Ctrl+N" Command="{Binding CreateNoteCommand}" />
-            <MenuItem Tag="miOpen" Header="{Binding Source={x:Static localApp:App.Localization}, Converter={StaticResource Translate}, ConverterParameter=MenuItem_Header_File_Open, StringFormat='_{0}'}" InputGestureText="Ctrl+O" Command="{Binding OpenNoteCommand}" />
-            <Separator/>
-            <MenuItem Tag="miSave" Header="{Binding Source={x:Static localApp:App.Localization}, Converter={StaticResource Translate}, ConverterParameter=MenuItem_Header_File_Save, StringFormat='_{0}'}" InputGestureText="Ctrl+S" Command="{Binding SaveNoteCommand}" />
-            <MenuItem Tag="miMetadata" Header="{Binding Source={x:Static localApp:App.Localization}, Converter={StaticResource Translate}, ConverterParameter=MenuItem_Header_File_Metadata, StringFormat='_{0}'}" Command="{Binding MetadataCommand}" />
-            <MenuItem Tag="miDelete" Header="{Binding Source={x:Static localApp:App.Localization}, Converter={StaticResource Translate}, ConverterParameter=MenuItem_Header_File_Delete, StringFormat='_{0}'}" InputGestureText="Ctrl+Delete" Command="{Binding DeleteNoteCommand}" />
-            <Separator/>
-            <MenuItem Tag="miExport" Header="{Binding Source={x:Static localApp:App.Localization}, Converter={StaticResource Translate}, ConverterParameter=MenuItem_Header_File_Export, StringFormat='_{0}'}" InputGestureText="Ctrl+Shift+E" Command="{Binding ExportNoteCommand}" />
-            <Separator/>
-            <MenuItem Tag="miConfiguration" Header="{Binding Source={x:Static localApp:App.Localization}, Converter={StaticResource Translate}, ConverterParameter=MenuItem_Header_File_Configuration, StringFormat='_{0}'}" InputGestureText="Ctrl+," Command="{Binding SettingsCommand}" />
-            <Separator/>
-            <MenuItem Tag="miExit" Header="{Binding Source={x:Static localApp:App.Localization}, Converter={StaticResource Translate}, ConverterParameter=MenuItem_Header_File_Exit, StringFormat='_{0}'}" InputGestureText="Alt+F4" Command="{Binding ExitCommand}" />
+        <!-- ===== File ===== -->
+        <MenuItem Header="{Binding Source={x:Static localApp:App.Localization}, Converter={StaticResource Translate}, ConverterParameter=MenuItem_Header_File, StringFormat='_{0}'}"
+                  Style="{StaticResource TopLevelMenuItem}">
+
+            <MenuItem Tag="miNew"
+                      Style="{StaticResource SubMenuItem}"
+                      Header="{Binding Source={x:Static localApp:App.Localization}, Converter={StaticResource Translate}, ConverterParameter=MenuItem_Header_File_New, StringFormat='_{0}'}"
+                      InputGestureText="Ctrl+N"
+                      Command="{Binding CreateNoteCommand}" />
+
+            <MenuItem Tag="miOpen"
+                      Style="{StaticResource SubMenuItem}"
+                      Header="{Binding Source={x:Static localApp:App.Localization}, Converter={StaticResource Translate}, ConverterParameter=MenuItem_Header_File_Open, StringFormat='_{0}'}"
+                      InputGestureText="Ctrl+O"
+                      Command="{Binding OpenNoteCommand}" />
+
+            <MenuItem Header="{Binding Source={x:Static localApp:App.Localization}, Converter={StaticResource Translate}, ConverterParameter=MenuItem_Header_File_Recent, StringFormat='_{0}'}"
+                      Style="{StaticResource SubMenuItem}"
+                      ItemsSource="{Binding RecentFiles}">
+                <MenuItem.ItemContainerStyle>
+                    <Style TargetType="MenuItem" BasedOn="{StaticResource RecentFileMenuItem}" />
+                </MenuItem.ItemContainerStyle>
+            </MenuItem>
+
+            <Separator />
+
+            <MenuItem Tag="miSave"
+                      Style="{StaticResource SubMenuItem}"
+                      Header="{Binding Source={x:Static localApp:App.Localization}, Converter={StaticResource Translate}, ConverterParameter=MenuItem_Header_File_Save, StringFormat='_{0}'}"
+                      InputGestureText="Ctrl+S"
+                      Command="{Binding SaveNoteCommand}" />
+
+            <MenuItem Tag="miMetadata"
+                      Style="{StaticResource SubMenuItem}"
+                      Header="{Binding Source={x:Static localApp:App.Localization}, Converter={StaticResource Translate}, ConverterParameter=MenuItem_Header_File_Metadata, StringFormat='_{0}'}"
+                      Command="{Binding MetadataCommand}" />
+
+            <MenuItem Tag="miDelete"
+                      Style="{StaticResource SubMenuItem}"
+                      Header="{Binding Source={x:Static localApp:App.Localization}, Converter={StaticResource Translate}, ConverterParameter=MenuItem_Header_File_Delete, StringFormat='_{0}'}"
+                      InputGestureText="Ctrl+Delete"
+                      Command="{Binding DeleteNoteCommand}" />
+
+            <Separator />
+
+            <MenuItem Tag="miExport"
+                      Style="{StaticResource SubMenuItem}"
+                      Header="{Binding Source={x:Static localApp:App.Localization}, Converter={StaticResource Translate}, ConverterParameter=MenuItem_Header_File_Export, StringFormat='_{0}'}"
+                      InputGestureText="Ctrl+Shift+E"
+                      Command="{Binding ExportNoteCommand}" />
+
+            <Separator />
+
+            <MenuItem Tag="miConfiguration"
+                      Style="{StaticResource SubMenuItem}"
+                      Header="{Binding Source={x:Static localApp:App.Localization}, Converter={StaticResource Translate}, ConverterParameter=MenuItem_Header_File_Configuration, StringFormat='_{0}'}"
+                      InputGestureText="Ctrl+,"
+                      Command="{Binding SettingsCommand}" />
+
+            <Separator />
+
+            <MenuItem Tag="miExit"
+                      Style="{StaticResource SubMenuItem}"
+                      Header="{Binding Source={x:Static localApp:App.Localization}, Converter={StaticResource Translate}, ConverterParameter=MenuItem_Header_File_Exit, StringFormat='_{0}'}"
+                      InputGestureText="Alt+F4"
+                      Command="{Binding ExitCommand}" />
         </MenuItem>
 
-        <MenuItem Header="{Binding Source={x:Static localApp:App.Localization}, Converter={StaticResource Translate}, ConverterParameter=MenuItem_Header_Help, StringFormat='_{0}'}" Margin="15 0 0 0" Height="26">
-            <MenuItem Tag="miAbout" Header="{Binding Source={x:Static localApp:App.Localization}, Converter={StaticResource Translate}, ConverterParameter=MenuItem_Header_Help_About, StringFormat='_{0}'}" Command="{Binding AboutCommand}" />
+        <!-- ===== Focus Mode ===== -->
+        <MenuItem Header="{Binding Source={x:Static localApp:App.Localization}, Converter={StaticResource Translate}, ConverterParameter=MenuItem_Header_Focus, StringFormat='_{0}'}"
+                  Style="{StaticResource TopLevelMenuItem}"
+                  Command="{Binding FocusModeCommand}"
+                  InputGestureText="Ctrl+Shift+F" />
+
+        <!-- ===== Help ===== -->
+        <MenuItem Header="{Binding Source={x:Static localApp:App.Localization}, Converter={StaticResource Translate}, ConverterParameter=MenuItem_Header_Help, StringFormat='_{0}'}"
+                  Style="{StaticResource TopLevelMenuItem}">
+            <MenuItem Tag="miAbout"
+                      Style="{StaticResource SubMenuItem}"
+                      Header="{Binding Source={x:Static localApp:App.Localization}, Converter={StaticResource Translate}, ConverterParameter=MenuItem_Header_Help_About, StringFormat='_{0}'}"
+                      Command="{Binding AboutCommand}" />
         </MenuItem>
     </Menu>
 </UserControl>
-

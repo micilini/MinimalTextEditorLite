@@ -27,6 +27,8 @@ namespace MinimalTextEditorLite.Core.Models
 
         public string Theme { get; set; }
 
+        public bool AssociateFilesWithApp { get; set; }
+
         public DateTime CreatedAt { get; set; }
 
         public DateTime UpdatedAt { get; set; }
@@ -40,6 +42,7 @@ namespace MinimalTextEditorLite.Core.Models
             ShowOpenNoteMessage = true;
             ExportFrontMatterYaml = true;
             Theme = AppThemePreference.Light;
+            AssociateFilesWithApp = false;
             CreatedAt = DateTime.UtcNow;
             UpdatedAt = DateTime.UtcNow;
         }

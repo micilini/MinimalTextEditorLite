@@ -8,49 +8,142 @@
         xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
         mc:Ignorable="d"
         TextElement.Foreground="{DynamicResource MaterialDesignBody}"
+        FontFamily="{StaticResource MTE.Font.Primary}"
         Background="{x:Null}"
-        AllowsTransparency="true"
+        AllowsTransparency="True"
         WindowStyle="None"
         WindowStartupLocation="CenterScreen"
-        Title="SettingsModalWindow" Height="520" Width="665">
-    <materialDesign:Card Background="{DynamicResource MaterialDesignPaper}" UniformCornerRadius="15" materialDesign:ShadowAssist.ShadowDepth="Depth4" Width="526" Height="355">
+        Title="AboutModalWindow"
+        Height="540" Width="665">
+
+    <materialDesign:Card Style="{StaticResource MTE.Card.Modal}"
+                         Width="540" Height="420">
         <Grid>
             <Grid.RowDefinitions>
-                <RowDefinition Height="70" />
-                <RowDefinition Height="300" />
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="*" />
+                <RowDefinition Height="Auto" />
             </Grid.RowDefinitions>
 
-            <StackPanel Grid.Row="0">
-                <WrapPanel Margin="20">
-                    <Image RenderOptions.BitmapScalingMode="HighQuality" Source="pack://application:,,,/Assets/Images/close-icon.png" Width="30" Height="30" Margin="0 0 10 0" Cursor="Hand" MouseLeftButtonUp="OnCloseIconClicked" />
-                    <Image RenderOptions.BitmapScalingMode="HighQuality" Source="pack://application:,,,/Assets/Images/about-icon-2.png" Width="30" Height="30" Margin="0 0 10 0" />
-                    <Label Content="{Binding Source={x:Static localApp:App.Localization}, Converter={StaticResource Translate}, ConverterParameter=About_Title}" FontFamily="Arial" FontSize="22" FontWeight="Bold" />
-                </WrapPanel>
-            </StackPanel>
+            <!-- ===== Header (com close button no canto direito) ===== -->
+            <Grid Grid.Row="0" Margin="28 20 14 8">
+                <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                    <Border Width="44" Height="44"
+                            CornerRadius="12"
+                            Background="{StaticResource MTE.Brush.PrimarySubtle}"
+                            VerticalAlignment="Center">
+                        <materialDesign:PackIcon Kind="InformationOutline"
+                                                 Width="24" Height="24"
+                                                 Foreground="{StaticResource MTE.Brush.Primary}"
+                                                 HorizontalAlignment="Center"
+                                                 VerticalAlignment="Center" />
+                    </Border>
+                    <Label Content="{Binding Source={x:Static localApp:App.Localization}, Converter={StaticResource Translate}, ConverterParameter=About_Title}"
+                           FontFamily="{StaticResource MTE.Font.Primary}"
+                           FontSize="20"
+                           FontWeight="SemiBold"
+                           VerticalAlignment="Center"
+                           Margin="14 0 0 0"
+                           Padding="0" />
+                </StackPanel>
 
-            <StackPanel Grid.Row="1" Margin="20">
-                <WrapPanel Margin="0 0 0 10">
-                    <TextBlock Text="{Binding Source={x:Static localApp:App.Localization}, Converter={StaticResource Translate}, ConverterParameter=About_Title_Id}" FontFamily="Arial" FontSize="16" FontWeight="Bold" />
-                    <TextBlock x:Name="AppId" Text="" FontFamily="Arial" FontSize="16" FontWeight="Light" Margin="6 0 0 0" Foreground="#636e72" />
-                </WrapPanel>
-                <WrapPanel>
-                    <TextBlock Text="{Binding Source={x:Static localApp:App.Localization}, Converter={StaticResource Translate}, ConverterParameter=About_Title_Current_Version}" FontFamily="Arial" FontSize="16" FontWeight="Bold" />
-                    <TextBlock x:Name="AppV" Text="" FontFamily="Arial" FontSize="16" FontWeight="Light" Margin="6 0 0 0" Foreground="#636e72" />
-                </WrapPanel>
+                <!-- Close button (Border + MouseLeftButtonUp preserva a assinatura
+                     do handler original em C#: MouseButtonEventArgs). -->
+                <Border Width="40" Height="40"
+                        CornerRadius="10"
+                        Background="Transparent"
+                        HorizontalAlignment="Right"
+                        VerticalAlignment="Center"
+                        Cursor="Hand"
+                        ToolTip="Close"
+                        MouseLeftButtonUp="OnCloseIconClicked">
+                    <Border.Style>
+                        <Style TargetType="Border">
+                            <Setter Property="Background" Value="Transparent" />
+                            <Style.Triggers>
+                                <Trigger Property="IsMouseOver" Value="True">
+                                    <Setter Property="Background" Value="{StaticResource MTE.Brush.IconHoverBg}" />
+                                </Trigger>
+                            </Style.Triggers>
+                        </Style>
+                    </Border.Style>
+                    <materialDesign:PackIcon Kind="Close"
+                                             Width="20" Height="20"
+                                             Foreground="{DynamicResource MaterialDesignBody}"
+                                             HorizontalAlignment="Center"
+                                             VerticalAlignment="Center" />
+                </Border>
+            </Grid>
 
+            <Border Grid.Row="0" Style="{StaticResource MTE.Divider}"
+                    VerticalAlignment="Bottom" Margin="28 0 28 0" />
 
-                <TabControl Margin="0,20,0,0" Height="145">
+            <!-- ===== Body ===== -->
+            <StackPanel Grid.Row="1" Margin="28 16 28 8">
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="Auto" />
+                        <ColumnDefinition Width="*" />
+                    </Grid.ColumnDefinitions>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="Auto" />
+                    </Grid.RowDefinitions>
+
+                    <TextBlock Grid.Row="0" Grid.Column="0"
+                               Text="{Binding Source={x:Static localApp:App.Localization}, Converter={StaticResource Translate}, ConverterParameter=About_Title_Id}"
+                               FontFamily="{StaticResource MTE.Font.Primary}"
+                               FontSize="13.5"
+                               FontWeight="SemiBold"
+                               Foreground="{DynamicResource MaterialDesignBody}"
+                               VerticalAlignment="Center" />
+                    <TextBlock Grid.Row="0" Grid.Column="1"
+                               x:Name="AppId"
+                               Text=""
+                               FontFamily="{StaticResource MTE.Font.Mono}"
+                               FontSize="13"
+                               FontWeight="Normal"
+                               Foreground="{DynamicResource MaterialDesignBodyLight}"
+                               VerticalAlignment="Center"
+                               Margin="10 0 0 0"
+                               TextTrimming="CharacterEllipsis" />
+
+                    <TextBlock Grid.Row="1" Grid.Column="0"
+                               Text="{Binding Source={x:Static localApp:App.Localization}, Converter={StaticResource Translate}, ConverterParameter=About_Title_Current_Version}"
+                               FontFamily="{StaticResource MTE.Font.Primary}"
+                               FontSize="13.5"
+                               FontWeight="SemiBold"
+                               Foreground="{DynamicResource MaterialDesignBody}"
+                               VerticalAlignment="Center"
+                               Margin="0 8 0 0" />
+                    <TextBlock Grid.Row="1" Grid.Column="1"
+                               x:Name="AppV"
+                               Text=""
+                               FontFamily="{StaticResource MTE.Font.Mono}"
+                               FontSize="13"
+                               FontWeight="Normal"
+                               Foreground="{DynamicResource MaterialDesignBodyLight}"
+                               VerticalAlignment="Center"
+                               Margin="10 8 0 0" />
+                </Grid>
+
+                <TabControl Margin="0 20 0 0" Height="180">
                     <TabItem Header="MIT License">
-                        <!-- opcional -->
-                        <ScrollViewer VerticalScrollBarVisibility="Auto"
-                      HorizontalScrollBarVisibility="Disabled"
-                      Padding="10">
-                            <TextBlock TextWrapping="Wrap"
-                       FontFamily="Consolas"
-                       FontSize="14">
+                        <Border Background="{DynamicResource MaterialDesignDivider}"
+                                Opacity="0.18"
+                                CornerRadius="6"
+                                Margin="0 8 0 0">
+                            <ScrollViewer VerticalScrollBarVisibility="Auto"
+                                          HorizontalScrollBarVisibility="Disabled"
+                                          Padding="14">
+                                <TextBlock TextWrapping="Wrap"
+                                           FontFamily="{StaticResource MTE.Font.Mono}"
+                                           FontSize="12"
+                                           LineHeight="17"
+                                           Foreground="{DynamicResource MaterialDesignBody}">
 MIT License
 
-Copyright (c) 2025 Micilini Roll
+Copyright (c) 2025-2026 Micilini Roll
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -69,15 +162,20 @@ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
 LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
-                            </TextBlock>
-                        </ScrollViewer>
+                                </TextBlock>
+                            </ScrollViewer>
+                        </Border>
                     </TabItem>
                 </TabControl>
-
-                <TextBlock Text="Portal Micilini - 2025" FontFamily="Arial" FontSize="14" FontWeight="Light" HorizontalAlignment="Right" Margin="0 20 0 0" Foreground="#7f8c8d" />
-
             </StackPanel>
 
+            <!-- ===== Footer ===== -->
+            <Grid Grid.Row="2" Margin="28 8 28 18">
+                <TextBlock Text="Portal Micilini · 2025-2026"
+                           Style="{StaticResource MTE.Text.Caption}"
+                           HorizontalAlignment="Right"
+                           VerticalAlignment="Center" />
+            </Grid>
         </Grid>
     </materialDesign:Card>
 </Window>

@@ -4,43 +4,85 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:MinimalTextEditorLite.App.View"
+        xmlns:localApp="clr-namespace:MinimalTextEditorLite.App"
         xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
         mc:Ignorable="d"
         Height="Auto" Width="Auto"
-        MinWidth="800" MinHeight="600"
+        MinWidth="900" MinHeight="640"
         WindowStartupLocation="CenterScreen"
         Icon="pack://application:,,,/View/logo-mte.ico"
-        Title="Minimal Text Editor (Lite)">
+        FontFamily="{StaticResource MTE.Font.Primary}"
+        Background="{DynamicResource MaterialDesignPaper}"
+        Title="{Binding WindowTitle}">
+
     <Grid>
         <DockPanel>
-        <ContentControl DockPanel.Dock="Top" Content="{Binding MenuContent}" />
+            <!-- Top: app menu -->
+            <ContentControl DockPanel.Dock="Top"
+                            Content="{Binding MenuContent}" />
 
-        <materialDesign:Card Background="{DynamicResource MaterialDesignPaper}" materialDesign:ShadowAssist.ShadowDepth="Depth0">
+            <!-- Divisor sutil sob o menu -->
+            <Border DockPanel.Dock="Top"
+                    Height="1"
+                    Background="{DynamicResource MaterialDesignDivider}"
+                    Opacity="0.5" />
+
             <Grid>
                 <Grid.RowDefinitions>
-                    <RowDefinition Height="80" />
+                    <RowDefinition Height="{Binding HeaderRowHeight}" />
                     <RowDefinition Height="*" />
-                    <RowDefinition Height="30" />
+                    <RowDefinition Height="32" />
                 </Grid.RowDefinitions>
 
-                <materialDesign:ColorZone Grid.Row="0" Height="Auto" Background="{DynamicResource MaterialDesignPaper}" VerticalAlignment="Stretch" HorizontalAlignment="Stretch" materialDesign:ShadowAssist.ShadowDepth="Depth0">
+                <!-- ===== Header (logo + action icons) ===== -->
+                <Grid Grid.Row="0"
+                      Background="{DynamicResource MaterialDesignPaper}"
+                      Visibility="{Binding HeaderVisibility}">
                     <ContentControl Content="{Binding HeaderContent}" />
-                </materialDesign:ColorZone>
+                </Grid>
 
-                <materialDesign:ColorZone Grid.Row="1" Height="Auto" Background="{DynamicResource MaterialDesignPaper}" VerticalAlignment="Stretch" HorizontalAlignment="Stretch">
+                <!-- Divisor sutil entre header e área de edição -->
+                <Border Grid.Row="0"
+                        VerticalAlignment="Bottom"
+                        Height="1"
+                        Background="{DynamicResource MaterialDesignDivider}"
+                        Opacity="0.4"
+                        Visibility="{Binding HeaderVisibility}" />
+
+                <!-- ===== Main content (editor WebView) ===== -->
+                <Grid Grid.Row="1"
+                      Background="{DynamicResource MaterialDesignPaper}">
                     <ContentControl Content="{Binding MainContent}" />
-                </materialDesign:ColorZone>
+                </Grid>
 
-                <materialDesign:ColorZone Grid.Row="2" Height="30" Background="{DynamicResource MaterialDesignPaper}" VerticalAlignment="Stretch" HorizontalAlignment="Stretch" BorderBrush="{x:Null}">
-                    <TextBlock Text="{Binding LastSaveTextBlock, Mode=TwoWay}"
-                       FontFamily="Arial" 
-                       FontSize="12" 
-                       HorizontalAlignment="Right" 
-                       VerticalAlignment="Center" 
-                       Margin="0 0 12 0" />
-                </materialDesign:ColorZone>
+                <!-- Divisor superior do footer -->
+                <Border Grid.Row="2"
+                        VerticalAlignment="Top"
+                        Height="1"
+                        Background="{DynamicResource MaterialDesignDivider}"
+                        Opacity="0.4" />
+
+                <!-- ===== Footer ===== -->
+                <Grid Grid.Row="2"
+                      Background="{DynamicResource MaterialDesignPaper}">
+                    <TextBlock Text="{Binding FocusModeFooterText, Mode=OneWay}"
+                               Visibility="{Binding FocusModeFooterVisibility}"
+                               FontFamily="{StaticResource MTE.Font.Primary}"
+                               FontSize="11.5"
+                               Foreground="{DynamicResource MaterialDesignBodyLight}"
+                               HorizontalAlignment="Left"
+                               VerticalAlignment="Center"
+                               Margin="16 0 0 0" />
+
+                    <TextBlock Text="{Binding FooterStatusText, Mode=OneWay}"
+                               FontFamily="{StaticResource MTE.Font.Primary}"
+                               FontSize="11.5"
+                               Foreground="{DynamicResource MaterialDesignBodyLight}"
+                               HorizontalAlignment="Right"
+                               VerticalAlignment="Center"
+                               Margin="0 0 16 0" />
+                </Grid>
             </Grid>
-        </materialDesign:Card>
-    </DockPanel>
+        </DockPanel>
     </Grid>
 </Window>

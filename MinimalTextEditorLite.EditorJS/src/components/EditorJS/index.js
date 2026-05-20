@@ -89,6 +89,12 @@ const EditorJSComponent = () => {
         table: { class: Table, inlineToolbar: true, shortcut: 'CMD+ALT+T' },
       },
       data: { blocks: [] },
+      onChange: () => {
+        postToHost({
+          event: 'dirty',
+          data: {},
+        });
+      },
       onReady: () => {
         new Undo({ editor });
         window.__editorInstance = editor;
@@ -184,15 +190,137 @@ const EditorJSComponent = () => {
       document.body.classList.add(`mte-theme-${theme}`);
     }
 
-    function getStats() {
-      const text = document.body.innerText || '';
-      const words = text.trim().split(/\s+/).filter(Boolean).length;
-      const readingTimeMin = Math.max(1, Math.round(words / 200));
+    function stripHtmlToText(value) {
+      if (!value || typeof value !== 'string') {
+        return '';
+      }
 
-      return {
-        words,
-        readingTimeMin,
-      };
+      const container = document.createElement('div');
+      container.innerHTML = value;
+      return container.textContent || container.innerText || '';
+    }
+
+    function tableToText(content) {
+      if (!Array.isArray(content)) {
+        return '';
+      }
+
+      return content
+        .flatMap((row) => (Array.isArray(row) ? row : []))
+        .map(stripHtmlToText)
+        .join(' ');
+    }
+
+    function listItemsToText(items) {
+      if (!Array.isArray(items)) {
+        return '';
+      }
+
+      return items
+        .map((item) => {
+          if (typeof item === 'string') {
+            return stripHtmlToText(item);
+          }
+
+          if (item && typeof item === 'object') {
+            return stripHtmlToText(item.content || item.text || '');
+          }
+
+          return '';
+        })
+        .join(' ');
+    }
+
+    function checklistItemsToText(items) {
+      if (!Array.isArray(items)) {
+        return '';
+      }
+
+      return items
+        .map((item) => stripHtmlToText(item?.text || ''))
+        .join(' ');
+    }
+
+    function blockToPlainText(block) {
+      const data = block?.data || {};
+
+      switch (block?.type) {
+        case 'header':
+        case 'paragraph':
+          return stripHtmlToText(data.text);
+
+        case 'quote':
+          return [stripHtmlToText(data.text), stripHtmlToText(data.caption)]
+            .filter(Boolean)
+            .join(' ');
+
+        case 'warning':
+          return [stripHtmlToText(data.title), stripHtmlToText(data.message)]
+            .filter(Boolean)
+            .join(' ');
+
+        case 'list':
+          return listItemsToText(data.items);
+
+        case 'checklist':
+          return checklistItemsToText(data.items);
+
+        case 'table':
+          return tableToText(data.content);
+
+        case 'code':
+          return data.code || '';
+
+        case 'image':
+          return stripHtmlToText(data.caption);
+
+        default:
+          return '';
+      }
+    }
+
+    function countWordsFromText(text) {
+      return (text || '')
+        .trim()
+        .split(/\s+/)
+        .filter(Boolean)
+        .length;
+    }
+
+    async function getStats() {
+      if (!editorInstance.current) {
+        return {
+          words: 0,
+          readingTimeMin: 1,
+        };
+      }
+
+      try {
+        await editorInstance.current.isReady;
+        const outputData = await editorInstance.current.save();
+
+        const text = (outputData.blocks || [])
+          .map(blockToPlainText)
+          .filter(Boolean)
+          .join(' ');
+
+        const words = countWordsFromText(text);
+        const readingTimeMin = words === 0
+          ? 0
+          : Math.max(1, Math.ceil(words / 200));
+
+        return {
+          words,
+          readingTimeMin,
+        };
+      } catch (error) {
+        console.log('[MTEBridge] Could not calculate stats:', error);
+
+        return {
+          words: 0,
+          readingTimeMin: 1,
+        };
+      }
     }
 
     function getDroppedImageFiles(event) {
@@ -336,7 +464,7 @@ const EditorJSComponent = () => {
     window.handleClear = () => window.MTEBridge.clear();
     window.handleLoad = (jsonData) => window.MTEBridge.load(jsonData);
 
-    function handleHostMessage(event) {
+    async function handleHostMessage(event) {
       const msg = event.data;
 
       if (!msg || typeof msg !== 'object') {
@@ -368,12 +496,16 @@ const EditorJSComponent = () => {
           window.MTEBridge.insertImage(msg.data);
           break;
 
-        case 'getStats':
+        case 'getStats': {
+          const stats = await window.MTEBridge.getStats();
+
           postToHost({
             event: 'stats',
-            data: window.MTEBridge.getStats(),
+            data: stats,
           });
+
           break;
+        }
 
         default:
           console.warn('[MTEBridge] Unknown action:', msg.action);

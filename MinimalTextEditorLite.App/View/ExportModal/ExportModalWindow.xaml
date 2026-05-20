@@ -8,52 +8,117 @@
         xmlns:localApp="clr-namespace:MinimalTextEditorLite.App"
         mc:Ignorable="d"
         TextElement.Foreground="{DynamicResource MaterialDesignBody}"
+        FontFamily="{StaticResource MTE.Font.Primary}"
         Background="{x:Null}"
-        AllowsTransparency="true"
+        AllowsTransparency="True"
         WindowStyle="None"
         WindowStartupLocation="CenterScreen"
-        Title="ExportModalWindow" Height="540" Width="665">
+        Title="ExportModalWindow"
+        Height="600" Width="665">
+
     <Grid>
-        <materialDesign:Card Background="{DynamicResource MaterialDesignPaper}" UniformCornerRadius="15" materialDesign:ShadowAssist.ShadowDepth="Depth4" Width="526" Height="385">
+        <materialDesign:Card Style="{StaticResource MTE.Card.Modal}"
+                             Width="540" Height="460">
             <Grid>
                 <Grid.RowDefinitions>
-                    <RowDefinition Height="70" />
-                    <RowDefinition MinHeight="174" Height="Auto" />
-                    <RowDefinition Height="80" />
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="*" />
+                    <RowDefinition Height="Auto" />
                 </Grid.RowDefinitions>
 
-                <StackPanel Grid.Row="0">
-                    <WrapPanel Margin="20">
-                        <Image RenderOptions.BitmapScalingMode="HighQuality" Source="pack://application:,,,/Assets/Images/editor-export-icon-2.png" Width="30" Height="30" Margin="0 0 10 0" />
-                        <Label Content="{Binding Source={x:Static localApp:App.Localization}, Converter={StaticResource Translate}, ConverterParameter=Export_Note_Title}" FontFamily="Arial" FontSize="22" FontWeight="Bold" />
-                    </WrapPanel>
-                </StackPanel>
+                <!-- ===== Header ===== -->
+                <Grid Grid.Row="0" Margin="28 24 28 8">
+                    <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                        <Border Width="44" Height="44"
+                                CornerRadius="12"
+                                Background="{StaticResource MTE.Brush.PrimarySubtle}"
+                                VerticalAlignment="Center">
+                            <materialDesign:PackIcon Kind="ExportVariant"
+                                                     Width="24" Height="24"
+                                                     Foreground="{StaticResource MTE.Brush.Primary}"
+                                                     HorizontalAlignment="Center"
+                                                     VerticalAlignment="Center" />
+                        </Border>
+                        <Label Content="{Binding Source={x:Static localApp:App.Localization}, Converter={StaticResource Translate}, ConverterParameter=Export_Note_Title}"
+                               Style="{StaticResource {x:Type Label}}"
+                               FontFamily="{StaticResource MTE.Font.Primary}"
+                               FontSize="20"
+                               FontWeight="SemiBold"
+                               VerticalAlignment="Center"
+                               Margin="14 0 0 0"
+                               Padding="0" />
+                    </StackPanel>
+                </Grid>
 
-                <StackPanel Grid.Row="1" Margin="20">
-                    <TextBlock Text="{Binding Source={x:Static localApp:App.Localization}, Converter={StaticResource Translate}, ConverterParameter=Export_Note_SubTitle}" Foreground="{DynamicResource MaterialDesignBody}" FontFamily="Arial" FontSize="18" Margin="0 0 0 0" />
-                    <TextBlock Text="{Binding Source={x:Static localApp:App.Localization}, Converter={StaticResource Translate}, ConverterParameter=Export_Note_Message}" Foreground="{DynamicResource MaterialDesignBody}" FontFamily="Arial" FontSize="14" FontWeight="Regular" Padding="0" Margin="0 5 0 0" Height="Auto" TextWrapping="Wrap" />
-                    <ComboBox x:Name="ExportComboBox" Width="315" Height="30" VerticalAlignment="Top" HorizontalAlignment="Left" Padding="0" Margin="0 20 0 0" FontFamily="Arial" FontSize="18" FontWeight="Regular" SelectionChanged="ExportComboBox_SelectionChanged">
+                <Border Grid.Row="0" Style="{StaticResource MTE.Divider}"
+                        VerticalAlignment="Bottom" Margin="28 0 28 0" />
+
+                <!-- ===== Body ===== -->
+                <StackPanel Grid.Row="1" Margin="28 16 28 16">
+                    <TextBlock Text="{Binding Source={x:Static localApp:App.Localization}, Converter={StaticResource Translate}, ConverterParameter=Export_Note_SubTitle}"
+                               Style="{StaticResource MTE.Text.SectionLabel}" />
+
+                    <TextBlock Text="{Binding Source={x:Static localApp:App.Localization}, Converter={StaticResource Translate}, ConverterParameter=Export_Note_Message}"
+                               Style="{StaticResource MTE.Text.Body}"
+                               Margin="0 6 0 0" />
+
+                    <ComboBox x:Name="ExportComboBox"
+                              Style="{StaticResource MTE.ComboBox.Form}"
+                              Margin="0 18 0 0"
+                              SelectionChanged="ExportComboBox_SelectionChanged">
                         <ComboBoxItem Content="JSON" />
                         <ComboBoxItem Content="Word (.doc)" />
                         <ComboBoxItem Content="HTML" />
                         <ComboBoxItem Content="Markdown (.md)" />
                         <ComboBoxItem Content="PDF" />
                     </ComboBox>
-                    <StackPanel x:Name="MarkdownImageOptionsPanel" Visibility="Collapsed" Margin="0 16 0 0">
-                        <TextBlock Text="{Binding Source={x:Static localApp:App.Localization}, Converter={StaticResource Translate}, ConverterParameter=Export_Markdown_ImageOptions_Title}" Foreground="{DynamicResource MaterialDesignBody}" FontFamily="Arial" FontSize="14" FontWeight="Regular" TextWrapping="Wrap" />
-                        <ComboBox x:Name="MarkdownImageModeComboBox" Width="315" Height="30" VerticalAlignment="Top" HorizontalAlignment="Left" Padding="0" Margin="0 8 0 0" FontFamily="Arial" FontSize="16" FontWeight="Regular">
+
+                    <StackPanel x:Name="MarkdownImageOptionsPanel"
+                                Visibility="Collapsed"
+                                Margin="0 18 0 0">
+                        <TextBlock Text="{Binding Source={x:Static localApp:App.Localization}, Converter={StaticResource Translate}, ConverterParameter=Export_Markdown_ImageOptions_Title}"
+                                   Style="{StaticResource MTE.Text.Body}" />
+                        <ComboBox x:Name="MarkdownImageModeComboBox"
+                                  Style="{StaticResource MTE.ComboBox.Form}"
+                                  Margin="0 8 0 0">
                             <ComboBoxItem Content="{Binding Source={x:Static localApp:App.Localization}, Converter={StaticResource Translate}, ConverterParameter=Export_Markdown_ImageMode_Embedded}" />
                             <ComboBoxItem Content="{Binding Source={x:Static localApp:App.Localization}, Converter={StaticResource Translate}, ConverterParameter=Export_Markdown_ImageMode_Folder}" />
                         </ComboBox>
                     </StackPanel>
                 </StackPanel>
 
-                <StackPanel Grid.Row="2">
-                    <WrapPanel Height="80" HorizontalAlignment="Right" VerticalAlignment="Center">
-                        <Button x:Name="ButtonExport" Content="{Binding Source={x:Static localApp:App.Localization}, Converter={StaticResource Translate}, ConverterParameter=Export_Button}" Click="ButtonExport_Click" Style="{StaticResource MaterialDesignRaisedButton}" BorderBrush="{x:Null}" materialDesign:ShadowAssist.ShadowDepth="Depth0" HorizontalAlignment="Left" Foreground="White" Background="#3498db" materialDesign:ButtonAssist.CornerRadius="4" Width="100" Height="48" Margin="0 15 20 0" FontFamily="Arial" FontSize="16" FontWeight="Bold" />
-                        <Button Content="{Binding Source={x:Static localApp:App.Localization}, Converter={StaticResource Translate}, ConverterParameter=Button_Close}" Click="ButtonClose_Click" Style="{StaticResource MaterialDesignRaisedButton}" BorderBrush="{x:Null}" materialDesign:ShadowAssist.ShadowDepth="Depth0" HorizontalAlignment="Left" Foreground="White" Background="#e74c3c" materialDesign:ButtonAssist.CornerRadius="4" Width="100" Height="48" Margin="0 15 20 0" FontFamily="Arial" FontSize="16" FontWeight="Bold" />
-                    </WrapPanel>
-                </StackPanel>
+                <!-- ===== Footer (action buttons) ===== -->
+                <Border Grid.Row="2" Style="{StaticResource MTE.Divider}"
+                        VerticalAlignment="Top" Margin="28 0 28 0" />
+
+                <Grid Grid.Row="2" Margin="28 16 28 22">
+                    <StackPanel Orientation="Horizontal" HorizontalAlignment="Left">
+                        <Button x:Name="ButtonCopyHtml"
+                                Content="{Binding Source={x:Static localApp:App.Localization}, Converter={StaticResource Translate}, ConverterParameter=Export_Copy_Html_Button}"
+                                Click="ButtonCopyHtml_Click"
+                                Style="{StaticResource MTE.Button.Secondary}"
+                                MinWidth="118"
+                                Margin="0 0 8 0" />
+                        <Button x:Name="ButtonCopyMarkdown"
+                                Content="{Binding Source={x:Static localApp:App.Localization}, Converter={StaticResource Translate}, ConverterParameter=Export_Copy_Markdown_Button}"
+                                Click="ButtonCopyMarkdown_Click"
+                                Style="{StaticResource MTE.Button.Secondary}"
+                                MinWidth="140" />
+                    </StackPanel>
+
+                    <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
+                        <Button Content="{Binding Source={x:Static localApp:App.Localization}, Converter={StaticResource Translate}, ConverterParameter=Button_Close}"
+                                Click="ButtonClose_Click"
+                                Style="{StaticResource MTE.Button.Danger}"
+                                MinWidth="96"
+                                Margin="0 0 10 0" />
+                        <Button x:Name="ButtonExport"
+                                Content="{Binding Source={x:Static localApp:App.Localization}, Converter={StaticResource Translate}, ConverterParameter=Export_Button}"
+                                Click="ButtonExport_Click"
+                                Style="{StaticResource MTE.Button.Primary}"
+                                MinWidth="110" />
+                    </StackPanel>
+                </Grid>
             </Grid>
         </materialDesign:Card>
     </Grid>

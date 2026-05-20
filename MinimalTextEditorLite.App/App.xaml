@@ -15,6 +15,290 @@
 
             <helpers:BoolToVisibilityConverter x:Key="BoolToVisibilityConverter" />
             <helpers:LocalizationResource x:Key="Translate" />
+
+            <!-- ============================================================
+                 MTE Design System
+                 Tokens (cores, tipografia) + Estilos compartilhados.
+                 Use prefixo MTE.* para evitar colisões com Material Design.
+                 ============================================================ -->
+
+            <!-- ===== Brand Palette =====
+                 Mantém o azul original do projeto (#1163E7 / #3B8BFF) como base
+                 e expande para hover/pressed. Vermelho/verde refinados. -->
+            <Color x:Key="MTE.Color.Primary">#1163E7</Color>
+            <Color x:Key="MTE.Color.PrimaryHover">#3B8BFF</Color>
+            <Color x:Key="MTE.Color.PrimaryPressed">#0B4DB8</Color>
+            <Color x:Key="MTE.Color.Danger">#E53E3E</Color>
+            <Color x:Key="MTE.Color.DangerHover">#F25555</Color>
+            <Color x:Key="MTE.Color.DangerPressed">#B92C2C</Color>
+            <Color x:Key="MTE.Color.Success">#10B981</Color>
+            <Color x:Key="MTE.Color.SuccessHover">#34D399</Color>
+            <Color x:Key="MTE.Color.SuccessPressed">#0E9466</Color>
+
+            <SolidColorBrush x:Key="MTE.Brush.Primary" Color="{StaticResource MTE.Color.Primary}" />
+            <SolidColorBrush x:Key="MTE.Brush.PrimaryHover" Color="{StaticResource MTE.Color.PrimaryHover}" />
+            <SolidColorBrush x:Key="MTE.Brush.PrimaryPressed" Color="{StaticResource MTE.Color.PrimaryPressed}" />
+            <SolidColorBrush x:Key="MTE.Brush.PrimarySubtle" Color="{StaticResource MTE.Color.Primary}" Opacity="0.12" />
+            <SolidColorBrush x:Key="MTE.Brush.Danger" Color="{StaticResource MTE.Color.Danger}" />
+            <SolidColorBrush x:Key="MTE.Brush.DangerHover" Color="{StaticResource MTE.Color.DangerHover}" />
+            <SolidColorBrush x:Key="MTE.Brush.DangerPressed" Color="{StaticResource MTE.Color.DangerPressed}" />
+            <SolidColorBrush x:Key="MTE.Brush.Success" Color="{StaticResource MTE.Color.Success}" />
+            <SolidColorBrush x:Key="MTE.Brush.SuccessHover" Color="{StaticResource MTE.Color.SuccessHover}" />
+            <SolidColorBrush x:Key="MTE.Brush.SuccessPressed" Color="{StaticResource MTE.Color.SuccessPressed}" />
+
+            <!-- Cor de fundo sutil para hover de icon buttons (funciona em light/dark
+                 porque é semitransparente sobre o paper). -->
+            <SolidColorBrush x:Key="MTE.Brush.IconHoverBg" Color="#000000" Opacity="0.06" />
+            <SolidColorBrush x:Key="MTE.Brush.IconPressedBg" Color="#000000" Opacity="0.12" />
+
+            <!-- ===== Tipografia =====
+                 Segoe UI Variable é a fonte padrão do Windows 11. Fallback para
+                 Segoe UI (Windows 10) garante compatibilidade total. -->
+            <FontFamily x:Key="MTE.Font.Primary">Segoe UI Variable, Segoe UI</FontFamily>
+            <FontFamily x:Key="MTE.Font.Mono">Cascadia Mono, Consolas</FontFamily>
+
+            <!-- ===== TextBlock styles ===== -->
+            <Style x:Key="MTE.Text.Display" TargetType="TextBlock">
+                <Setter Property="FontFamily" Value="{StaticResource MTE.Font.Primary}" />
+                <Setter Property="FontSize" Value="32" />
+                <Setter Property="FontWeight" Value="SemiBold" />
+                <Setter Property="Foreground" Value="{DynamicResource MaterialDesignBody}" />
+                <Setter Property="TextOptions.TextFormattingMode" Value="Ideal" />
+            </Style>
+
+            <Style x:Key="MTE.Text.Title" TargetType="TextBlock">
+                <Setter Property="FontFamily" Value="{StaticResource MTE.Font.Primary}" />
+                <Setter Property="FontSize" Value="22" />
+                <Setter Property="FontWeight" Value="SemiBold" />
+                <Setter Property="Foreground" Value="{DynamicResource MaterialDesignBody}" />
+            </Style>
+
+            <Style x:Key="MTE.Text.SectionLabel" TargetType="TextBlock">
+                <Setter Property="FontFamily" Value="{StaticResource MTE.Font.Primary}" />
+                <Setter Property="FontSize" Value="15" />
+                <Setter Property="FontWeight" Value="SemiBold" />
+                <Setter Property="Foreground" Value="{DynamicResource MaterialDesignBody}" />
+            </Style>
+
+            <Style x:Key="MTE.Text.Body" TargetType="TextBlock">
+                <Setter Property="FontFamily" Value="{StaticResource MTE.Font.Primary}" />
+                <Setter Property="FontSize" Value="13" />
+                <Setter Property="FontWeight" Value="Normal" />
+                <Setter Property="Foreground" Value="{DynamicResource MaterialDesignBodyLight}" />
+                <Setter Property="TextWrapping" Value="Wrap" />
+                <Setter Property="LineHeight" Value="19" />
+            </Style>
+
+            <Style x:Key="MTE.Text.Caption" TargetType="TextBlock">
+                <Setter Property="FontFamily" Value="{StaticResource MTE.Font.Primary}" />
+                <Setter Property="FontSize" Value="11.5" />
+                <Setter Property="Foreground" Value="{DynamicResource MaterialDesignBodyLight}" />
+                <Setter Property="Opacity" Value="0.85" />
+            </Style>
+
+            <!-- ===== Fonte padrão para controles comuns =====
+                 Não criar estilos implícitos BasedOn="{StaticResource {x:Type ...}}".
+                 Esse padrão pode criar dependência cíclica quando o próprio estilo implícito
+                 é resolvido pelo WPF. Use os estilos explícitos MTE.* nos formulários. -->
+
+            <!-- ===== Button styles =====
+                 4 variantes semânticas. Cada uma é BasedOn um base que cuida do
+                 corner radius/padding/font. As variantes só trocam cor. -->
+            <Style x:Key="MTE.Button.Base" TargetType="Button" BasedOn="{StaticResource MaterialDesignRaisedButton}">
+                <Setter Property="FontFamily" Value="{StaticResource MTE.Font.Primary}" />
+                <Setter Property="FontSize" Value="13.5" />
+                <Setter Property="FontWeight" Value="SemiBold" />
+                <Setter Property="Foreground" Value="White" />
+                <Setter Property="Height" Value="40" />
+                <Setter Property="MinWidth" Value="92" />
+                <Setter Property="Padding" Value="18 0" />
+                <Setter Property="BorderBrush" Value="{x:Null}" />
+                <Setter Property="materialDesign:ShadowAssist.ShadowDepth" Value="Depth0" />
+                <Setter Property="materialDesign:ButtonAssist.CornerRadius" Value="8" />
+                <Setter Property="Cursor" Value="Hand" />
+            </Style>
+
+            <Style x:Key="MTE.Button.Primary" TargetType="Button" BasedOn="{StaticResource MTE.Button.Base}">
+                <Setter Property="Background" Value="{StaticResource MTE.Brush.Primary}" />
+                <Style.Triggers>
+                    <Trigger Property="IsMouseOver" Value="True">
+                        <Setter Property="Background" Value="{StaticResource MTE.Brush.PrimaryHover}" />
+                    </Trigger>
+                    <Trigger Property="IsPressed" Value="True">
+                        <Setter Property="Background" Value="{StaticResource MTE.Brush.PrimaryPressed}" />
+                    </Trigger>
+                </Style.Triggers>
+            </Style>
+
+            <Style x:Key="MTE.Button.Danger" TargetType="Button" BasedOn="{StaticResource MTE.Button.Base}">
+                <Setter Property="Background" Value="{StaticResource MTE.Brush.Danger}" />
+                <Style.Triggers>
+                    <Trigger Property="IsMouseOver" Value="True">
+                        <Setter Property="Background" Value="{StaticResource MTE.Brush.DangerHover}" />
+                    </Trigger>
+                    <Trigger Property="IsPressed" Value="True">
+                        <Setter Property="Background" Value="{StaticResource MTE.Brush.DangerPressed}" />
+                    </Trigger>
+                </Style.Triggers>
+            </Style>
+
+            <Style x:Key="MTE.Button.Success" TargetType="Button" BasedOn="{StaticResource MTE.Button.Base}">
+                <Setter Property="Background" Value="{StaticResource MTE.Brush.Success}" />
+                <Style.Triggers>
+                    <Trigger Property="IsMouseOver" Value="True">
+                        <Setter Property="Background" Value="{StaticResource MTE.Brush.SuccessHover}" />
+                    </Trigger>
+                    <Trigger Property="IsPressed" Value="True">
+                        <Setter Property="Background" Value="{StaticResource MTE.Brush.SuccessPressed}" />
+                    </Trigger>
+                </Style.Triggers>
+            </Style>
+
+            <!-- Botão neutro/secundário: usa cores do tema (vira cinza claro/escuro
+                 automaticamente em light/dark). -->
+            <Style x:Key="MTE.Button.Secondary" TargetType="Button" BasedOn="{StaticResource MaterialDesignOutlinedButton}">
+                <Setter Property="FontFamily" Value="{StaticResource MTE.Font.Primary}" />
+                <Setter Property="FontSize" Value="13.5" />
+                <Setter Property="FontWeight" Value="SemiBold" />
+                <Setter Property="Height" Value="40" />
+                <Setter Property="MinWidth" Value="92" />
+                <Setter Property="Padding" Value="18 0" />
+                <Setter Property="materialDesign:ButtonAssist.CornerRadius" Value="8" />
+                <Setter Property="Cursor" Value="Hand" />
+            </Style>
+
+            <!-- ===== Icon button =====
+                 Usado no header e no botão de close de modais. Hover com
+                 background sutil + scale; foco visual sem anel feio. -->
+            <Style x:Key="MTE.Button.Icon" TargetType="Button">
+                <Setter Property="OverridesDefaultStyle" Value="True" />
+                <Setter Property="Cursor" Value="Hand" />
+                <Setter Property="Background" Value="Transparent" />
+                <Setter Property="BorderBrush" Value="Transparent" />
+                <Setter Property="BorderThickness" Value="0" />
+                <Setter Property="FocusVisualStyle" Value="{x:Null}" />
+                <Setter Property="Width" Value="40" />
+                <Setter Property="Height" Value="40" />
+                <Setter Property="Foreground" Value="{DynamicResource MaterialDesignBody}" />
+                <Setter Property="RenderTransformOrigin" Value="0.5,0.5" />
+                <Setter Property="RenderTransform">
+                    <Setter.Value>
+                        <ScaleTransform ScaleX="1" ScaleY="1" />
+                    </Setter.Value>
+                </Setter>
+                <Setter Property="Template">
+                    <Setter.Value>
+                        <ControlTemplate TargetType="Button">
+                            <Border x:Name="rootBorder"
+                                    Background="{TemplateBinding Background}"
+                                    CornerRadius="10"
+                                    SnapsToDevicePixels="True">
+                                <ContentPresenter HorizontalAlignment="Center"
+                                                  VerticalAlignment="Center"
+                                                  RecognizesAccessKey="True" />
+                            </Border>
+                            <ControlTemplate.Triggers>
+                                <Trigger Property="IsMouseOver" Value="True">
+                                    <Setter TargetName="rootBorder"
+                                            Property="Background"
+                                            Value="{StaticResource MTE.Brush.IconHoverBg}" />
+                                </Trigger>
+                                <Trigger Property="IsPressed" Value="True">
+                                    <Setter TargetName="rootBorder"
+                                            Property="Background"
+                                            Value="{StaticResource MTE.Brush.IconPressedBg}" />
+                                </Trigger>
+                            </ControlTemplate.Triggers>
+                        </ControlTemplate>
+                    </Setter.Value>
+                </Setter>
+                <Style.Triggers>
+                    <Trigger Property="IsPressed" Value="True">
+                        <Trigger.EnterActions>
+                            <BeginStoryboard>
+                                <Storyboard>
+                                    <DoubleAnimation Storyboard.TargetProperty="RenderTransform.(ScaleTransform.ScaleX)" To="0.92" Duration="0:0:0.08" />
+                                    <DoubleAnimation Storyboard.TargetProperty="RenderTransform.(ScaleTransform.ScaleY)" To="0.92" Duration="0:0:0.08" />
+                                </Storyboard>
+                            </BeginStoryboard>
+                        </Trigger.EnterActions>
+                        <Trigger.ExitActions>
+                            <BeginStoryboard>
+                                <Storyboard>
+                                    <DoubleAnimation Storyboard.TargetProperty="RenderTransform.(ScaleTransform.ScaleX)" To="1" Duration="0:0:0.12" />
+                                    <DoubleAnimation Storyboard.TargetProperty="RenderTransform.(ScaleTransform.ScaleY)" To="1" Duration="0:0:0.12" />
+                                </Storyboard>
+                            </BeginStoryboard>
+                        </Trigger.ExitActions>
+                    </Trigger>
+                </Style.Triggers>
+            </Style>
+
+            <!-- Variante "ghost" para o icon button do header — menor, sem fundo
+                 hover tão pesado (já tem muitos no header). -->
+            <Style x:Key="MTE.Button.IconGhost" TargetType="Button" BasedOn="{StaticResource MTE.Button.Icon}">
+                <Setter Property="Width" Value="38" />
+                <Setter Property="Height" Value="38" />
+            </Style>
+
+            <!-- ===== Card de modal =====
+                 Background + shadow + corner radius padronizados. -->
+            <Style x:Key="MTE.Card.Modal" TargetType="materialDesign:Card">
+                <Setter Property="Background" Value="{DynamicResource MaterialDesignPaper}" />
+                <Setter Property="UniformCornerRadius" Value="16" />
+                <Setter Property="materialDesign:ShadowAssist.ShadowDepth" Value="Depth3" />
+            </Style>
+
+            <!-- ===== ProgressBar com cor da marca =====
+                 IsIndeterminate puxa cor do Foreground. Tema-aware via Brush. -->
+            <Style x:Key="MTE.ProgressBar.Brand" TargetType="ProgressBar" BasedOn="{StaticResource MaterialDesignLinearProgressBar}">
+                <Setter Property="Foreground" Value="{StaticResource MTE.Brush.Primary}" />
+                <Setter Property="Background" Value="{StaticResource MTE.Brush.PrimarySubtle}" />
+                <Setter Property="BorderBrush" Value="{x:Null}" />
+                <Setter Property="Height" Value="6" />
+            </Style>
+
+            <!-- ===== ComboBox e TextBox de formulário =====
+                 Padronização para usar nos modais. -->
+            <Style x:Key="MTE.ComboBox.Form" TargetType="ComboBox" BasedOn="{StaticResource {x:Type ComboBox}}">
+                <Setter Property="FontFamily" Value="{StaticResource MTE.Font.Primary}" />
+                <Setter Property="FontSize" Value="14" />
+                <Setter Property="Height" Value="38" />
+                <Setter Property="MinWidth" Value="320" />
+                <Setter Property="HorizontalAlignment" Value="Left" />
+                <Setter Property="VerticalContentAlignment" Value="Center" />
+                <Setter Property="Padding" Value="10 0" />
+            </Style>
+
+            <Style x:Key="MTE.TextBox.Form" TargetType="TextBox" BasedOn="{StaticResource MaterialDesignOutlinedTextBox}">
+                <Setter Property="FontFamily" Value="{StaticResource MTE.Font.Primary}" />
+                <Setter Property="FontSize" Value="14" />
+                <Setter Property="Height" Value="40" />
+                <Setter Property="Padding" Value="12 8" />
+                <Setter Property="materialDesign:HintAssist.IsFloating" Value="True" />
+            </Style>
+
+            <Style x:Key="MTE.DatePicker.Form" TargetType="DatePicker" BasedOn="{StaticResource {x:Type DatePicker}}">
+                <Setter Property="FontFamily" Value="{StaticResource MTE.Font.Primary}" />
+                <Setter Property="FontSize" Value="14" />
+                <Setter Property="Height" Value="40" />
+            </Style>
+
+            <!-- Divisor sutil entre seções dentro de modais. -->
+            <Style x:Key="MTE.Divider" TargetType="Border">
+                <Setter Property="Height" Value="1" />
+                <Setter Property="Background" Value="{DynamicResource MaterialDesignDivider}" />
+                <Setter Property="Margin" Value="0 18 0 18" />
+                <Setter Property="Opacity" Value="0.6" />
+            </Style>
+
+            <!-- Badge "LITE" usado no splash e em outros lugares onde fizer sentido. -->
+            <Style x:Key="MTE.Badge.Lite" TargetType="Border">
+                <Setter Property="Background" Value="{StaticResource MTE.Brush.PrimarySubtle}" />
+                <Setter Property="CornerRadius" Value="6" />
+                <Setter Property="Padding" Value="8 3" />
+                <Setter Property="VerticalAlignment" Value="Center" />
+            </Style>
         </ResourceDictionary>
     </Application.Resources>
 </Application>

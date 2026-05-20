@@ -7,47 +7,121 @@
         xmlns:localApp="clr-namespace:MinimalTextEditorLite.App"
         mc:Ignorable="d"
         TextElement.Foreground="{DynamicResource MaterialDesignBody}"
+        FontFamily="{StaticResource MTE.Font.Primary}"
         Background="{x:Null}"
-        AllowsTransparency="true"
+        AllowsTransparency="True"
         WindowStyle="None"
         WindowStartupLocation="CenterScreen"
-        Title="MetadataModalWindow" Height="520" Width="665" Loaded="Window_Loaded">
-    <materialDesign:Card Background="{DynamicResource MaterialDesignPaper}" UniformCornerRadius="15" materialDesign:ShadowAssist.ShadowDepth="Depth4" Width="526" Height="400">
+        Title="MetadataModalWindow"
+        Height="560" Width="665"
+        Loaded="Window_Loaded">
+
+    <materialDesign:Card Style="{StaticResource MTE.Card.Modal}"
+                         Width="540" Height="460">
         <Grid>
             <Grid.RowDefinitions>
-                <RowDefinition Height="70" />
-                <RowDefinition Height="250" />
-                <RowDefinition Height="80" />
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="*" />
+                <RowDefinition Height="Auto" />
             </Grid.RowDefinitions>
 
-            <StackPanel Grid.Row="0">
-                <WrapPanel Margin="20">
-                    <Image RenderOptions.BitmapScalingMode="HighQuality" Source="pack://application:,,,/Assets/Images/editor-gear-icon-2.png" Width="30" Height="30" Margin="0 0 10 0" />
-                    <Label Content="{Binding Source={x:Static localApp:App.Localization}, Converter={StaticResource Translate}, ConverterParameter=Metadata_Title}" FontFamily="Arial" FontSize="22" FontWeight="Bold" />
-                </WrapPanel>
-            </StackPanel>
+            <!-- ===== Header ===== -->
+            <Grid Grid.Row="0" Margin="28 24 28 8">
+                <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                    <Border Width="44" Height="44"
+                            CornerRadius="12"
+                            Background="{StaticResource MTE.Brush.PrimarySubtle}"
+                            VerticalAlignment="Center">
+                        <materialDesign:PackIcon Kind="FileDocumentEditOutline"
+                                                 Width="24" Height="24"
+                                                 Foreground="{StaticResource MTE.Brush.Primary}"
+                                                 HorizontalAlignment="Center"
+                                                 VerticalAlignment="Center" />
+                    </Border>
+                    <Label Content="{Binding Source={x:Static localApp:App.Localization}, Converter={StaticResource Translate}, ConverterParameter=Metadata_Title}"
+                           FontFamily="{StaticResource MTE.Font.Primary}"
+                           FontSize="20"
+                           FontWeight="SemiBold"
+                           VerticalAlignment="Center"
+                           Margin="14 0 0 0"
+                           Padding="0" />
+                </StackPanel>
+            </Grid>
 
-            <StackPanel Grid.Row="1" Margin="20 5 20 10">
-                <TextBlock Text="{Binding Source={x:Static localApp:App.Localization}, Converter={StaticResource Translate}, ConverterParameter=Metadata_Field_Title}" Foreground="{DynamicResource MaterialDesignBody}" FontFamily="Arial" FontSize="14" />
-                <TextBox Text="{Binding Title, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" Height="32" Margin="0 4 0 10" FontFamily="Arial" FontSize="14" />
+            <Border Grid.Row="0" Style="{StaticResource MTE.Divider}"
+                    VerticalAlignment="Bottom" Margin="28 0 28 0" />
 
-                <TextBlock Text="{Binding Source={x:Static localApp:App.Localization}, Converter={StaticResource Translate}, ConverterParameter=Metadata_Field_Slug}" Foreground="{DynamicResource MaterialDesignBody}" FontFamily="Arial" FontSize="14" />
-                <TextBox Text="{Binding Slug, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" Height="32" Margin="0 4 0 10" FontFamily="Arial" FontSize="14" />
+            <!-- ===== Body (form) ===== -->
+            <ScrollViewer Grid.Row="1"
+                          VerticalScrollBarVisibility="Auto"
+                          HorizontalScrollBarVisibility="Disabled"
+                          Padding="28 16 28 8">
+                <StackPanel>
 
-                <TextBlock Text="{Binding Source={x:Static localApp:App.Localization}, Converter={StaticResource Translate}, ConverterParameter=Metadata_Field_Tags}" Foreground="{DynamicResource MaterialDesignBody}" FontFamily="Arial" FontSize="14" />
-                <TextBox Text="{Binding Tags, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" Height="32" Margin="0 4 0 2" FontFamily="Arial" FontSize="14" />
-                <TextBlock Text="{Binding Source={x:Static localApp:App.Localization}, Converter={StaticResource Translate}, ConverterParameter=Metadata_Field_Tags_Hint}" Foreground="{DynamicResource MaterialDesignBody}" FontFamily="Arial" FontSize="12" Margin="0 0 0 10" />
+                    <!-- Title -->
+                    <TextBlock Text="{Binding Source={x:Static localApp:App.Localization}, Converter={StaticResource Translate}, ConverterParameter=Metadata_Field_Title}"
+                               Style="{StaticResource MTE.Text.SectionLabel}" />
+                    <TextBox Text="{Binding Title, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                             FontFamily="{StaticResource MTE.Font.Primary}"
+                             FontSize="14"
+                             Height="38"
+                             Padding="12 8"
+                             Style="{StaticResource MaterialDesignOutlinedTextBox}"
+                             Margin="0 8 0 16" />
 
-                <TextBlock Text="{Binding Source={x:Static localApp:App.Localization}, Converter={StaticResource Translate}, ConverterParameter=Metadata_Field_PublishDate}" Foreground="{DynamicResource MaterialDesignBody}" FontFamily="Arial" FontSize="14" />
-                <DatePicker SelectedDate="{Binding PublishDate, Mode=TwoWay}" Height="32" Margin="0 4 0 0" FontFamily="Arial" FontSize="14" />
-            </StackPanel>
+                    <!-- Slug -->
+                    <TextBlock Text="{Binding Source={x:Static localApp:App.Localization}, Converter={StaticResource Translate}, ConverterParameter=Metadata_Field_Slug}"
+                               Style="{StaticResource MTE.Text.SectionLabel}" />
+                    <TextBox Text="{Binding Slug, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                             FontFamily="{StaticResource MTE.Font.Mono}"
+                             FontSize="14"
+                             Height="38"
+                             Padding="12 8"
+                             Style="{StaticResource MaterialDesignOutlinedTextBox}"
+                             Margin="0 8 0 16" />
 
-            <StackPanel Grid.Row="2">
-                <WrapPanel Height="80" HorizontalAlignment="Right" VerticalAlignment="Center">
-                    <Button Content="{Binding Source={x:Static localApp:App.Localization}, Converter={StaticResource Translate}, ConverterParameter=Metadata_Save_Button}" Command="{Binding SaveCommand}" Style="{StaticResource MaterialDesignRaisedButton}" BorderBrush="{x:Null}" materialDesign:ShadowAssist.ShadowDepth="Depth0" HorizontalAlignment="Left" Foreground="White" Background="#3498db" materialDesign:ButtonAssist.CornerRadius="4" Width="100" Height="48" Margin="0 15 20 0" FontFamily="Arial" FontSize="16" FontWeight="Bold" />
-                    <Button Content="{Binding Source={x:Static localApp:App.Localization}, Converter={StaticResource Translate}, ConverterParameter=Button_Close}" Command="{Binding CloseCommand}" Style="{StaticResource MaterialDesignRaisedButton}" BorderBrush="{x:Null}" materialDesign:ShadowAssist.ShadowDepth="Depth0" HorizontalAlignment="Left" Foreground="White" Background="#e74c3c" materialDesign:ButtonAssist.CornerRadius="4" Width="100" Height="48" Margin="0 15 20 0" FontFamily="Arial" FontSize="16" FontWeight="Bold" />
-                </WrapPanel>
-            </StackPanel>
+                    <!-- Tags -->
+                    <TextBlock Text="{Binding Source={x:Static localApp:App.Localization}, Converter={StaticResource Translate}, ConverterParameter=Metadata_Field_Tags}"
+                               Style="{StaticResource MTE.Text.SectionLabel}" />
+                    <TextBox Text="{Binding Tags, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                             FontFamily="{StaticResource MTE.Font.Primary}"
+                             FontSize="14"
+                             Height="38"
+                             Padding="12 8"
+                             Style="{StaticResource MaterialDesignOutlinedTextBox}"
+                             Margin="0 8 0 4" />
+                    <TextBlock Text="{Binding Source={x:Static localApp:App.Localization}, Converter={StaticResource Translate}, ConverterParameter=Metadata_Field_Tags_Hint}"
+                               Style="{StaticResource MTE.Text.Caption}"
+                               Margin="0 0 0 16" />
+
+                    <!-- Publish date -->
+                    <TextBlock Text="{Binding Source={x:Static localApp:App.Localization}, Converter={StaticResource Translate}, ConverterParameter=Metadata_Field_PublishDate}"
+                               Style="{StaticResource MTE.Text.SectionLabel}" />
+                    <DatePicker SelectedDate="{Binding PublishDate, Mode=TwoWay}"
+                                FontFamily="{StaticResource MTE.Font.Primary}"
+                                FontSize="14"
+                                Height="38"
+                                Margin="0 8 0 0" />
+                </StackPanel>
+            </ScrollViewer>
+
+            <!-- ===== Footer ===== -->
+            <Border Grid.Row="2" Style="{StaticResource MTE.Divider}"
+                    VerticalAlignment="Top" Margin="28 0 28 0" />
+
+            <Grid Grid.Row="2" Margin="28 16 28 22">
+                <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
+                    <Button Content="{Binding Source={x:Static localApp:App.Localization}, Converter={StaticResource Translate}, ConverterParameter=Button_Close}"
+                            Command="{Binding CloseCommand}"
+                            Style="{StaticResource MTE.Button.Danger}"
+                            MinWidth="96"
+                            Margin="0 0 10 0" />
+                    <Button Content="{Binding Source={x:Static localApp:App.Localization}, Converter={StaticResource Translate}, ConverterParameter=Metadata_Save_Button}"
+                            Command="{Binding SaveCommand}"
+                            Style="{StaticResource MTE.Button.Primary}"
+                            MinWidth="110" />
+                </StackPanel>
+            </Grid>
         </Grid>
     </materialDesign:Card>
 </Window>
