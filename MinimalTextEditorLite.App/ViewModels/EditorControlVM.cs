@@ -213,10 +213,42 @@ public partial class EditorControlVM : ObservableObject, IDisposable
             data = document
         });
 
+        SendThemeToEditor(((App)Application.Current).EffectiveTheme);
+
         ProgressBarVisibility = Visibility.Collapsed;
         WebViewVisibility = Visibility.Visible;
         userCanSaveNote = true;
         mainScreenWindow.SaveNoteCompleted = true;
+    }
+
+    public void SendThemeToEditor(string? themeName)
+    {
+        _ = SendThemeToEditorSafeAsync(themeName);
+    }
+
+    private async Task SendThemeToEditorSafeAsync(string? themeName)
+    {
+        try
+        {
+            await SendThemeToEditorAsync(themeName);
+        }
+        catch
+        {
+            // Theme synchronization should not interrupt the editor.
+        }
+    }
+
+    public async Task SendThemeToEditorAsync(string? themeName)
+    {
+        var normalizedTheme = string.Equals(themeName, "dark", StringComparison.OrdinalIgnoreCase)
+            ? "dark"
+            : "light";
+
+        await PostEditorMessageAsync(new
+        {
+            action = "setTheme",
+            data = normalizedTheme
+        });
     }
 
     private Task PostEditorMessageAsync(object message)

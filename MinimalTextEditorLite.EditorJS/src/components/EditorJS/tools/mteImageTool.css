@@ -99,3 +99,47 @@
   color: #9d1f1f;
   font-size: 13px;
 }
+
+body.mte-theme-dark .mte-image-tool__dropzone {
+  border-color: #555;
+  background: #252525;
+}
+
+body.mte-theme-dark .mte-image-tool__dropzone--active {
+  border-color: #6b92ff;
+  background: #29334a;
+}
+
+body.mte-theme-dark .mte-image-tool__title {
+  color: #f0f0f0;
+}
+
+body.mte-theme-dark .mte-image-tool__description,
+body.mte-theme-dark .mte-image-tool__meta {
+  color: #b8b8b8;
+}
+
+body.mte-theme-dark .mte-image-tool__image {
+  background: #252525;
+}
+
+body.mte-theme-dark .mte-image-tool__caption {
+  background: #252525;
+  color: #f0f0f0;
+  border-color: #555;
+}
+
+body.mte-theme-dark .mte-image-tool__button,
+body.mte-theme-dark .mte-image-tool__action {
+  background: #3a3a3a;
+  color: #ffffff;
+}
+
+body.mte-theme-dark .mte-image-tool__action--danger {
+  background: #9d3434;
+}
+
+body.mte-theme-dark .mte-image-tool__error {
+  background: #3b2020;
+  color: #ffbdbd;
+}

@@ -1,6 +1,7 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using MinimalTextEditorLite.App.Helpers;
+using MinimalTextEditorLite.App.Services;
 using MinimalTextEditorLite.App.View.SettingsModal;
 using MinimalTextEditorLite.Core.Database;
 using MinimalTextEditorLite.Core.Models;
@@ -17,6 +18,7 @@ public partial class SettingsModalWindowVM : ObservableObject
 {
     private readonly ISettingsRepository settingsRepository;
     private readonly IBackupService backupService;
+    private readonly IThemeService themeService;
 
     private SettingsModalWindow SettingsModalWindow { get; }
 
@@ -44,6 +46,15 @@ public partial class SettingsModalWindowVM : ObservableObject
     }
 
     [ObservableProperty]
+    private int selectedThemeIndex;
+
+    partial void OnSelectedThemeIndexChanged(int value)
+    {
+        if (AllowUserInteract)
+            _ = UpdateThemeSafeAsync(MapIndexToThemePreference(value));
+    }
+
+    [ObservableProperty]
     private bool exportFrontMatterYaml;
 
     partial void OnExportFrontMatterYamlChanged(bool value)
@@ -52,11 +63,16 @@ public partial class SettingsModalWindowVM : ObservableObject
             _ = UpdateExportFrontMatterYamlSafeAsync(value);
     }
 
-    public SettingsModalWindowVM(SettingsModalWindow settingsWindow, ISettingsRepository settingsRepository, IBackupService backupService)
+    public SettingsModalWindowVM(
+        SettingsModalWindow settingsWindow,
+        ISettingsRepository settingsRepository,
+        IBackupService backupService,
+        IThemeService themeService)
     {
         SettingsModalWindow = settingsWindow;
         this.settingsRepository = settingsRepository;
         this.backupService = backupService;
+        this.themeService = themeService;
 
         GetAppConfiguration();
         GetBackupFilesInfo();
@@ -70,12 +86,14 @@ public partial class SettingsModalWindowVM : ObservableObject
         {
             SelectedAutoSaveIndex = GetAutoSaveIndexFromValue(settings.AutoSaveNote);
             SelectedLanguageIndex = settings.Language.Equals("pt_br", StringComparison.OrdinalIgnoreCase) ? 1 : 0;
+            SelectedThemeIndex = GetThemeIndexFromPreference(settings.Theme);
             ExportFrontMatterYaml = settings.ExportFrontMatterYaml;
         }
         else
         {
             SelectedAutoSaveIndex = 0;
             SelectedLanguageIndex = 0;
+            SelectedThemeIndex = 0;
             ExportFrontMatterYaml = true;
         }
     }
@@ -132,6 +150,28 @@ public partial class SettingsModalWindowVM : ObservableObject
             5 => AutoSaveInterval.OneHour,
             6 => AutoSaveInterval.TwoHours,
             _ => AutoSaveInterval.Never
+        };
+    }
+
+    private static int GetThemeIndexFromPreference(string? preference)
+    {
+        var normalized = AppThemePreference.Normalize(preference);
+
+        return normalized switch
+        {
+            AppThemePreference.Dark => 1,
+            AppThemePreference.System => 2,
+            _ => 0
+        };
+    }
+
+    private static string MapIndexToThemePreference(int index)
+    {
+        return index switch
+        {
+            1 => AppThemePreference.Dark,
+            2 => AppThemePreference.System,
+            _ => AppThemePreference.Light
         };
     }
 
@@ -201,6 +241,40 @@ public partial class SettingsModalWindowVM : ObservableObject
         {
             ModalMessages.showErrorModal(App.Localization.Translate("Error_Language_Update"));
         }
+    }
+
+    private async Task UpdateThemeSafeAsync(string themePreference)
+    {
+        try
+        {
+            await UpdateThemeAsync(themePreference);
+        }
+        catch
+        {
+            ModalMessages.showErrorModal(App.Localization.Translate("Error_Settings_Update"));
+        }
+    }
+
+    private async Task UpdateThemeAsync(string themePreference)
+    {
+        var settings = await settingsRepository.GetCurrentAsync();
+
+        if (settings == null)
+        {
+            ModalMessages.showErrorModal(App.Localization.Translate("Error_App_Settings_Not_Found"));
+            return;
+        }
+
+        settings.Theme = AppThemePreference.Normalize(themePreference);
+        settings.UpdatedAt = DateTime.UtcNow;
+
+        if (!await settingsRepository.UpdateAsync(settings))
+        {
+            ModalMessages.showErrorModal(App.Localization.Translate("Error_Settings_Update"));
+            return;
+        }
+
+        themeService.Apply(settings.Theme);
     }
 
     private async Task UpdateExportFrontMatterYamlSafeAsync(bool value)

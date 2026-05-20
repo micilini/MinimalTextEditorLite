@@ -1,10 +1,8 @@
-﻿using CommunityToolkit.Mvvm.ComponentModel;
-using MinimalTextEditorLite.Core.Startup;
-using System.Windows;
+using CommunityToolkit.Mvvm.ComponentModel;
 
 namespace MinimalTextEditorLite.App.ViewModels;
 
-public partial class SplashScreenWindowVM(StartupAppConfiguration startupConfig) : ObservableObject
+public partial class SplashScreenWindowVM : ObservableObject
 {
     public event Action? OnLoadingComplete;
 
@@ -15,13 +13,6 @@ public partial class SplashScreenWindowVM(StartupAppConfiguration startupConfig)
     {
         await Task.Run(() =>
         {
-            var result = startupConfig.CheckAndCreateDatabase();
-
-            Application.Current.Dispatcher.Invoke(() =>
-            {
-                ((App)Application.Current).ApplySettings(result.Settings);
-            });
-
             for (var i = 0; i <= 100; i++)
             {
                 ProgressValue = i;

@@ -25,6 +25,8 @@ namespace MinimalTextEditorLite.Core.Models
 
         public bool ExportFrontMatterYaml { get; set; }
 
+        public string Theme { get; set; }
+
         public DateTime CreatedAt { get; set; }
 
         public DateTime UpdatedAt { get; set; }
@@ -37,6 +39,7 @@ namespace MinimalTextEditorLite.Core.Models
             ShowBackupSizeLimiteMessage = true;
             ShowOpenNoteMessage = true;
             ExportFrontMatterYaml = true;
+            Theme = AppThemePreference.Light;
             CreatedAt = DateTime.UtcNow;
             UpdatedAt = DateTime.UtcNow;
         }

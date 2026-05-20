@@ -106,6 +106,9 @@ public partial class MainScreenWindowVM : ObservableObject
 
         if (e.PropertyName == nameof(App.LastNoteUpdated) && sender is App app)
             LastSaveTextBlock = app.LastNoteUpdated;
+
+        if (e.PropertyName == nameof(App.EffectiveTheme) && sender is App themeApp)
+            editorControl.SendThemeToEditor(themeApp.EffectiveTheme);
     }
 
     private void MainScreenWindow_Loaded(object sender, RoutedEventArgs e)

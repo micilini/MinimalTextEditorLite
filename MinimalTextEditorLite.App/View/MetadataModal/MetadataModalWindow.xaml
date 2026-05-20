@@ -28,17 +28,17 @@
             </StackPanel>
 
             <StackPanel Grid.Row="1" Margin="20 5 20 10">
-                <TextBlock Text="{Binding Source={x:Static localApp:App.Localization}, Converter={StaticResource Translate}, ConverterParameter=Metadata_Field_Title}" Foreground="#2d2d2d" FontFamily="Arial" FontSize="14" />
+                <TextBlock Text="{Binding Source={x:Static localApp:App.Localization}, Converter={StaticResource Translate}, ConverterParameter=Metadata_Field_Title}" Foreground="{DynamicResource MaterialDesignBody}" FontFamily="Arial" FontSize="14" />
                 <TextBox Text="{Binding Title, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" Height="32" Margin="0 4 0 10" FontFamily="Arial" FontSize="14" />
 
-                <TextBlock Text="{Binding Source={x:Static localApp:App.Localization}, Converter={StaticResource Translate}, ConverterParameter=Metadata_Field_Slug}" Foreground="#2d2d2d" FontFamily="Arial" FontSize="14" />
+                <TextBlock Text="{Binding Source={x:Static localApp:App.Localization}, Converter={StaticResource Translate}, ConverterParameter=Metadata_Field_Slug}" Foreground="{DynamicResource MaterialDesignBody}" FontFamily="Arial" FontSize="14" />
                 <TextBox Text="{Binding Slug, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" Height="32" Margin="0 4 0 10" FontFamily="Arial" FontSize="14" />
 
-                <TextBlock Text="{Binding Source={x:Static localApp:App.Localization}, Converter={StaticResource Translate}, ConverterParameter=Metadata_Field_Tags}" Foreground="#2d2d2d" FontFamily="Arial" FontSize="14" />
+                <TextBlock Text="{Binding Source={x:Static localApp:App.Localization}, Converter={StaticResource Translate}, ConverterParameter=Metadata_Field_Tags}" Foreground="{DynamicResource MaterialDesignBody}" FontFamily="Arial" FontSize="14" />
                 <TextBox Text="{Binding Tags, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" Height="32" Margin="0 4 0 2" FontFamily="Arial" FontSize="14" />
-                <TextBlock Text="{Binding Source={x:Static localApp:App.Localization}, Converter={StaticResource Translate}, ConverterParameter=Metadata_Field_Tags_Hint}" Foreground="#666666" FontFamily="Arial" FontSize="12" Margin="0 0 0 10" />
+                <TextBlock Text="{Binding Source={x:Static localApp:App.Localization}, Converter={StaticResource Translate}, ConverterParameter=Metadata_Field_Tags_Hint}" Foreground="{DynamicResource MaterialDesignBody}" FontFamily="Arial" FontSize="12" Margin="0 0 0 10" />
 
-                <TextBlock Text="{Binding Source={x:Static localApp:App.Localization}, Converter={StaticResource Translate}, ConverterParameter=Metadata_Field_PublishDate}" Foreground="#2d2d2d" FontFamily="Arial" FontSize="14" />
+                <TextBlock Text="{Binding Source={x:Static localApp:App.Localization}, Converter={StaticResource Translate}, ConverterParameter=Metadata_Field_PublishDate}" Foreground="{DynamicResource MaterialDesignBody}" FontFamily="Arial" FontSize="14" />
                 <DatePicker SelectedDate="{Binding PublishDate, Mode=TwoWay}" Height="32" Margin="0 4 0 0" FontFamily="Arial" FontSize="14" />
             </StackPanel>
 
