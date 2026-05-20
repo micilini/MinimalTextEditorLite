@@ -7,7 +7,7 @@
              xmlns:localApp="clr-namespace:MinimalTextEditorLite.App"
              mc:Ignorable="d"
              d:DesignHeight="450" d:DesignWidth="800">
-    <Menu DockPanel.Dock="Top" Background="#ecf0f1" FontSize="14" Padding="12 5 5 5">
+    <Menu DockPanel.Dock="Top" Background="{DynamicResource MaterialDesignPaper}" FontSize="14" Padding="12 5 5 5">
 
         <Menu.Resources>
             <Style TargetType="MenuItem"

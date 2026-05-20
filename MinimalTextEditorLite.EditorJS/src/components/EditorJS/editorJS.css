@@ -43,3 +43,104 @@ body, html{
 #editorjs{
     margin-top:10px;
 }
+
+body.mte-theme-light {
+    background: #ffffff;
+    color: #2d2d2d;
+}
+
+body.mte-theme-dark {
+    background: #1e1e1e;
+    color: #f0f0f0;
+}
+
+body.mte-theme-dark .mte-block {
+    background: #1e1e1e;
+    color: #f0f0f0;
+}
+
+body.mte-theme-dark #editorjs {
+    background: #1e1e1e;
+    color: #f0f0f0;
+}
+
+body.mte-theme-dark .ce-block__content,
+body.mte-theme-dark .ce-toolbar__content {
+    color: #f0f0f0;
+}
+
+body.mte-theme-dark .ce-paragraph,
+body.mte-theme-dark .ce-paragraph[contenteditable],
+body.mte-theme-dark .ce-header,
+body.mte-theme-dark .cdx-block {
+    color: #f0f0f0;
+}
+
+body.mte-theme-dark .ce-toolbar__plus,
+body.mte-theme-dark .ce-toolbar__settings-btn,
+body.mte-theme-dark .ce-inline-toolbar,
+body.mte-theme-dark .ce-conversion-toolbar,
+body.mte-theme-dark .ce-settings,
+body.mte-theme-dark .ce-popover {
+    background: #2a2a2a;
+    color: #f0f0f0;
+    border-color: #444;
+}
+
+body.mte-theme-dark .ce-popover-item,
+body.mte-theme-dark .ce-conversion-tool,
+body.mte-theme-dark .ce-settings__button {
+    color: #f0f0f0;
+}
+
+body.mte-theme-dark .ce-popover-item:hover,
+body.mte-theme-dark .ce-conversion-tool:hover,
+body.mte-theme-dark .ce-settings__button:hover,
+body.mte-theme-dark .ce-toolbar__plus:hover,
+body.mte-theme-dark .ce-toolbar__settings-btn:hover {
+    background: #3a3a3a;
+}
+
+body.mte-theme-dark .ce-inline-tool {
+    color: #f0f0f0;
+}
+
+body.mte-theme-dark .ce-inline-tool:hover,
+body.mte-theme-dark .ce-inline-tool--active {
+    background: #3a3a3a;
+}
+
+body.mte-theme-dark .cdx-input {
+    background: #252525;
+    color: #f0f0f0;
+    border-color: #444;
+}
+
+body.mte-theme-dark code,
+body.mte-theme-dark .ce-code__textarea {
+    background: #252525;
+    color: #f5b042;
+    border-color: #444;
+}
+
+body.mte-theme-dark .cdx-quote__text,
+body.mte-theme-dark .cdx-quote__caption,
+body.mte-theme-dark .cdx-warning__title,
+body.mte-theme-dark .cdx-warning__message {
+    background: #252525;
+    color: #f0f0f0;
+    border-color: #444;
+}
+
+body.mte-theme-dark .tc-table,
+body.mte-theme-dark .tc-row,
+body.mte-theme-dark .tc-cell {
+    background: #252525;
+    color: #f0f0f0;
+    border-color: #444;
+}
+
+body.mte-theme-dark ::selection {
+    background: #3f6fd8;
+    color: #ffffff;
+}

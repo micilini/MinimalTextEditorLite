@@ -24,11 +24,11 @@
                 <WrapPanel>
                     <Image RenderOptions.BitmapScalingMode="HighQuality" Source="pack://application:,,,/Assets/Images/logo-mte.png" HorizontalAlignment="Left" Width="47" Height="47"></Image>
                     <TextBlock Text="Minimal Text Editor" FontSize="30" FontWeight="Bold" FontFamily="Arial" HorizontalAlignment="Left" VerticalAlignment="Center" Margin="15 0 0 0"></TextBlock>
-                    <TextBlock Text="{Binding Source={x:Static localApp:App.Localization}, Converter={StaticResource Translate}, ConverterParameter=Splash_Screen_Lite}" FontSize="22" FontWeight="Bold" FontFamily="Arial" HorizontalAlignment="Left" Foreground="#2c3e50" VerticalAlignment="Center" Margin="63 -10 0 0"></TextBlock>
-                    <TextBlock Text="{Binding Source={x:Static localApp:App.Localization}, Converter={StaticResource Translate}, ConverterParameter=Splash_Screen_Description}" FontFamily="Arial" HorizontalAlignment="Right" TextWrapping="Wrap" FontSize="15" FontWeight="Regular" Height="40" Margin="65 10 0 0"></TextBlock>
+                    <TextBlock Text="{Binding Source={x:Static localApp:App.Localization}, Converter={StaticResource Translate}, ConverterParameter=Splash_Screen_Lite}" FontSize="22" FontWeight="Bold" FontFamily="Arial" HorizontalAlignment="Left" Foreground="{DynamicResource MaterialDesignBody}" VerticalAlignment="Center" Margin="63 -10 0 0"></TextBlock>
+                    <TextBlock Text="{Binding Source={x:Static localApp:App.Localization}, Converter={StaticResource Translate}, ConverterParameter=Splash_Screen_Description}" Foreground="{DynamicResource MaterialDesignBody}" FontFamily="Arial" HorizontalAlignment="Right" TextWrapping="Wrap" FontSize="15" FontWeight="Regular" Height="40" Margin="65 10 0 0"></TextBlock>
                 </WrapPanel>
 
-                <TextBlock Text="{Binding Source={x:Static localApp:App.Localization}, Converter={StaticResource Translate}, ConverterParameter=Splash_Screen_Loading_Message}" FontSize="11.9" FontFamily="Arial" FontWeight="Light" HorizontalAlignment="Left" Margin="0 30 0 8"></TextBlock>
+                <TextBlock Text="{Binding Source={x:Static localApp:App.Localization}, Converter={StaticResource Translate}, ConverterParameter=Splash_Screen_Loading_Message}" Foreground="{DynamicResource MaterialDesignBody}" FontSize="11.9" FontFamily="Arial" FontWeight="Light" HorizontalAlignment="Left" Margin="0 30 0 8"></TextBlock>
 
                 <ProgressBar Name="progressBar" Value="{Binding ProgressValue}" Height="8" Width="300" IsIndeterminate="True" BorderBrush="{x:Null}" HorizontalAlignment="Left" Style="{DynamicResource MaterialDesignLinearProgressBar}" Foreground="#1163E7" Background="#3B8BFF" />
             </StackPanel> 

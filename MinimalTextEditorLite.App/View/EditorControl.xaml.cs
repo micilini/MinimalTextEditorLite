@@ -30,6 +30,11 @@ public partial class EditorControl : UserControl
         EditorControlVM.SaveContentDebounced();
     }
 
+    public void SendThemeToEditor(string? themeName)
+    {
+        EditorControlVM.SendThemeToEditor(themeName);
+    }
+
     public void DoAction(string action)
     {
         EditorControlVM.DoAction(action);

@@ -23,15 +23,15 @@
                     <RowDefinition Height="30" />
                 </Grid.RowDefinitions>
 
-                <materialDesign:ColorZone Grid.Row="0" Height="Auto" Background="#ecf0f1" VerticalAlignment="Stretch" HorizontalAlignment="Stretch" materialDesign:ShadowAssist.ShadowDepth="Depth0">
+                <materialDesign:ColorZone Grid.Row="0" Height="Auto" Background="{DynamicResource MaterialDesignPaper}" VerticalAlignment="Stretch" HorizontalAlignment="Stretch" materialDesign:ShadowAssist.ShadowDepth="Depth0">
                     <ContentControl Content="{Binding HeaderContent}" />
                 </materialDesign:ColorZone>
 
-                <materialDesign:ColorZone Grid.Row="1" Height="Auto" Background="White" VerticalAlignment="Stretch" HorizontalAlignment="Stretch">
+                <materialDesign:ColorZone Grid.Row="1" Height="Auto" Background="{DynamicResource MaterialDesignPaper}" VerticalAlignment="Stretch" HorizontalAlignment="Stretch">
                     <ContentControl Content="{Binding MainContent}" />
                 </materialDesign:ColorZone>
 
-                <materialDesign:ColorZone Grid.Row="2" Height="30" Background="White" VerticalAlignment="Stretch" HorizontalAlignment="Stretch" BorderBrush="{x:Null}">
+                <materialDesign:ColorZone Grid.Row="2" Height="30" Background="{DynamicResource MaterialDesignPaper}" VerticalAlignment="Stretch" HorizontalAlignment="Stretch" BorderBrush="{x:Null}">
                     <TextBlock Text="{Binding LastSaveTextBlock, Mode=TwoWay}"
                        FontFamily="Arial" 
                        FontSize="12" 

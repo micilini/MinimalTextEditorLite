@@ -22,7 +22,7 @@ public sealed class StartupAppConfiguration(
         connection.CreateTable<AppVersion>();
         connection.CreateTable<SettingsModel>();
         connection.CreateTable<NoteModel>();
-        EnsureV6Columns(connection);
+        EnsureV2Columns(connection);
 
         if (!connection.Table<AppVersion>().Any())
             connection.Insert(new AppVersion());
@@ -42,7 +42,7 @@ public sealed class StartupAppConfiguration(
         };
     }
 
-    private static void EnsureV6Columns(SQLite.SQLiteConnection connection)
+    private static void EnsureV2Columns(SQLite.SQLiteConnection connection)
     {
         AddColumnIfMissing(connection, "Note", "Title", "Title TEXT");
         AddColumnIfMissing(connection, "Note", "Slug", "Slug TEXT");
@@ -50,6 +50,7 @@ public sealed class StartupAppConfiguration(
         AddColumnIfMissing(connection, "Note", "PublishDate", "PublishDate TEXT");
 
         AddColumnIfMissing(connection, "Settings", "ExportFrontMatterYaml", "ExportFrontMatterYaml INTEGER NOT NULL DEFAULT 1");
+        AddColumnIfMissing(connection, "Settings", "Theme", "Theme TEXT NOT NULL DEFAULT 'light'");
     }
 
     private static void AddColumnIfMissing(SQLite.SQLiteConnection connection, string tableName, string columnName, string columnDefinition)
