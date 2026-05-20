@@ -50,15 +50,15 @@
             </Grid>
 
             <Border Grid.Row="0" Style="{StaticResource MTE.Divider}"
-                    VerticalAlignment="Bottom" Margin="28 0 28 0" />
+                    VerticalAlignment="Bottom" Margin="36 0 36 0" />
 
             <!-- ===== Body (scrollable) ===== -->
             <ScrollViewer Grid.Row="1"
                           VerticalScrollBarVisibility="Auto"
                           HorizontalScrollBarVisibility="Disabled"
-                          Padding="28 16 28 8">
+                          Padding="0">
 
-                <StackPanel>
+                <StackPanel Margin="36 18 36 10">
 
                     <!-- Auto-save -->
                     <TextBlock Text="{Binding Source={x:Static localApp:App.Localization}, Converter={StaticResource Translate}, ConverterParameter=Modal_Settings_AutoSave}"
@@ -179,9 +179,9 @@
 
             <!-- ===== Footer ===== -->
             <Border Grid.Row="2" Style="{StaticResource MTE.Divider}"
-                    VerticalAlignment="Top" Margin="28 0 28 0" />
+                    VerticalAlignment="Top" Margin="36 0 36 0" />
 
-            <Grid Grid.Row="2" Margin="28 16 28 22">
+            <Grid Grid.Row="2" Margin="36 16 36 22">
                 <Button Content="{Binding Source={x:Static localApp:App.Localization}, Converter={StaticResource Translate}, ConverterParameter=Button_Close}"
                         Command="{Binding CancelCommand}"
                         Style="{StaticResource MTE.Button.Danger}"
