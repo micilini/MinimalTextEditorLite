@@ -12,32 +12,12 @@ import InlineCode from '@editorjs/inline-code';
 import LinkTool from '@editorjs/link';
 import Embed from '@editorjs/embed';
 import Table from '@editorjs/table';
-import SimpleImage from '@editorjs/simple-image';
 import Undo from 'editorjs-undo';
+import MteImageTool from './tools/MteImageTool';
 
 import './editorJS.css';
 
 const DEBOUNCE_MS = 400;
-const MAX_IMAGE_BYTES = 50 * 1024 * 1024;
-
-const ALLOWED_IMAGE_TYPES = new Set([
-  'image/png',
-  'image/jpeg',
-  'image/gif',
-  'image/webp',
-  'image/svg+xml',
-]);
-
-const IMAGE_MIME_BY_EXTENSION = {
-  '.png': 'image/png',
-  '.jpg': 'image/jpeg',
-  '.jpeg': 'image/jpeg',
-  '.gif': 'image/gif',
-  '.webp': 'image/webp',
-  '.svg': 'image/svg+xml',
-};
-
-const IMAGE_NORMALIZATION_FEATURES = 'normalizeDataImageUrl|getMimeTypeFromFileName|arrayBufferToBase64';
 
 function normalizeDocument(data) {
   if (!data) {
@@ -67,234 +47,6 @@ function postToHost(message) {
   }
 }
 
-function getFileExtension(fileName) {
-  if (!fileName || typeof fileName !== 'string') {
-    return '';
-  }
-
-  const lastDotIndex = fileName.lastIndexOf('.');
-
-  if (lastDotIndex < 0) {
-    return '';
-  }
-
-  return fileName.slice(lastDotIndex).toLowerCase();
-}
-
-function getMimeTypeFromFileName(fileName) {
-  const extension = getFileExtension(fileName);
-  return IMAGE_MIME_BY_EXTENSION[extension] || '';
-}
-
-function getMimeTypeFromFile(file) {
-  if (!file) {
-    return '';
-  }
-
-  if (file.type && ALLOWED_IMAGE_TYPES.has(file.type)) {
-    return file.type;
-  }
-
-  return getMimeTypeFromFileName(file.name);
-}
-
-function isSupportedImageFile(file) {
-  const mimeType = getMimeTypeFromFile(file);
-  return Boolean(file && mimeType && file.size <= MAX_IMAGE_BYTES);
-}
-
-function arrayBufferToBase64(buffer) {
-  const bytes = new Uint8Array(buffer);
-  const chunkSize = 0x8000;
-  let binary = '';
-
-  for (let index = 0; index < bytes.length; index += chunkSize) {
-    const chunk = bytes.subarray(index, index + chunkSize);
-    binary += String.fromCharCode.apply(null, chunk);
-  }
-
-  return btoa(binary);
-}
-
-function readFileAsDataUrl(file) {
-  return new Promise((resolve, reject) => {
-    const mimeType = getMimeTypeFromFile(file);
-
-    if (!mimeType) {
-      reject(new Error('Unsupported image type.'));
-      return;
-    }
-
-    const reader = new FileReader();
-
-    reader.onload = () => {
-      try {
-        const base64 = arrayBufferToBase64(reader.result);
-        resolve(`data:${mimeType};base64,${base64}`);
-      } catch (error) {
-        reject(error);
-      }
-    };
-
-    reader.onerror = () => reject(reader.error || new Error('Could not read image file.'));
-
-    reader.readAsArrayBuffer(file);
-  });
-}
-
-async function insertImageFile(editor, file) {
-  if (!isSupportedImageFile(file)) {
-    postToHost({
-      event: 'editorError',
-      data: {
-        action: 'insertImage',
-        message: 'Unsupported image file or image is too large.',
-      },
-    });
-
-    return false;
-  }
-
-  const dataUrl = await readFileAsDataUrl(file);
-
-  await editor.isReady;
-
-  editor.blocks.insert('image', {
-    url: dataUrl,
-    caption: file.name || '',
-  });
-
-  return true;
-}
-
-function getImageFilesFromDataTransfer(dataTransfer) {
-  if (!dataTransfer) {
-    return [];
-  }
-
-  const filesFromList = Array.from(dataTransfer.files || []);
-
-  const filesFromItems = Array.from(dataTransfer.items || [])
-    .filter((item) => item.kind === 'file')
-    .map((item) => item.getAsFile())
-    .filter(Boolean);
-
-  const allFiles = [...filesFromList, ...filesFromItems];
-  const uniqueFiles = [];
-  const seen = new Set();
-
-  for (const file of allFiles) {
-    const key = `${file.name || ''}:${file.size || 0}:${file.lastModified || 0}`;
-
-    if (seen.has(key)) {
-      continue;
-    }
-
-    seen.add(key);
-    uniqueFiles.push(file);
-  }
-
-  return uniqueFiles.filter(isSupportedImageFile);
-}
-
-async function blobUrlToDataUrl(url) {
-  const response = await fetch(url);
-  const blob = await response.blob();
-
-  return await new Promise((resolve, reject) => {
-    const reader = new FileReader();
-    reader.onload = () => resolve(reader.result);
-    reader.onerror = () => reject(reader.error || new Error('Could not read blob image.'));
-    reader.readAsDataURL(blob);
-  });
-}
-
-function normalizeDataImageUrl(url, fallbackFileName) {
-  if (!url || typeof url !== 'string') {
-    return url;
-  }
-
-  if (!url.startsWith('data:')) {
-    return url;
-  }
-
-  const commaIndex = url.indexOf(',');
-
-  if (commaIndex < 0) {
-    return url;
-  }
-
-  const metadata = url.slice(0, commaIndex);
-  const payload = url.slice(commaIndex + 1);
-
-  const hasBase64 = metadata
-    .split(';')
-    .some((part) => part.toLowerCase() === 'base64');
-
-  if (!hasBase64) {
-    return url;
-  }
-
-  const isMissingMime =
-    metadata.toLowerCase() === 'data:;base64' ||
-    metadata.toLowerCase() === 'data:application/octet-stream;base64';
-
-  if (!isMissingMime) {
-    return url;
-  }
-
-  const mimeType = getMimeTypeFromFileName(fallbackFileName);
-
-  if (!mimeType) {
-    return url;
-  }
-
-  return `data:${mimeType};base64,${payload}`;
-}
-
-async function normalizeImagesBeforePost(document) {
-  const normalizedBlocks = [];
-
-  for (const block of document.blocks || []) {
-    if (block.type !== 'image') {
-      normalizedBlocks.push(block);
-      continue;
-    }
-
-    const url = block.data?.url || '';
-    const caption = block.data?.caption || '';
-
-    if (url.startsWith('blob:')) {
-      try {
-        const dataUrl = await blobUrlToDataUrl(url);
-        normalizedBlocks.push({
-          ...block,
-          data: {
-            ...block.data,
-            url: normalizeDataImageUrl(dataUrl, caption),
-          },
-        });
-        continue;
-      } catch (error) {
-        console.log('[MTEBridge] Could not convert blob image:', error);
-      }
-    }
-
-    normalizedBlocks.push({
-      ...block,
-      data: {
-        ...block.data,
-        url: normalizeDataImageUrl(url, caption),
-      },
-    });
-  }
-
-  return {
-    ...document,
-    blocks: normalizedBlocks,
-  };
-}
-
 const EditorJSComponent = () => {
   const editorInstance = useRef(null);
   const saveTimer = useRef(null);
@@ -310,7 +62,9 @@ const EditorJSComponent = () => {
           config: { placeholder: 'Header' },
           shortcut: 'CMD+SHIFT+H',
         },
-        image: SimpleImage,
+        image: {
+          class: MteImageTool,
+        },
         list: { class: List, inlineToolbar: true, shortcut: 'CMD+SHIFT+L' },
         checklist: { class: Checklist, inlineToolbar: true },
         quote: {
@@ -355,8 +109,7 @@ const EditorJSComponent = () => {
       try {
         await editorInstance.current.isReady;
         const outputData = await editorInstance.current.save();
-        const normalizedOutputData = await normalizeImagesBeforePost(outputData);
-        postToHost(normalizedOutputData);
+        postToHost(outputData);
       } catch (error) {
         console.log('[MTEBridge] Error on saving:', error);
         postToHost({
@@ -439,83 +192,6 @@ const EditorJSComponent = () => {
       };
     }
 
-    async function handleImageDrop(event) {
-      const imageFiles = getImageFilesFromDataTransfer(event.dataTransfer);
-
-      if (imageFiles.length === 0) {
-        return;
-      }
-
-      stopImageEvent(event);
-
-      try {
-        for (const file of imageFiles) {
-          await insertImageFile(editor, file);
-        }
-
-        saveDebounced();
-      } catch (error) {
-        console.log('[MTEBridge] Error inserting dropped image:', error);
-        postToHost({
-          event: 'editorError',
-          data: {
-            action: 'dropImage',
-            message: String(error && error.message ? error.message : error),
-          },
-        });
-      }
-    }
-
-    async function handleImagePaste(event) {
-      const items = Array.from(event.clipboardData?.items || []);
-      const imageFiles = items
-        .filter((item) => item.kind === 'file')
-        .map((item) => item.getAsFile())
-        .filter(isSupportedImageFile);
-
-      if (imageFiles.length === 0) {
-        return;
-      }
-
-      stopImageEvent(event);
-
-      try {
-        for (const file of imageFiles) {
-          await insertImageFile(editor, file);
-        }
-
-        saveDebounced();
-      } catch (error) {
-        console.log('[MTEBridge] Error inserting pasted image:', error);
-        postToHost({
-          event: 'editorError',
-          data: {
-            action: 'pasteImage',
-            message: String(error && error.message ? error.message : error),
-          },
-        });
-      }
-    }
-
-    function stopImageEvent(event) {
-      event.preventDefault();
-      event.stopPropagation();
-
-      if (typeof event.stopImmediatePropagation === 'function') {
-        event.stopImmediatePropagation();
-      }
-    }
-
-    function handleImageDragOver(event) {
-      const imageFiles = getImageFilesFromDataTransfer(event.dataTransfer);
-
-      if (imageFiles.length === 0) {
-        return;
-      }
-
-      stopImageEvent(event);
-    }
-
     window.MTEBridge = {
       version: '2.0.0-react',
 
@@ -531,6 +207,25 @@ const EditorJSComponent = () => {
       clear,
       setTheme,
       getStats,
+      insertImage: async (data) => {
+        if (!editorInstance.current) {
+          return;
+        }
+
+        await editorInstance.current.isReady;
+
+        editorInstance.current.blocks.insert('image', {
+          url: data?.url || '',
+          caption: data?.caption || '',
+          width: data?.width || null,
+          height: data?.height || null,
+          fileName: data?.fileName || data?.caption || '',
+          mimeType: data?.mimeType || '',
+          size: data?.size || null,
+        });
+
+        saveDebounced();
+      },
     };
 
     window.handleSave = () => window.MTEBridge.save();
@@ -565,6 +260,10 @@ const EditorJSComponent = () => {
           window.MTEBridge.setTheme(msg.data);
           break;
 
+        case 'insertImage':
+          window.MTEBridge.insertImage(msg.data);
+          break;
+
         case 'getStats':
           postToHost({
             event: 'stats',
@@ -585,17 +284,11 @@ const EditorJSComponent = () => {
         event: 'bridgeReady',
         data: {
           version: window.MTEBridge.version,
-          imageNormalization: IMAGE_NORMALIZATION_FEATURES,
+          imageTool: 'MteImageTool',
+          imageNormalization: 'mte-custom-image-tool-v1',
         },
       });
     }
-
-    window.addEventListener('dragover', handleImageDragOver, true);
-    window.addEventListener('drop', handleImageDrop, true);
-    window.addEventListener('paste', handleImagePaste, true);
-    document.addEventListener('dragover', handleImageDragOver, true);
-    document.addEventListener('drop', handleImageDrop, true);
-    document.addEventListener('paste', handleImagePaste, true);
 
     return () => {
       if (saveTimer.current) {
@@ -605,13 +298,6 @@ const EditorJSComponent = () => {
       if (window.chrome && window.chrome.webview) {
         window.chrome.webview.removeEventListener('message', handleHostMessage);
       }
-
-      window.removeEventListener('dragover', handleImageDragOver, true);
-      window.removeEventListener('drop', handleImageDrop, true);
-      window.removeEventListener('paste', handleImagePaste, true);
-      document.removeEventListener('dragover', handleImageDragOver, true);
-      document.removeEventListener('drop', handleImageDrop, true);
-      document.removeEventListener('paste', handleImagePaste, true);
 
       delete window.MTEBridge;
       delete window.handleSave;

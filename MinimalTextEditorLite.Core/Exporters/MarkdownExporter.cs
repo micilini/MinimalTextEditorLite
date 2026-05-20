@@ -168,7 +168,7 @@ public sealed class MarkdownExporter : IExporter, IMarkdownAssetExporter
             {
                 var data = block.Data.Deserialize<EditorJsImageData>(EditorJsJson.Options);
                 var caption = ConvertInline(data?.Caption);
-                var imageUrl = ResolveImageUrlForMarkdown(data?.Url, assetContext);
+                var imageUrl = ResolveImageUrlForMarkdown(data, assetContext);
                 AppendSeparated(builder, $"![{caption}]({imageUrl})");
                 break;
             }
@@ -277,8 +277,10 @@ public sealed class MarkdownExporter : IExporter, IMarkdownAssetExporter
         return needsQuotes ? $"\"{trimmed.Replace("\"", "\\\"")}\"" : trimmed;
     }
 
-    private string ResolveImageUrlForMarkdown(string? url, MarkdownAssetContext? assetContext)
+    private string ResolveImageUrlForMarkdown(EditorJsImageData? data, MarkdownAssetContext? assetContext)
     {
+        var url = data?.Url;
+
         if (string.IsNullOrWhiteSpace(url))
             return string.Empty;
 
@@ -295,7 +297,7 @@ public sealed class MarkdownExporter : IExporter, IMarkdownAssetExporter
             return url;
 
         var extension = GetExtensionFromMimeType(mimeType);
-        var fileName = $"image-{assetContext.NextIndex():000}{extension}";
+        var fileName = GetSafeAssetFileName(data?.FileName, assetContext.NextIndex(), extension);
         var filePath = Path.Combine(assetContext.AssetsDirectoryPath, fileName);
 
         File.WriteAllBytes(filePath, bytes);
@@ -346,6 +348,32 @@ public sealed class MarkdownExporter : IExporter, IMarkdownAssetExporter
             "image/svg+xml" => ".svg",
             _ => ".img"
         };
+    }
+
+    private static string GetSafeAssetFileName(string? originalFileName, int index, string extension)
+    {
+        var fallback = $"image-{index:000}{extension}";
+
+        if (string.IsNullOrWhiteSpace(originalFileName))
+            return fallback;
+
+        var nameWithoutExtension = Path.GetFileNameWithoutExtension(originalFileName);
+        var originalExtension = Path.GetExtension(originalFileName);
+
+        var finalExtension = string.IsNullOrWhiteSpace(originalExtension)
+            ? extension
+            : originalExtension;
+
+        var invalidChars = Path.GetInvalidFileNameChars();
+        var safeName = new string(nameWithoutExtension
+            .Select(ch => invalidChars.Contains(ch) ? '-' : ch)
+            .ToArray())
+            .Trim('-', ' ', '.');
+
+        if (string.IsNullOrWhiteSpace(safeName))
+            return fallback;
+
+        return $"{index:000}-{safeName}{finalExtension}";
     }
 
     private static string GetSafeBaseFileName(NoteModel note)

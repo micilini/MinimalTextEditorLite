@@ -15,7 +15,6 @@
     "@editorjs/list": "^1.10.0",
     "@editorjs/marker": "^1.4.0",
     "@editorjs/quote": "^2.7.2",
-    "@editorjs/simple-image": "^1.6.0",
     "@editorjs/table": "^2.4.2",
     "@editorjs/warning": "^1.4.0",
     "@testing-library/jest-dom": "^5.17.0",

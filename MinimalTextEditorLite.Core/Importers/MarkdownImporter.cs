@@ -119,7 +119,10 @@ public sealed class MarkdownImporter : IImporter
             blocks.Add(CreateBlock("image", new EditorJsImageData
             {
                 Url = image.Url,
-                Caption = image.Caption
+                Caption = image.Caption,
+                FileName = image.FileName,
+                MimeType = image.MimeType,
+                Size = image.Size
             }));
             return;
         }
@@ -289,39 +292,38 @@ public sealed class MarkdownImporter : IImporter
 
         var originalUrl = image.Url ?? string.Empty;
         var caption = GetPlainText(image);
-        var resolvedUrl = ResolveMarkdownImageUrl(originalUrl, markdownDirectory);
-        imageSource = new MarkdownImageSource(resolvedUrl, caption);
+        imageSource = ResolveMarkdownImageUrl(originalUrl, markdownDirectory, caption);
         return true;
     }
 
-    private static string ResolveMarkdownImageUrl(string url, string markdownDirectory)
+    private static MarkdownImageSource ResolveMarkdownImageUrl(string url, string markdownDirectory, string caption)
     {
         if (string.IsNullOrWhiteSpace(url))
-            return url;
+            return new MarkdownImageSource(url, caption);
 
         if (url.StartsWith("data:image/", StringComparison.OrdinalIgnoreCase))
-            return url;
+            return new MarkdownImageSource(url, caption, MimeType: TryGetDataImageMimeType(url));
 
         if (Path.IsPathRooted(url))
-            return TryConvertLocalImageToDataUrl(url) ?? url;
+            return TryConvertLocalImageToDataUrl(url, caption) ?? new MarkdownImageSource(url, caption);
 
         if (Uri.TryCreate(url, UriKind.Absolute, out var absoluteUri))
         {
             if (absoluteUri.Scheme is "http" or "https")
-                return url;
+                return new MarkdownImageSource(url, caption);
 
             if (absoluteUri.Scheme.Equals("file", StringComparison.OrdinalIgnoreCase))
-                return TryConvertLocalImageToDataUrl(absoluteUri.LocalPath) ?? url;
+                return TryConvertLocalImageToDataUrl(absoluteUri.LocalPath, caption) ?? new MarkdownImageSource(url, caption);
 
-            return url;
+            return new MarkdownImageSource(url, caption);
         }
 
         var localPath = Path.GetFullPath(Path.Combine(markdownDirectory, url.Replace('/', Path.DirectorySeparatorChar)));
 
-        return TryConvertLocalImageToDataUrl(localPath) ?? url;
+        return TryConvertLocalImageToDataUrl(localPath, caption) ?? new MarkdownImageSource(url, caption);
     }
 
-    private static string? TryConvertLocalImageToDataUrl(string path)
+    private static MarkdownImageSource? TryConvertLocalImageToDataUrl(string path, string caption)
     {
         try
         {
@@ -337,12 +339,34 @@ public sealed class MarkdownImporter : IImporter
                 return null;
 
             var bytes = File.ReadAllBytes(path);
-            return $"data:{mimeType};base64,{Convert.ToBase64String(bytes)}";
+            return new MarkdownImageSource(
+                $"data:{mimeType};base64,{Convert.ToBase64String(bytes)}",
+                caption,
+                Path.GetFileName(path),
+                mimeType,
+                info.Length);
         }
         catch
         {
             return null;
         }
+    }
+
+    private static string? TryGetDataImageMimeType(string url)
+    {
+        var commaIndex = url.IndexOf(',');
+        if (commaIndex <= 0)
+            return null;
+
+        var metadata = url[..commaIndex];
+        if (!metadata.StartsWith("data:", StringComparison.OrdinalIgnoreCase))
+            return null;
+
+        var semicolonIndex = metadata.IndexOf(';');
+        if (semicolonIndex <= "data:".Length)
+            return null;
+
+        return metadata["data:".Length..semicolonIndex];
     }
 
     private static string GetPlainText(ContainerInline inline)
@@ -452,5 +476,10 @@ public sealed class MarkdownImporter : IImporter
                 .Select(tag => tag.Trim('"')));
     }
 
-    private sealed record MarkdownImageSource(string Url, string Caption);
+    private sealed record MarkdownImageSource(
+        string Url,
+        string Caption,
+        string? FileName = null,
+        string? MimeType = null,
+        long? Size = null);
 }

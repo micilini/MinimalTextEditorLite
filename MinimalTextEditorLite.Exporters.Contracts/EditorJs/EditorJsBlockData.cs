@@ -79,4 +79,19 @@ public sealed class EditorJsImageData
 
     [JsonPropertyName("caption")]
     public string? Caption { get; set; }
+
+    [JsonPropertyName("width")]
+    public int? Width { get; set; }
+
+    [JsonPropertyName("height")]
+    public int? Height { get; set; }
+
+    [JsonPropertyName("fileName")]
+    public string? FileName { get; set; }
+
+    [JsonPropertyName("mimeType")]
+    public string? MimeType { get; set; }
+
+    [JsonPropertyName("size")]
+    public long? Size { get; set; }
 }

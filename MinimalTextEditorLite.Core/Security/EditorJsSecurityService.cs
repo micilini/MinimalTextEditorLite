@@ -236,6 +236,18 @@ public sealed class EditorJsSecurityService(
                 return CreateInvalidImagePlaceholder(block.Id, data.Caption, data.Url);
 
             data.Caption = htmlSanitizer.SanitizeInlineHtml(data.Caption);
+            data.FileName = htmlSanitizer.SanitizePlainText(data.FileName);
+            data.MimeType = htmlSanitizer.SanitizePlainText(data.MimeType);
+
+            if (data.Width <= 0)
+                data.Width = null;
+
+            if (data.Height <= 0)
+                data.Height = null;
+
+            if (data.Size <= 0)
+                data.Size = null;
+
             return CreateBlock(block.Id, "image", data);
         }
         catch (JsonException)
