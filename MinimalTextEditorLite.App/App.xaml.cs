@@ -3,6 +3,7 @@ using MinimalTextEditorLite.App.Helpers;
 using MinimalTextEditorLite.App.ViewModels;
 using MinimalTextEditorLite.Core.Database;
 using MinimalTextEditorLite.Core.Exporters;
+using MinimalTextEditorLite.Core.Importers;
 using MinimalTextEditorLite.Core.Models;
 using MinimalTextEditorLite.Core.Repositories;
 using MinimalTextEditorLite.Core.Security;
@@ -123,8 +124,12 @@ public partial class App : Application, INotifyPropertyChanged
         services.AddSingleton<EditorJsInlineHtmlSanitizer>();
         services.AddSingleton<IIsolatedTempFileService, IsolatedTempFileService>();
 
+        services.AddSingleton<IImporter, JsonImporter>();
+        services.AddSingleton<IImporter, MarkdownImporter>();
+
         services.AddSingleton<IExporter, JsonExporter>();
         services.AddSingleton<IExporter, HtmlExporter>();
+        services.AddSingleton<IExporter, MarkdownExporter>();
         services.AddSingleton<IExporter, DocExporter>();
         services.AddSingleton<IExporter, PdfExporter>();
 
@@ -133,6 +138,7 @@ public partial class App : Application, INotifyPropertyChanged
         services.AddTransient<EditorControlVM>();
         services.AddTransient<HeaderControlVM>();
         services.AddTransient<SettingsModalWindowVM>();
+        services.AddTransient<MetadataModalWindowVM>();
         services.AddTransient<GlobalModalsWindowVM>();
     }
 

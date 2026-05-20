@@ -15,8 +15,9 @@ public sealed class HtmlExporter : IExporter
     public string DefaultFileName => "Note.html";
     public string FileDialogFilter => "HTML Files (*.html)|*.html";
 
-    public Task<byte[]> ExportAsync(EditorJsDocument document)
+    public Task<byte[]> ExportAsync(ExportContext context)
     {
+        var document = context.Document;
         var htmlBuilder = new StringBuilder();
         htmlBuilder.Append("<!DOCTYPE html>");
         htmlBuilder.Append("<html lang='en'>");

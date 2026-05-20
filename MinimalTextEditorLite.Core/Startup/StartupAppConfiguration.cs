@@ -22,6 +22,7 @@ public sealed class StartupAppConfiguration(
         connection.CreateTable<AppVersion>();
         connection.CreateTable<SettingsModel>();
         connection.CreateTable<NoteModel>();
+        EnsureV6Columns(connection);
 
         if (!connection.Table<AppVersion>().Any())
             connection.Insert(new AppVersion());
@@ -39,5 +40,28 @@ public sealed class StartupAppConfiguration(
             Settings = settings,
             DatabaseAlreadyExisted = databaseAlreadyExisted
         };
+    }
+
+    private static void EnsureV6Columns(SQLite.SQLiteConnection connection)
+    {
+        AddColumnIfMissing(connection, "Note", "Title", "Title TEXT");
+        AddColumnIfMissing(connection, "Note", "Slug", "Slug TEXT");
+        AddColumnIfMissing(connection, "Note", "Tags", "Tags TEXT");
+        AddColumnIfMissing(connection, "Note", "PublishDate", "PublishDate TEXT");
+
+        AddColumnIfMissing(connection, "Settings", "ExportFrontMatterYaml", "ExportFrontMatterYaml INTEGER NOT NULL DEFAULT 1");
+    }
+
+    private static void AddColumnIfMissing(SQLite.SQLiteConnection connection, string tableName, string columnName, string columnDefinition)
+    {
+        var escapedTableName = tableName.Replace("'", "''");
+        var escapedColumnName = columnName.Replace("'", "''");
+
+        var exists = connection.ExecuteScalar<int>(
+            $"SELECT COUNT(*) FROM pragma_table_info('{escapedTableName}') WHERE name = ?",
+            escapedColumnName);
+
+        if (exists == 0)
+            connection.Execute($"ALTER TABLE {tableName} ADD COLUMN {columnDefinition}");
     }
 }

@@ -6,6 +6,7 @@ using MinimalTextEditorLite.App.View;
 using MinimalTextEditorLite.App.View.AboutModal;
 using MinimalTextEditorLite.App.View.Components;
 using MinimalTextEditorLite.App.View.ExportModal;
+using MinimalTextEditorLite.App.View.MetadataModal;
 using MinimalTextEditorLite.App.View.SettingsModal;
 using MinimalTextEditorLite.Core.Services;
 using System.IO;
@@ -225,7 +226,7 @@ public partial class MainScreenWindowVM : ObservableObject
 
         var openFileDialog = new OpenFileDialog
         {
-            Filter = "JSON Files (*.json)|*.json",
+            Filter = "Supported Files (*.json;*.md)|*.json;*.md|JSON Files (*.json)|*.json|Markdown Files (*.md)|*.md",
             DefaultExt = "json",
             Title = App.Localization.Translate("Title_Open_Note")
         };
@@ -307,6 +308,14 @@ public partial class MainScreenWindowVM : ObservableObject
         }
     }
 
+    public void OpenMetadataDialog()
+    {
+        AddToMainGrid();
+        var metadataModal = new MetadataModalWindow();
+        metadataModal.ShowDialog();
+        RemoveToMainGrid();
+    }
+
     public void SearchNote()
     {
         editorControl.DoAction("Search");
@@ -375,6 +384,9 @@ public partial class MainScreenWindowVM : ObservableObject
 
     [RelayCommand]
     private void ExportNote() => ExportNoteDialog();
+
+    [RelayCommand]
+    private void Metadata() => OpenMetadataDialog();
 
     [RelayCommand]
     private void Settings() => OpenSettingsDialog();

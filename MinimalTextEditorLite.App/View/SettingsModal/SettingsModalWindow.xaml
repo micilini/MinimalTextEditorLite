@@ -51,6 +51,10 @@
                         <ComboBoxItem Content="{Binding Source={x:Static localApp:App.Localization}, Converter={StaticResource Translate}, ConverterParameter=Modal_Settings_Language_Choice_1}" />
                     </ComboBox>
 
+                    <TextBlock Text="{Binding Source={x:Static localApp:App.Localization}, Converter={StaticResource Translate}, ConverterParameter=Modal_Settings_Markdown_Title}" Foreground="#2d2d2d" FontFamily="Arial" FontSize="18" Margin="0 20 0 0" />
+                    <TextBlock Text="{Binding Source={x:Static localApp:App.Localization}, Converter={StaticResource Translate}, ConverterParameter=Modal_Settings_Markdown_Description}" Foreground="#2d2d2d" FontFamily="Arial" FontSize="14" FontWeight="Regular" Padding="0" Margin="0 5 0 0" Height="Auto" TextWrapping="Wrap" />
+                    <CheckBox Content="{Binding Source={x:Static localApp:App.Localization}, Converter={StaticResource Translate}, ConverterParameter=Modal_Settings_Markdown_FrontMatter}" IsChecked="{Binding ExportFrontMatterYaml, Mode=TwoWay}" Margin="0 12 0 0" FontFamily="Arial" FontSize="14" />
+
                     <TextBlock Text="{Binding Source={x:Static localApp:App.Localization}, Converter={StaticResource Translate}, ConverterParameter=Modal_Settings_Backup_Title}" Foreground="#2d2d2d" FontFamily="Arial" FontSize="18" Margin="0 20 0 0" />
                     <TextBlock x:Name="BackupFilesInfo" Text="{Binding BackupFilesText, Mode=TwoWay}" TextWrapping="Wrap" Foreground="#2d2d2d" FontFamily="Arial" FontSize="14" Margin="0 6 0 0" />
 

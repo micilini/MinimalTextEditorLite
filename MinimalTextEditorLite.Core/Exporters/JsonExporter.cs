@@ -11,9 +11,9 @@ public sealed class JsonExporter : IExporter
     public string DefaultFileName => "Note.json";
     public string FileDialogFilter => "JSON Files (*.json)|*.json";
 
-    public Task<byte[]> ExportAsync(EditorJsDocument document)
+    public Task<byte[]> ExportAsync(ExportContext context)
     {
-        var json = JsonSerializer.Serialize(document, EditorJsJson.Options);
+        var json = JsonSerializer.Serialize(context.Document, EditorJsJson.Options);
         return Task.FromResult(Encoding.UTF8.GetBytes(json));
     }
 }

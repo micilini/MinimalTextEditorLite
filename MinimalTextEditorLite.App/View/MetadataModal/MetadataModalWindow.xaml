@@ -1,0 +1,53 @@
+<Window x:Class="MinimalTextEditorLite.App.View.MetadataModal.MetadataModalWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
+        xmlns:localApp="clr-namespace:MinimalTextEditorLite.App"
+        mc:Ignorable="d"
+        TextElement.Foreground="{DynamicResource MaterialDesignBody}"
+        Background="{x:Null}"
+        AllowsTransparency="true"
+        WindowStyle="None"
+        WindowStartupLocation="CenterScreen"
+        Title="MetadataModalWindow" Height="520" Width="665" Loaded="Window_Loaded">
+    <materialDesign:Card Background="{DynamicResource MaterialDesignPaper}" UniformCornerRadius="15" materialDesign:ShadowAssist.ShadowDepth="Depth4" Width="526" Height="400">
+        <Grid>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="70" />
+                <RowDefinition Height="250" />
+                <RowDefinition Height="80" />
+            </Grid.RowDefinitions>
+
+            <StackPanel Grid.Row="0">
+                <WrapPanel Margin="20">
+                    <Image RenderOptions.BitmapScalingMode="HighQuality" Source="pack://application:,,,/Assets/Images/editor-gear-icon-2.png" Width="30" Height="30" Margin="0 0 10 0" />
+                    <Label Content="{Binding Source={x:Static localApp:App.Localization}, Converter={StaticResource Translate}, ConverterParameter=Metadata_Title}" FontFamily="Arial" FontSize="22" FontWeight="Bold" />
+                </WrapPanel>
+            </StackPanel>
+
+            <StackPanel Grid.Row="1" Margin="20 5 20 10">
+                <TextBlock Text="{Binding Source={x:Static localApp:App.Localization}, Converter={StaticResource Translate}, ConverterParameter=Metadata_Field_Title}" Foreground="#2d2d2d" FontFamily="Arial" FontSize="14" />
+                <TextBox Text="{Binding Title, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" Height="32" Margin="0 4 0 10" FontFamily="Arial" FontSize="14" />
+
+                <TextBlock Text="{Binding Source={x:Static localApp:App.Localization}, Converter={StaticResource Translate}, ConverterParameter=Metadata_Field_Slug}" Foreground="#2d2d2d" FontFamily="Arial" FontSize="14" />
+                <TextBox Text="{Binding Slug, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" Height="32" Margin="0 4 0 10" FontFamily="Arial" FontSize="14" />
+
+                <TextBlock Text="{Binding Source={x:Static localApp:App.Localization}, Converter={StaticResource Translate}, ConverterParameter=Metadata_Field_Tags}" Foreground="#2d2d2d" FontFamily="Arial" FontSize="14" />
+                <TextBox Text="{Binding Tags, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" Height="32" Margin="0 4 0 2" FontFamily="Arial" FontSize="14" />
+                <TextBlock Text="{Binding Source={x:Static localApp:App.Localization}, Converter={StaticResource Translate}, ConverterParameter=Metadata_Field_Tags_Hint}" Foreground="#666666" FontFamily="Arial" FontSize="12" Margin="0 0 0 10" />
+
+                <TextBlock Text="{Binding Source={x:Static localApp:App.Localization}, Converter={StaticResource Translate}, ConverterParameter=Metadata_Field_PublishDate}" Foreground="#2d2d2d" FontFamily="Arial" FontSize="14" />
+                <DatePicker SelectedDate="{Binding PublishDate, Mode=TwoWay}" Height="32" Margin="0 4 0 0" FontFamily="Arial" FontSize="14" />
+            </StackPanel>
+
+            <StackPanel Grid.Row="2">
+                <WrapPanel Height="80" HorizontalAlignment="Right" VerticalAlignment="Center">
+                    <Button Content="{Binding Source={x:Static localApp:App.Localization}, Converter={StaticResource Translate}, ConverterParameter=Metadata_Save_Button}" Command="{Binding SaveCommand}" Style="{StaticResource MaterialDesignRaisedButton}" BorderBrush="{x:Null}" materialDesign:ShadowAssist.ShadowDepth="Depth0" HorizontalAlignment="Left" Foreground="White" Background="#3498db" materialDesign:ButtonAssist.CornerRadius="4" Width="100" Height="48" Margin="0 15 20 0" FontFamily="Arial" FontSize="16" FontWeight="Bold" />
+                    <Button Content="{Binding Source={x:Static localApp:App.Localization}, Converter={StaticResource Translate}, ConverterParameter=Button_Close}" Command="{Binding CloseCommand}" Style="{StaticResource MaterialDesignRaisedButton}" BorderBrush="{x:Null}" materialDesign:ShadowAssist.ShadowDepth="Depth0" HorizontalAlignment="Left" Foreground="White" Background="#e74c3c" materialDesign:ButtonAssist.CornerRadius="4" Width="100" Height="48" Margin="0 15 20 0" FontFamily="Arial" FontSize="16" FontWeight="Bold" />
+                </WrapPanel>
+            </StackPanel>
+        </Grid>
+    </materialDesign:Card>
+</Window>
