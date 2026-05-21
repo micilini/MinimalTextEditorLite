@@ -37,7 +37,7 @@ namespace MinimalTextEditorLite.Core.Models
                   "id": "mte-welcome-title",
                   "type": "header",
                   "data": {
-                    "text": "Minimal Text Editor Lite (V 2.2.0)",
+                    "text": "Minimal Text Editor Lite (V 2.2.1)",
                     "level": 2
                   }
                 },

@@ -33,7 +33,7 @@ public partial class App : Application, INotifyPropertyChanged
 
     public string DatabaseFileName { get; } = "mte-lite.dll";
 
-    public string ApplicationVersion { get; } = "2.2.0";
+    public string ApplicationVersion { get; } = "2.2.1";
 
     public string ApplicationIdentifier { get; set; } = string.Empty;
 

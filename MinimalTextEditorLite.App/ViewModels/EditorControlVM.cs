@@ -89,7 +89,10 @@ public partial class EditorControlVM : ObservableObject, IDisposable
 
         await DisableWebViewCacheSafeAsync();
 
-        var folderPath = Path.Combine(Directory.GetCurrentDirectory(), "EditorModules", "EditorJS");
+        var folderPath = Path.GetFullPath(Path.Combine(
+            AppContext.BaseDirectory,
+            "EditorModules",
+            "EditorJS"));
 
         if (!Directory.Exists(folderPath))
         {

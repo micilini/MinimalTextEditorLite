@@ -3,7 +3,7 @@
 </p>
 
 <h1 align="center">
-  Minimal Text Editor Lite For Windows (2.2.0)
+  Minimal Text Editor Lite For Windows (2.2.1)
 </h1>
 
 <p align="center">
@@ -66,6 +66,8 @@ The application stores notes locally, supports dark mode and Focus Mode, keeps r
 - Image support, including embedded base64 images.
 - Clipboard export support.
 - File association support for JSON and Markdown files.
+- Fixed first-launch path resolution for `EditorModules/EditorJS` after installation.
+- Publish output now explicitly includes EditorJS modules and language files.
 - No external exporter executables required since version 2.1.0.
 
 ## Supported Editor Blocks
@@ -153,6 +155,8 @@ The export pipeline is centered around `HtmlDocumentBuilder`, which converts the
 
 ## What Changed Since Version 2.0.0
 
+Version 2.2.1 fixes installed-app EditorJS path resolution and explicitly includes EditorJS modules and language files in publish output.
+
 Version 2.2.0 expands note metadata beyond Markdown. Metadata is now included in JSON exports, rendered in HTML/PDF/DOCX exports, and written into DOCX package properties where applicable.
 
 Version 2.1.0 removes the old external exporter binaries and replaces them with in-process C# export pipelines.
@@ -215,6 +219,10 @@ DOCX and PDF export are generated in-process. No external Python executables are
 - CommunityToolkit.Mvvm
 
 ## Version History
+
+### Version 2.2.1
+
+Patch release focused on installed-app reliability. This version fixes the EditorJS module path resolution used by the WPF/WebView2 editor, preventing the application from looking for `EditorModules/EditorJS` in the wrong working directory when launched by an installer or external process. The publish configuration now explicitly includes `EditorModules` and language files in the published output.
 
 ### Version 2.2.0
 
