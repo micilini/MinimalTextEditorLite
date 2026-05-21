@@ -25,10 +25,14 @@ public sealed class PdfExporter : IExporter
     {
         ArgumentNullException.ThrowIfNull(context);
 
+        var metadata = ExportMetadataHelper.FromNote(context.Note);
+
         var html = htmlBuilder.Build(context.Document, new HtmlBuildOptions
         {
             Variant = HtmlVariant.Print,
-            DocumentTitle = "Note Export"
+            DocumentTitle = ExportMetadataHelper.GetDocumentTitle(context.Note),
+            Metadata = metadata,
+            IncludeMetadataSummary = metadata.HasAnyValue
         });
 
         var options = new PdfRenderOptions

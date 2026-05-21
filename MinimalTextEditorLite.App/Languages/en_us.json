@@ -119,7 +119,7 @@
   "MenuItem_Header_Help": "Help",
   "MenuItem_Header_Help_About": "About This Application",
   "Metadata_Title": "Note Metadata",
-  "Metadata_Description": "Metadata is stored with the current note. It is currently used for Markdown front matter and Markdown asset export naming, and can be reused by future PDF, DOCX, and HTML metadata features.",
+  "Metadata_Description": "Metadata is stored with the current note and is now used across exports: JSON includes it as structured metadata, Markdown uses it as front matter, and HTML, PDF, and DOCX can show it in the exported document.",
   "Metadata_Field_Title": "Title",
   "Metadata_Field_Slug": "Slug",
   "Metadata_Field_Tags": "Tags",

@@ -1,4 +1,5 @@
 using Ganss.Xss;
+using MinimalTextEditorLite.Core.Models;
 using MinimalTextEditorLite.Exporters.Contracts.EditorJs;
 using System.Net;
 using System.Text;
@@ -22,11 +23,15 @@ public sealed class HtmlDocumentBuilder
         htmlBuilder.Append("<meta charset='UTF-8'>");
         htmlBuilder.Append("<meta name='viewport' content='width=device-width, initial-scale=1.0'>");
         htmlBuilder.Append($"<title>{SafeText(options.DocumentTitle)}</title>");
+        AppendMetadataHead(htmlBuilder, options.Metadata);
         htmlBuilder.Append("<style>");
         AppendCss(htmlBuilder, options.Variant);
         htmlBuilder.Append("</style>");
         htmlBuilder.Append("</head>");
         htmlBuilder.Append("<body>");
+
+        if (options.IncludeMetadataSummary && options.Metadata?.HasAnyValue == true)
+            AppendMetadataSummary(htmlBuilder, options.Metadata);
 
         foreach (var block in document.Blocks)
             AppendBlock(htmlBuilder, block, options.Variant);
@@ -78,6 +83,11 @@ public sealed class HtmlDocumentBuilder
         htmlBuilder.Append(".mte-warning { border: 1px solid #f0a020; background: #fff8e5; padding: 12px 16px; border-radius: 4px; margin: 12px 0; }");
         htmlBuilder.Append(".mte-warning strong { color: #7a4b00; }");
         htmlBuilder.Append(".mte-delimiter { text-align: center; font-size: 22px; letter-spacing: 8px; margin: 20px 0; color: #999; }");
+        htmlBuilder.Append(".mte-document-metadata { margin: 0 0 24px; padding: 16px 18px; border: 1px solid #d9d9d9; border-radius: 8px; background: #fafafa; }");
+        htmlBuilder.Append(".mte-metadata-title { margin: 0 0 10px; font-size: 24px; color: #111; }");
+        htmlBuilder.Append(".mte-metadata-grid { display: grid; gap: 6px; margin-top: 8px; }");
+        htmlBuilder.Append(".mte-metadata-row { font-size: 13px; color: #444; }");
+        htmlBuilder.Append(".mte-metadata-label { font-weight: 700; color: #222; }");
     }
 
     private static void AppendPrintCss(StringBuilder htmlBuilder)
@@ -95,6 +105,7 @@ public sealed class HtmlDocumentBuilder
         htmlBuilder.Append("pre { white-space: pre-wrap; word-break: break-word; }");
         htmlBuilder.Append("a { color: #1a4ba8; text-decoration: underline; }");
         htmlBuilder.Append(".no-print { display: none; }");
+        htmlBuilder.Append(".mte-document-metadata { page-break-inside: avoid; break-inside: avoid; margin-bottom: 20px; }");
     }
 
     private void AppendBlock(StringBuilder htmlBuilder, EditorJsBlock block, HtmlVariant variant)
@@ -229,6 +240,66 @@ public sealed class HtmlDocumentBuilder
             htmlBuilder.Append($"<figcaption>{captionHtml}</figcaption>");
 
         htmlBuilder.Append("</figure>");
+    }
+
+    private static void AppendMetadataHead(StringBuilder htmlBuilder, NoteMetadata? metadata)
+    {
+        if (metadata?.HasAnyValue != true)
+            return;
+
+        if (!string.IsNullOrWhiteSpace(metadata.Title))
+        {
+            htmlBuilder.Append($"<meta name=\"title\" content=\"{SafeText(metadata.Title)}\">");
+            htmlBuilder.Append($"<meta property=\"og:title\" content=\"{SafeText(metadata.Title)}\">");
+        }
+
+        if (!string.IsNullOrWhiteSpace(metadata.Slug))
+            htmlBuilder.Append($"<meta name=\"slug\" content=\"{SafeText(metadata.Slug)}\">");
+
+        var tags = ExportMetadataHelper.SplitTags(metadata.Tags);
+        if (tags.Length > 0)
+            htmlBuilder.Append($"<meta name=\"keywords\" content=\"{SafeText(string.Join(", ", tags))}\">");
+
+        var publishDate = ExportMetadataHelper.GetIsoDate(metadata.PublishDate);
+        if (!string.IsNullOrWhiteSpace(publishDate))
+        {
+            htmlBuilder.Append($"<meta name=\"date\" content=\"{SafeText(publishDate)}\">");
+            htmlBuilder.Append($"<meta property=\"article:published_time\" content=\"{SafeText(publishDate)}\">");
+        }
+    }
+
+    private static void AppendMetadataSummary(StringBuilder htmlBuilder, NoteMetadata metadata)
+    {
+        htmlBuilder.Append("<section class=\"mte-document-metadata\">");
+
+        if (!string.IsNullOrWhiteSpace(metadata.Title))
+            htmlBuilder.Append($"<h1 class=\"mte-metadata-title\">{SafeText(metadata.Title)}</h1>");
+        else
+            htmlBuilder.Append("<h1 class=\"mte-metadata-title\">Document metadata</h1>");
+
+        htmlBuilder.Append("<div class=\"mte-metadata-grid\">");
+
+        AppendMetadataRow(htmlBuilder, "Slug", metadata.Slug);
+
+        var tags = ExportMetadataHelper.SplitTags(metadata.Tags);
+        if (tags.Length > 0)
+            AppendMetadataRow(htmlBuilder, "Tags", string.Join(", ", tags));
+
+        AppendMetadataRow(htmlBuilder, "Publish date", ExportMetadataHelper.GetIsoDate(metadata.PublishDate));
+
+        htmlBuilder.Append("</div>");
+        htmlBuilder.Append("</section>");
+    }
+
+    private static void AppendMetadataRow(StringBuilder htmlBuilder, string label, string? value)
+    {
+        if (string.IsNullOrWhiteSpace(value))
+            return;
+
+        htmlBuilder.Append("<div class=\"mte-metadata-row\">");
+        htmlBuilder.Append($"<span class=\"mte-metadata-label\">{SafeText(label)}:</span> ");
+        htmlBuilder.Append(SafeText(value));
+        htmlBuilder.Append("</div>");
     }
 
     private static HtmlSanitizer CreateSanitizer()

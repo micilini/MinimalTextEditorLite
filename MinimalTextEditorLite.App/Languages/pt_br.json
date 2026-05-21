@@ -119,7 +119,7 @@
   "MenuItem_Header_Help": "Ajuda",
   "MenuItem_Header_Help_About": "Sobre Este Aplicativo",
   "Metadata_Title": "Metadados da Nota",
-  "Metadata_Description": "Os metadados ficam salvos junto da nota. Hoje eles sao usados no front matter do Markdown e no nome-base do Markdown com assets; no futuro podem alimentar metadados de PDF, DOCX e HTML.",
+  "Metadata_Description": "Os metadados ficam salvos junto da nota e agora sao usados nas exportacoes: JSON inclui metadata estruturado, Markdown usa front matter, e HTML, PDF e DOCX podem mostrar essas informacoes no documento exportado.",
   "Metadata_Field_Title": "Titulo",
   "Metadata_Field_Slug": "Slug",
   "Metadata_Field_Tags": "Tags",

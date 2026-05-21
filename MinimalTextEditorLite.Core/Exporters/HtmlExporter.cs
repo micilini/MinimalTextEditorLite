@@ -18,10 +18,16 @@ public sealed class HtmlExporter : IExporter
 
     public Task<byte[]> ExportAsync(ExportContext context)
     {
+        ArgumentNullException.ThrowIfNull(context);
+
+        var metadata = ExportMetadataHelper.FromNote(context.Note);
+
         var html = builder.Build(context.Document, new HtmlBuildOptions
         {
             Variant = HtmlVariant.Standard,
-            DocumentTitle = "Note Export"
+            DocumentTitle = ExportMetadataHelper.GetDocumentTitle(context.Note),
+            Metadata = metadata,
+            IncludeMetadataSummary = metadata.HasAnyValue
         });
 
         return Task.FromResult(Encoding.UTF8.GetBytes(html));

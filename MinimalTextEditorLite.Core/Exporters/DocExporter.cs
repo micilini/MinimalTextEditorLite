@@ -2,7 +2,7 @@ using DocumentFormat.OpenXml;
 using DocumentFormat.OpenXml.Packaging;
 using DocumentFormat.OpenXml.Wordprocessing;
 using HtmlToOpenXml;
-using MinimalTextEditorLite.Exporters.Contracts.EditorJs;
+using MinimalTextEditorLite.Core.Models;
 
 namespace MinimalTextEditorLite.Core.Exporters;
 
@@ -29,15 +29,19 @@ public sealed class DocExporter : IExporter
 
         // HtmlConverter é síncrono. Mantemos em background para não bloquear a UI
         // caso o usuário exporte documentos maiores.
-        return Task.Run(() => GenerateDocxBytes(context.Document));
+        return Task.Run(() => GenerateDocxBytes(context));
     }
 
-    private byte[] GenerateDocxBytes(EditorJsDocument document)
+    private byte[] GenerateDocxBytes(ExportContext context)
     {
-        var html = htmlBuilder.Build(document, new HtmlBuildOptions
+        var metadata = ExportMetadataHelper.FromNote(context.Note);
+
+        var html = htmlBuilder.Build(context.Document, new HtmlBuildOptions
         {
             Variant = HtmlVariant.Standard,
-            DocumentTitle = "Note Export"
+            DocumentTitle = ExportMetadataHelper.GetDocumentTitle(context.Note),
+            Metadata = metadata,
+            IncludeMetadataSummary = metadata.HasAnyValue
         });
 
         using var stream = new MemoryStream();
@@ -46,6 +50,8 @@ public sealed class DocExporter : IExporter
             stream,
             DocumentFormat.OpenXml.WordprocessingDocumentType.Document))
         {
+            ApplyPackageProperties(wordDocument, context.Note);
+
             var mainPart = wordDocument.AddMainDocumentPart();
             mainPart.Document = new Document(new Body());
 
@@ -71,6 +77,29 @@ public sealed class DocExporter : IExporter
         }
 
         return stream.ToArray();
+    }
+
+    private static void ApplyPackageProperties(WordprocessingDocument wordDocument, NoteModel note)
+    {
+        var metadata = ExportMetadataHelper.FromNote(note);
+
+        if (!metadata.HasAnyValue)
+            return;
+
+        if (!string.IsNullOrWhiteSpace(metadata.Title))
+            wordDocument.PackageProperties.Title = metadata.Title;
+
+        if (!string.IsNullOrWhiteSpace(metadata.Slug))
+            wordDocument.PackageProperties.Subject = metadata.Slug;
+
+        var tags = ExportMetadataHelper.SplitTags(metadata.Tags);
+        if (tags.Length > 0)
+            wordDocument.PackageProperties.Keywords = string.Join(", ", tags);
+
+        if (metadata.PublishDate.HasValue)
+            wordDocument.PackageProperties.Created = metadata.PublishDate.Value;
+
+        wordDocument.PackageProperties.Modified = DateTime.UtcNow;
     }
 
     private static void PolishDocument(MainDocumentPart mainPart)

@@ -3,7 +3,7 @@
 </p>
 
 <h1 align="center">
-  Minimal Text Editor Lite For Windows (2.1.0)
+  Minimal Text Editor Lite For Windows (2.2.0)
 </h1>
 
 <p align="center">
@@ -38,6 +38,18 @@ It is designed for quick notes, documentation drafts, technical writing, study n
 
 The application stores notes locally, supports dark mode and Focus Mode, keeps recent files, exports to multiple formats, and now generates DOCX and PDF files in-process without external Python executables.
 
+<p align="center">
+  <img src="images/mte-app-light.png" alt="Minimal Text Editor Lite screenshot" width="800">
+</p>
+
+<p align="center">
+  <img src="images/mte-app-dark.png" alt="Minimal Text Editor Lite screenshot" width="800">
+</p>
+
+<p align="center">
+  <img src="images/mte-app-dark-settings.png" alt="Minimal Text Editor Lite screenshot" width="800">
+</p>
+
 ## Highlights
 
 - Block-based writing powered by Editor.js.
@@ -46,6 +58,7 @@ The application stores notes locally, supports dark mode and Focus Mode, keeps r
 - Light mode, dark mode, and system theme support.
 - Focus Mode for distraction-free writing.
 - JSON import/export for portable structured notes.
+- Metadata support across JSON, Markdown, HTML, PDF, and DOCX exports.
 - Markdown import/export with optional YAML front matter.
 - HTML export for browser-friendly documents.
 - DOCX export generated in-process with OpenXML/HtmlToOpenXml.
@@ -78,32 +91,38 @@ Minimal Text Editor Lite currently supports these note blocks:
 
 | Format | Status | Notes |
 |---|---|---|
-| JSON | Supported | Native structured format for notes |
-| Markdown | Supported | Includes optional YAML front matter |
-| HTML | Supported | Browser-friendly output |
-| DOCX | Supported | Generated in-process with OpenXML/HtmlToOpenXml |
-| PDF | Supported | Generated in-process with WebView2 / Chromium |
+| JSON | Supported | Exports document plus structured metadata envelope since 2.2.0 |
+| Markdown | Supported | Includes optional YAML front matter from metadata |
+| HTML | Supported | Browser-friendly output with document metadata |
+| DOCX | Supported | Generated in-process with OpenXML/HtmlToOpenXml and internal file properties |
+| PDF | Supported | Generated in-process with WebView2 / Chromium and visible document metadata |
 
-## Application Images
+## Metadata Support
 
-Current screenshot:
+Minimal Text Editor Lite includes a metadata panel available through:
 
-<p align="center">
-  <img src="images/mte-app-print.png" alt="Minimal Text Editor Lite screenshot" width="800">
-</p>
+```text
+File > Metadata
+```
 
-Recommended images to add later:
+The metadata fields are stored with the current note:
 
-| Suggested file | What to show |
+- Title
+- Slug
+- Tags
+- Publish date
+
+Starting with version 2.2.0, metadata is reused across the export pipeline:
+
+| Export | Metadata behavior |
 |---|---|
-| `images/mte-home-light.png` | Main editor in light mode |
-| `images/mte-home-dark.png` | Main editor in dark mode |
-| `images/mte-focus-mode.png` | Focus Mode active |
-| `images/mte-export-modal.png` | Export modal with JSON, Markdown, HTML, DOCX, and PDF |
-| `images/mte-settings.png` | Settings modal with theme, language, backup, Markdown, and file association options |
-| `images/mte-recent-files.png` | Recent files menu/list |
-| `images/mte-pdf-output.png` | Generated PDF preview with headings, tables, images, and emoji |
-| `images/mte-docx-output.png` | Generated DOCX preview after the 2.1.0 OpenXML polish |
+| JSON | Exports a `metadata` object together with the Editor.js document |
+| Markdown | Uses metadata as YAML front matter |
+| HTML | Adds `<title>`, metadata tags, and a visible metadata block |
+| PDF | Prints the visible metadata block through the WebView2 PDF pipeline |
+| DOCX | Adds visible metadata and Word document properties such as title, subject, keywords, and created date |
+
+Legacy Editor.js JSON files are still supported on import.
 
 ## Architecture Overview
 
@@ -133,6 +152,8 @@ Exporters
 The export pipeline is centered around `HtmlDocumentBuilder`, which converts the Editor.js document model into reusable HTML. HTML, DOCX, and PDF exports share the same document-building path, reducing duplicated rendering logic.
 
 ## What Changed Since Version 2.0.0
+
+Version 2.2.0 expands note metadata beyond Markdown. Metadata is now included in JSON exports, rendered in HTML/PDF/DOCX exports, and written into DOCX package properties where applicable.
 
 Version 2.1.0 removes the old external exporter binaries and replaces them with in-process C# export pipelines.
 
@@ -194,6 +215,10 @@ DOCX and PDF export are generated in-process. No external Python executables are
 - CommunityToolkit.Mvvm
 
 ## Version History
+
+### Version 2.2.0
+
+Expands note metadata support across export formats. JSON now exports a structured package with metadata plus the Editor.js document, JSON import remains backward-compatible with legacy Editor.js files, and HTML, PDF, and DOCX exports can include visible document metadata. DOCX also writes metadata into internal Word document properties.
 
 ### Version 2.1.0
 
